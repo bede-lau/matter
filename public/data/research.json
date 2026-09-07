@@ -1,0 +1,334 @@
+{
+  "title": "Metamaterials concept-learning research dataset",
+  "version": "2026-09-07",
+  "scope": "Nine families spanning mechanical, acoustic and optical metamaterials; variants are named, mechanisms are concise, and biological inspiration is not inferred from visual resemblance.",
+  "evidence_status_legend": {
+    "experimentally_demonstrated": "Primary source reports a fabricated or physical experimental realization.",
+    "analytical_and_numerical": "Primary source develops theory and/or simulation without the same claim being physically demonstrated there.",
+    "conceptual_foundation": "Seminal theoretical proposal or foundational classification."
+  },
+  "families": [
+    {
+      "id": "auxetic_mechanical",
+      "domain": "mechanical",
+      "name": "Auxetic lattices",
+      "core_idea": "A geometry-dominated solid with effective Poisson ratio nu_eff < 0: it widens under axial tension.",
+      "key_relation": "nu = -epsilon_transverse/epsilon_axial",
+      "variants": [
+        {
+          "name": "Re-entrant foam / re-entrant honeycomb",
+          "inspiration": {"type": "engineering_geometry", "basis": "Inward-pointing cell ribs rotate and bend; the cited foam was transformed from conventional open-cell foam.", "natural_derivation": null},
+          "mechanism": "Opening of re-entrant cell angles couples axial extension to transverse expansion.",
+          "use_cases": ["indentation-resistant cores", "synclastic panels", "energy absorption"],
+          "limitations": ["bending-dominated stiffness can be low", "response depends on strain range and buckling", "manufacturing defects alter hinge behavior"],
+          "source_urls": ["https://doi.org/10.1126/science.235.4792.1038"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "Rotating squares",
+          "inspiration": {"type": "mathematical_kinematics", "basis": "Rigid squares joined at vertices form a rotating-unit mechanism.", "natural_derivation": null},
+          "mechanism": "Counter-rotation of nearly rigid squares opens gaps in both axes; the ideal mechanism approaches nu = -1.",
+          "use_cases": ["deployable sheets", "tunable filters", "strain-amplifying structures"],
+          "limitations": ["ideal hinges are difficult to realize", "finite hinge stiffness changes nu", "large rotations can cause self-contact"],
+          "source_urls": ["https://doi.org/10.1016/S0022-5096(99)00034-2"],
+          "evidence_status": "analytical_and_numerical"
+        }
+      ]
+    },
+    {
+      "id": "folded_and_cut_mechanical",
+      "domain": "mechanical",
+      "name": "Origami and kirigami metamaterials",
+      "core_idea": "Creases or cuts prescribe low-energy deformation paths, enabling large shape change from thin sheets.",
+      "key_relation": "Rigid-origami compatibility constrains fold angles; mobility follows the crease-pattern constraint rank.",
+      "variants": [
+        {
+          "name": "Miura-ori",
+          "inspiration": {"type": "mathematical_origami", "basis": "Periodic parallelogram crease pattern developed by Koryo Miura.", "natural_derivation": null},
+          "mechanism": "One-degree-of-freedom rigid folding couples in-plane dimensions and produces tunable anisotropy and negative Poisson response.",
+          "use_cases": ["compact deployment", "morphing surfaces", "tunable stiffness"],
+          "limitations": ["crease fatigue", "panel bending breaks rigid-folding assumptions", "thick panels require hinge offsets"],
+          "source_urls": ["https://doi.org/10.1073/pnas.1217998110", "https://doi.org/10.1038/ncomms5130"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "X-shaped tristable kirigami",
+          "inspiration": {"type": "cut_pattern_kinematics", "basis": "Engineered X-shaped cuts create coupled snap-through units.", "natural_derivation": null},
+          "mechanism": "Cut ligaments buckle and snap between three stable configurations; hierarchy propagates programmed shape changes.",
+          "use_cases": ["reconfigurable structures", "mechanical memory", "shape morphing"],
+          "limitations": ["stress concentration at cut tips", "hysteresis and fatigue", "state transitions require threshold loads"],
+          "source_urls": ["https://doi.org/10.1126/sciadv.abf1966"],
+          "evidence_status": "experimentally_demonstrated"
+        }
+      ]
+    },
+    {
+      "id": "extreme_elasticity",
+      "domain": "mechanical",
+      "name": "Extreme-stiffness elastic lattices",
+      "core_idea": "Architecture steers which elastic moduli remain large or small, producing unusual effective elasticity.",
+      "key_relation": "Pentamode target: bulk modulus B much greater than shear modulus G; figure of merit B/G.",
+      "variants": [
+        {
+          "name": "Double-cone pentamode lattice",
+          "inspiration": {"type": "mathematical_elasticity", "basis": "Pentamode theory leaves one nonzero eigenvalue in the 6x6 elasticity tensor.", "natural_derivation": null},
+          "mechanism": "Point-like connections between double cones resist compression far more than shear, approximating a solid that flows acoustically like a fluid.",
+          "use_cases": ["transformation-acoustics media", "elastic cloaking research", "stress-guiding structures"],
+          "limitations": ["finite junctions give nonzero shear modulus", "fragile tips", "three-dimensional microfabrication is demanding"],
+          "source_urls": ["https://doi.org/10.1103/PhysRevLett.74.3939", "https://doi.org/10.1063/1.4709436"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "Isotropic plate-nanolattice",
+          "inspiration": {"type": "mathematical_bounds", "basis": "Plate-based unit cells were designed to approach Hashin-Shtrikman isotropic stiffness bounds.", "natural_derivation": null},
+          "mechanism": "Material placed in intersecting plates carries load primarily by stretching rather than beam bending.",
+          "use_cases": ["ultralight stiff cores", "aerospace structures", "multifunctional microlattices"],
+          "limitations": ["thin plates are imperfection-sensitive", "buckling limits compression", "nanoscale fabrication limits volume"],
+          "source_urls": ["https://doi.org/10.1038/nature21075"],
+          "evidence_status": "experimentally_demonstrated"
+        }
+      ]
+    },
+    {
+      "id": "locally_resonant_acoustic",
+      "domain": "acoustic",
+      "name": "Locally resonant acoustic metamaterials",
+      "core_idea": "Subwavelength resonators exchange momentum or compressibility with the host and can create stop bands below the Bragg scale.",
+      "key_relation": "Near resonance, effective density or bulk modulus can become dispersive and negative; a mass-spring resonance obeys omega_0 = sqrt(k/m).",
+      "variants": [
+        {
+          "name": "Coated-sphere sonic crystal",
+          "inspiration": {"type": "mass_spring_analogy", "basis": "Dense cores and compliant coatings act as local mass-spring resonators.", "natural_derivation": null},
+          "mechanism": "Core motion out of phase with the matrix yields negative effective dynamic mass near resonance and a low-frequency band gap.",
+          "use_cases": ["vibration isolation", "low-frequency sound attenuation", "wave filters"],
+          "limitations": ["resonant bandwidth is narrow", "loss can weaken effective-parameter features", "added resonator mass"],
+          "source_urls": ["https://doi.org/10.1126/science.289.5485.1734"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "Membrane-plus-Helmholtz double-negative cell",
+          "inspiration": {"type": "lumped_acoustic_circuit", "basis": "Membrane resonance controls dynamic density; cavity-neck resonance controls compressibility.", "natural_derivation": null},
+          "mechanism": "Overlapping membrane and Helmholtz resonances produce frequency ranges with simultaneously negative effective density and bulk modulus.",
+          "use_cases": ["negative refraction", "compact sound control", "acoustic focusing"],
+          "limitations": ["requires resonance overlap", "narrow operating band", "viscothermal loss in small necks"],
+          "source_urls": ["https://doi.org/10.1103/PhysRevB.86.184302"],
+          "evidence_status": "experimentally_demonstrated"
+        }
+      ]
+    },
+    {
+      "id": "phononic_crystals",
+      "domain": "acoustic_mechanical",
+      "name": "Phononic crystals and elastic band-gap lattices",
+      "core_idea": "Periodic contrast and interference shape dispersion omega(k), forbidding propagation in selected frequency intervals.",
+      "key_relation": "Bragg gaps occur when wavelength is comparable to lattice spacing; Bloch condition u(r+R)=u(r)exp(i k·R).",
+      "variants": [
+        {
+          "name": "Bragg-scattering phononic crystal",
+          "inspiration": {"type": "crystal_band_theory", "basis": "Elastic analogue of electronic and photonic Bloch bands in periodic crystals.", "natural_derivation": null},
+          "mechanism": "Multiple scattering from a periodic array destructively interferes, opening complete or directional band gaps.",
+          "use_cases": ["waveguides", "frequency filters", "vibration shielding"],
+          "limitations": ["low-frequency gaps require large periods", "disorder scatters guided modes", "gap depends on propagation direction"],
+          "source_urls": ["https://doi.org/10.1103/PhysRevLett.71.2022"],
+          "evidence_status": "analytical_and_numerical"
+        },
+        {
+          "name": "Inertially amplified lattice",
+          "inspiration": {"type": "mechanical_lever_kinematics", "basis": "Linkages amplify resonator acceleration without simply increasing attached mass.", "natural_derivation": null},
+          "mechanism": "Geometric amplification increases effective inertia and can open deep-subwavelength elastic band gaps.",
+          "use_cases": ["lightweight vibration absorbers", "structural wave filters", "low-frequency isolation"],
+          "limitations": ["hinge compliance and damping shift the gap", "large local forces", "performance is geometry-sensitive"],
+          "source_urls": ["https://doi.org/10.1016/j.jsv.2014.10.042"],
+          "evidence_status": "analytical_and_numerical"
+        }
+      ]
+    },
+    {
+      "id": "topological_mechanical",
+      "domain": "mechanical_acoustic",
+      "name": "Topological mechanical metamaterials",
+      "core_idea": "A bulk band invariant predicts boundary or interface modes that persist under disorder that does not close the relevant band gap or break required symmetry.",
+      "key_relation": "Bulk-boundary correspondence links a winding/Chern/polarization invariant to edge-mode count.",
+      "variants": [
+        {
+          "name": "Topological Maxwell lattice",
+          "inspiration": {"type": "topology_and_constraint_counting", "basis": "Maxwell isostatic frames combined with a topological polarization of the compatibility matrix.", "natural_derivation": null},
+          "mechanism": "Changing unit-cell geometry shifts floppy modes to one boundary and states of self-stress to the opposite boundary.",
+          "use_cases": ["directional compliance", "stress focusing", "robust mechanical waveguides"],
+          "limitations": ["ideal theory assumes central-force hinges", "finite size hybridizes edge modes", "protection is conditional on gap and symmetry"],
+          "source_urls": ["https://doi.org/10.1038/nphys2835"],
+          "evidence_status": "conceptual_foundation"
+        },
+        {
+          "name": "Gyroscopic Chern lattice",
+          "inspiration": {"type": "topological_band_theory", "basis": "Spinning gyroscopes break time-reversal symmetry and realize a mechanical analogue of Chern bands.", "natural_derivation": null},
+          "mechanism": "Gyroscopic precession produces nonreciprocal coupling and one-way edge waves around defects.",
+          "use_cases": ["robust vibration routing", "mechanical isolators", "nonreciprocal signal transport"],
+          "limitations": ["needs active spinning elements", "dissipation limits travel distance", "moving parts complicate scaling"],
+          "source_urls": ["https://doi.org/10.1073/pnas.1507413112"],
+          "evidence_status": "experimentally_demonstrated"
+        }
+      ]
+    },
+    {
+      "id": "photonic_crystals",
+      "domain": "optical",
+      "name": "Photonic crystals",
+      "core_idea": "Periodic dielectric structure creates optical Bloch bands and photonic band gaps by interference.",
+      "key_relation": "Frequency-domain Maxwell eigenproblem: curl[(1/epsilon(r))curl H] = (omega/c)^2 H.",
+      "variants": [
+        {
+          "name": "Three-dimensional dielectric photonic crystal",
+          "inspiration": {"type": "electronic_band_structure_analogy", "basis": "Yablonovitch proposed inhibiting spontaneous emission using a periodic dielectric analogue of an electronic band gap.", "natural_derivation": null},
+          "mechanism": "A complete photonic band gap removes propagating optical states over a frequency interval.",
+          "use_cases": ["spontaneous-emission control", "low-loss cavities", "integrated waveguides"],
+          "limitations": ["complete 3D gaps need high index contrast", "fabrication tolerances cause scattering", "operation scales with lattice constant"],
+          "source_urls": ["https://doi.org/10.1103/PhysRevLett.58.2059", "https://doi.org/10.1038/35094587"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "Photonic-crystal slab cavity",
+          "inspiration": {"type": "defect_state_in_periodic_lattice", "basis": "A deliberate defect localizes a mode inside an in-plane photonic band gap.", "natural_derivation": null},
+          "mechanism": "In-plane Bragg confinement plus vertical total internal reflection yields small mode volume and high quality factor.",
+          "use_cases": ["nanolasers", "cavity quantum electrodynamics", "biosensing"],
+          "limitations": ["out-of-plane radiation limits Q", "surface disorder is consequential", "narrow resonances need thermal control"],
+          "source_urls": ["https://doi.org/10.1038/35094587"],
+          "evidence_status": "experimentally_demonstrated"
+        }
+      ]
+    },
+    {
+      "id": "negative_index_and_hyperbolic",
+      "domain": "optical_electromagnetic",
+      "name": "Negative-index and hyperbolic metamaterials",
+      "core_idea": "Structured conductors and dielectrics create effective tensor components unavailable together in ordinary transparent media.",
+      "key_relation": "Isotropic negative index requires Re(epsilon)<0 and Re(mu)<0; a uniaxial hyperbolic medium has epsilon_parallel·epsilon_perpendicular<0.",
+      "variants": [
+        {
+          "name": "Split-ring-and-wire negative-index medium",
+          "inspiration": {"type": "engineered_LC_resonance", "basis": "Split rings provide magnetic resonance while wires provide plasma-like electric response.", "natural_derivation": null},
+          "mechanism": "Overlapping negative epsilon and negative mu bands yield backward phase propagation and negative refraction.",
+          "use_cases": ["negative-refraction demonstrations", "compact microwave optics", "transformation-optics research"],
+          "limitations": ["strong dispersion and loss", "effective-medium validity requires subwavelength cells", "resonant bandwidth is narrow"],
+          "source_urls": ["https://doi.org/10.1126/science.1058847"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "Metal-dielectric multilayer hyperbolic medium",
+          "inspiration": {"type": "effective_medium_tensor_design", "basis": "Layer filling fraction tunes opposite signs of principal permittivity components.", "natural_derivation": null},
+          "mechanism": "Indefinite permittivity gives an open hyperbolic isofrequency surface supporting very large in-plane wavevectors.",
+          "use_cases": ["high-k imaging", "emission-rate engineering", "subwavelength propagation"],
+          "limitations": ["metal absorption", "nonlocality and finite period cap high-k states", "impedance mismatch complicates coupling"],
+          "source_urls": ["https://doi.org/10.1364/OPEX.14.008247", "https://doi.org/10.1364/OL.34.003358"],
+          "evidence_status": "experimentally_demonstrated"
+        }
+      ]
+    },
+    {
+      "id": "optical_metasurfaces",
+      "domain": "optical",
+      "name": "Optical metasurfaces",
+      "core_idea": "A subwavelength-thin array of scatterers imposes spatially varying phase, amplitude, polarization, or dispersion on a wavefront.",
+      "key_relation": "Generalized refraction adds a phase gradient: n_t sin(theta_t)-n_i sin(theta_i) = (lambda/2pi)dPhi/dx.",
+      "variants": [
+        {
+          "name": "V-antenna phase-gradient metasurface",
+          "inspiration": {"type": "generalized_boundary_phase", "basis": "An engineered array samples a prescribed abrupt phase profile at an interface.", "natural_derivation": null},
+          "mechanism": "Anisotropic plasmonic antennas provide position-dependent cross-polarized phase shifts, steering reflected or transmitted beams.",
+          "use_cases": ["beam steering", "flat holography", "polarization conversion"],
+          "limitations": ["plasmonic absorption", "cross-polarized efficiency can be low", "phase response is dispersive"],
+          "source_urls": ["https://doi.org/10.1126/science.1210713"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "Geometric-phase dielectric metalens",
+          "inspiration": {"type": "Pancharatnam_Berry_phase", "basis": "Rotating anisotropic nanoelements imparts geometric phase 2theta to converted circular polarization.", "natural_derivation": null},
+          "mechanism": "High-index nanopillars rotate polarization and encode a lens phase profile in a single patterned layer.",
+          "use_cases": ["flat imaging", "compact microscopy", "integrated optics"],
+          "limitations": ["polarization dependence in geometric-phase designs", "chromatic focal shift", "nanofabrication aspect-ratio limits"],
+          "source_urls": ["https://doi.org/10.1126/science.aaf6644"],
+          "evidence_status": "experimentally_demonstrated"
+        },
+        {
+          "name": "Huygens dielectric metasurface",
+          "inspiration": {"type": "Huygens_equivalent_sources", "basis": "Balanced electric and magnetic dipole responses act as co-located Huygens sources.", "natural_derivation": null},
+          "mechanism": "Spectrally overlapping electric and magnetic Mie resonances suppress reflection while spanning nearly 2pi transmission phase.",
+          "use_cases": ["efficient wavefront shaping", "transmissive flat optics", "beam deflectors"],
+          "limitations": ["resonance balance is fabrication-sensitive", "bandwidth remains limited", "high-index materials may absorb at some wavelengths"],
+          "source_urls": ["https://doi.org/10.1002/adom.201400584"],
+          "evidence_status": "experimentally_demonstrated"
+        }
+      ]
+    }
+  ],
+  "open_datasets": [
+    {
+      "name": "2D orthotropic metamaterial microstructure dataset",
+      "repository": "Figshare",
+      "doi": "10.6084/m9.figshare.17141975",
+      "landing_url": "https://figshare.com/articles/dataset/2D_orthotropic_metamaterial_micorstructrue_dataset/17141975",
+      "direct_download_available": true,
+      "contents": "90,245 50x50 binary microstructures with C11, C12, C22 and C66 effective stiffness components.",
+      "format": "download archive; pixel matrices and stiffness labels",
+      "size_verified": "6.57 MB shown by repository",
+      "license": "CC BY 4.0",
+      "provenance": "Liwei Wang, Jagannadh Boddapati, Ke Liu, Ping Zhu, Chiara Daraio and Wei Chen; posted 2021-12-08; topology optimization seeds plus stochastic shape perturbation.",
+      "verification_url": "https://figshare.com/articles/dataset/2D_orthotropic_metamaterial_micorstructrue_dataset/17141975",
+      "evidence_status": "repository_metadata_verified"
+    },
+    {
+      "name": "2D elastodynamic metamaterials",
+      "repository": "UCI Machine Learning Repository",
+      "doi": "10.24432/C5ZS5D",
+      "landing_url": "https://archive.ics.uci.edu/dataset/692/2d%2Belastodynamic%2Bmetamaterials",
+      "direct_download_available": true,
+      "contents": "20,521 10x10 pixel unit-cell designs with first band-gap center and width targets; no missing values.",
+      "format": "CSV",
+      "size_verified": "data.csv 717.6 KB; download 717.8 KB shown by repository",
+      "license": "CC BY 4.0",
+      "provenance": "Alexander Ogren, Zhi Chen, L. Catherine Brinson, Mary Bastawrous, Cynthia Rudin and Chiara Daraio; donated 2021-11-25; DOE grant DE-SC0021358.",
+      "verification_url": "https://archive.ics.uci.edu/dataset/692/2d%2Belastodynamic%2Bmetamaterials",
+      "evidence_status": "repository_metadata_verified"
+    },
+    {
+      "name": "Dielectric nanomechanical metamaterial dataset",
+      "repository": "University of Southampton ePrints",
+      "doi": "10.5258/SOTON/383566",
+      "landing_url": "https://eprints.soton.ac.uk/383566",
+      "direct_download_available": true,
+      "contents": "Spreadsheet supporting dielectric optomechanical metamaterial research.",
+      "format": "XLSX",
+      "size_verified": "180 kB shown by institutional repository",
+      "license": "Creative Commons Attribution (version not specified on landing page)",
+      "provenance": "Kevin MacDonald, University of Southampton Optoelectronics Research Centre; published 2015; project Nanostructured Photonic Metamaterials (EP/G060363/1).",
+      "verification_url": "https://eprints.soton.ac.uk/383566",
+      "evidence_status": "repository_metadata_verified"
+    }
+  ],
+  "editorial_notes": [
+    "Metamaterial labels overlap: photonic crystals rely mainly on periodic interference, whereas effective-medium metamaterials rely on subwavelength homogenization; the app should teach this distinction rather than present a rigid taxonomy.",
+    "Negative effective parameters are frequency-dependent retrievals, not statements that constituent mass, density, permittivity or permeability is intrinsically negative.",
+    "Topological robustness is conditional: disorder can destroy a mode if it closes the gap or breaks the symmetry that protects it.",
+    "Natural_derivation is null throughout because these named variants are established through engineering geometry, mathematical physics, or analogy. Do not add biological origin claims based only on visual similarity."
+  ],
+  "web_verification": {
+    "checked_on": "2026-09-07",
+    "dataset_repository_facts": [
+      "https://figshare.com/articles/dataset/2D_orthotropic_metamaterial_micorstructrue_dataset/17141975",
+      "https://archive.ics.uci.edu/dataset/692/2d%2Belastodynamic%2Bmetamaterials",
+      "https://eprints.soton.ac.uk/383566"
+    ],
+    "additional_primary_source_index": [
+      "https://doi.org/10.1126/science.235.4792.1038",
+      "https://doi.org/10.1038/ncomms5130",
+      "https://doi.org/10.1063/1.4709436",
+      "https://doi.org/10.1126/science.289.5485.1734",
+      "https://doi.org/10.1103/PhysRevB.86.184302",
+      "https://doi.org/10.1038/nphys2835",
+      "https://doi.org/10.1073/pnas.1507413112",
+      "https://doi.org/10.1103/PhysRevLett.58.2059",
+      "https://doi.org/10.1126/science.1058847",
+      "https://doi.org/10.1126/science.1210713"
+    ]
+  }
+}
