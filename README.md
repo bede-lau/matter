@@ -19,7 +19,9 @@ For a production Cloudflare Workers build, run `npm run build` from macOS/Linux,
 
 - Six 3D families with 18 geometry variants: gyroid, FCC octet truss, re-entrant lattice, Kelvin cell, honeycomb, local resonator.
 - Repetition, thickness and cell-size controls; orbit/zoom; wireframe; cutaway; pause/resume; reset; full screen.
-- Structure, illustrative behavior, and application views, including an articulated running figure wearing small shoes beside an enlarged sole cutaway.
+- Structure, illustrative behavior, and six distinct product applications: detailed running shoe and athlete, aircraft wing, fitted knee protection, cycling helmet, honeycomb skateboard, and motor isolation mount.
+- Shoe anatomy includes mesh vamp, tongue, laces, eyelets, padded collar, heel counter, sockliner, strobel board, cellular midsole and traction outsole.
+- Exploded product assemblies, projected component labels, motion speed and 18 variant-specific learning notes. The running animation uses two-link leg IK, opposing arms, stance and airborne intervals.
 - Two-phase material composition exploration with ideal Voigt/Reuss solid-modulus bounds and an illustrative lattice scaling law.
 - Field guide with distinctions between natural analogy and mathematical origin.
 - 20,520 real UCI elastodynamic dataset rows, center/width filtering, nearest matches, source attribution and export.
@@ -28,7 +30,7 @@ For a production Cloudflare Workers build, run `npm run build` from macOS/Linux,
 
 ## Scientific limits
 
-This is a concept-learning prototype, not a materials discovery engine, FEA solver, or manufacturing certification tool. Density is an illustrative family-specific model, not integrated mesh volume. Modulus estimates do not constitute measured predictions. Composition bounds assume ideal linear elastic phases; bonding, processing, anisotropy and print defects are not solved. The gyroid field is a trigonometric approximation rather than an exact minimal surface. Open-cell honeycomb is an edge-frame schematic, not a shell-wall solid. Finite arrays show boundaries. Cutaway does not generate capped cross-sections. Most deformation uses illustrative affine compression rather than local finite-element physics. Resonator masses have relative animated displacement, but no dynamic solution is computed. Application scenes use designed procedural illustrations, not photoreal scanned people or validated use-case assets.
+This is a concept-learning prototype, not a materials discovery engine, FEA solver, or manufacturing certification tool. Density is an illustrative family-specific model, not integrated mesh volume. Modulus estimates do not constitute measured predictions. Composition bounds assume ideal linear elastic phases; bonding, processing, anisotropy and print defects are not solved. The gyroid field is a trigonometric approximation rather than an exact minimal surface. The standalone honeycomb view is an edge-frame schematic; the skateboard application uses vertical hexagonal shell walls. Finite arrays show boundaries. Cutaway does not generate capped cross-sections. Most deformation uses illustrative affine compression rather than local finite-element physics. Resonator masses have relative animated displacement, but no dynamic solution is computed. Application scenes use detailed procedural illustrations, not photoreal scanned people or validated use-case assets. The product envelopes normalize geometry for teaching: they are not dimensionally calibrated CAD. The three variants in each family share its product context while changing the internal lattice and teaching note.
 
 The catalog is curated, not exhaustive. Optical, thermal and electromagnetic families are research references only, not interactive 3D modes. The UCI encoded 15-bit design is displayed as a code, not falsely reconstructed as its 10x10 geometry.
 
@@ -41,7 +43,8 @@ The catalog is curated, not exhaustive. Optical, thermal and electromagnetic fam
 ## Main files
 
 - `components/matter/Studio.tsx`: workspace, controls and import/export.
-- `components/matter/Scene.tsx`: procedural geometry, WebGL rendering and application animation.
+- `components/matter/Scene.tsx`: procedural lattices, WebGL rendering and projected annotations.
+- `components/matter/models/`: separate product assemblies, shoe anatomy, kinematic athlete and shared mesh primitives.
 - `components/matter/SoftwareRenderer.ts`: software geometry projection fallback.
 - `components/matter/ResearchExplorer.tsx`: actual UCI dataset exploration.
 - `lib/matter/catalog.ts`: curated educational content and illustrative base values.

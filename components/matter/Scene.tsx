@@ -1,4 +1,5 @@
 "use client";
+import { createApplication, type Application } from "./models/Applications";
 import { SoftwareRenderer } from "./SoftwareRenderer";
 import { useEffect, useRef, useState } from "react";
 import * as T from "three";
@@ -16,6 +17,9 @@ export type SceneProps = {
   wire: boolean;
   section: boolean;
   reset: number;
+  explode: number;
+  labels: boolean;
+  speed: number;
 };
 export default function Scene(p: SceneProps) {
   const host = useRef<HTMLDivElement>(null);
@@ -42,13 +46,16 @@ export default function Scene(p: SceneProps) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = T.PCFSoftShadowMap;
     renderer.toneMapping = T.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 0.88;
     container.appendChild(renderer.domElement);
     renderer.domElement.setAttribute(
       "aria-label",
       `${p.kind} interactive three-dimensional lattice`,
     );
+    if (!software) setError("");
     const scene = new T.Scene();
+    scene.background = new T.Color(0x111820);
+    scene.environmentIntensity = 0.45;
     const camera = new T.PerspectiveCamera(35, 1, 0.1, 100);
     camera.position.set(8, 6, 9);
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -66,8 +73,8 @@ export default function Scene(p: SceneProps) {
       scene.environment = env.texture;
       room.dispose();
     }
-    scene.add(new T.HemisphereLight(0xe5f6ff, 0x20252a, 2));
-    const key = new T.DirectionalLight(0xffffff, 4);
+    scene.add(new T.HemisphereLight(0xe5f6ff, 0x20252a, 1.1));
+    const key = new T.DirectionalLight(0xffffff, 2.2);
     key.position.set(4, 8, 4);
     key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
@@ -77,7 +84,7 @@ export default function Scene(p: SceneProps) {
     key.shadow.camera.bottom = -6;
     key.shadow.bias = -0.0004;
     scene.add(key);
-    const rim = new T.DirectionalLight(0xa8caff, 3);
+    const rim = new T.DirectionalLight(0xa8caff, 1.25);
     rim.position.set(-5, 2, -5);
     scene.add(rim);
     const ground = new T.Mesh(
@@ -408,119 +415,82 @@ export default function Scene(p: SceneProps) {
       cylinders.receiveShadow = true;
       root.add(cylinders);
     }
-    const app = new T.Group();
-    scene.add(app);
-    const dark = new T.MeshStandardMaterial({
-      color: 0x293746,
-      roughness: 0.55,
-      metalness: 0.3,
-    });
-    const white = new T.MeshStandardMaterial({
-      color: 0xe4e8df,
-      roughness: 0.7,
-    });
-    const box = (
-      w: number,
-      h: number,
-      d: number,
-      x: number,
-      y: number,
-      z: number,
-      mat: T.Material = dark,
-    ) => {
-      const m = addMesh(new T.BoxGeometry(w, h, d), mat, app);
-      m.position.set(x, y, z);
-      return m;
-    };
-    let runner: T.Group | null = null;
+    let application: Application | undefined;
     if (p.mode === "application") {
-      if (p.kind === "gyroid") {
-        root.scale.set(1.1, 0.22, 0.48);
-        root.position.set(0, -1.8, 0);
-        box(4.5, 0.16, 1.85, 0, -2.27, 0, white);
-        const shape = new T.Shape();
-        shape.moveTo(-2, -1.55);
-        shape.bezierCurveTo(-1.8, -0.8, -1.3, -0.6, -0.7, -0.8);
-        shape.lineTo(0.2, -1.18);
-        shape.bezierCurveTo(1, -1.05, 2.3, -1.45, 2.2, -1.65);
-        shape.lineTo(-2, -1.65);
-        const upper = addMesh(
-          new T.ExtrudeGeometry(shape, {
-            depth: 1.45,
-            bevelEnabled: true,
-            bevelThickness: 0.12,
-            bevelSize: 0.12,
-            bevelSegments: 4,
-            steps: 1,
-            curveSegments: 24,
-          }),
-          dark,
-          app,
-        );
-        upper.position.z = -0.72;
-        for (let i = 0; i < 5; i++)
-          rod(
-            [-0.6 + i * 0.23, -1.05 - i * 0.045, -0.55],
-            [-0.6 + i * 0.23, -1.05 - i * 0.045, 0.55],
-            0.028,
-            app,
-            white,
-          );
-        runner = new T.Group();
-        app.add(runner);
-        runner.position.set(3, -0.85, -0.5);
-        runner.scale.setScalar(0.9);
-        const head = addMesh(new T.SphereGeometry(0.22, 24, 16), white, runner);
-        head.position.set(0, 1.1, 0);
-        rod([0, 0.83, 0], [0.1, 0, 0], 0.18, runner, dark);
-        const legs: T.Group[] = [],
-          knees: T.Group[] = [],
-          arms: T.Group[] = [];
-        for (let side of [-1, 1]) {
-          const leg = new T.Group();
-          leg.position.set(0.1, 0, side * 0.15);
-          runner.add(leg);
-          rod([0, 0, 0], [0, -0.62, 0], 0.09, leg, dark);
-          const knee = new T.Group();
-          knee.position.y = -0.62;
-          leg.add(knee);
-          rod([0, 0, 0], [0, -0.6, 0], 0.065, knee, white);
-          const shoe = addMesh(
-            new T.CapsuleGeometry(0.105, 0.29, 5, 10),
-            dark,
-            knee,
-          );
-          shoe.rotation.z = Math.PI / 2;
-          shoe.position.set(0.08, -0.62, 0);
-          const sole = addMesh(
-            new T.BoxGeometry(0.48, 0.06, 0.23),
-            material,
-            knee,
-          );
-          sole.position.set(0.08, -0.71, 0);
-          legs.push(leg);
-          knees.push(knee);
-          const arm = new T.Group();
-          arm.position.set(0, 0.72, side * 0.24);
-          runner.add(arm);
-          rod([0, 0, 0], [0, -0.42, 0], 0.065, arm, white);
-          rod([0, -0.42, 0], [0.35, -0.48, 0], 0.055, arm, white);
-          arms.push(arm);
-        }
-        runner.userData.legs = legs;
-        runner.userData.knees = knees;
-        runner.userData.arms = arms;
-        camera.position.set(9, 4.5, 11);
-        controls.target.set(0.7, -0.4, 0);
-      } else if (p.kind === "octet" || p.kind === "honeycomb") {
-        root.scale.y = 0.38;
-        box(4.2, 0.12, 4.2, 0, 0.84, 0, white);
-        box(4.2, 0.12, 4.2, 0, -0.84, 0, white);
-      } else {
-        box(4.4, 0.15, 4.4, 0, 2.1, 0, white);
-        box(4.4, 0.15, 4.4, 0, -2.1, 0, dark);
-      }
+      application = createApplication(
+        p.kind,
+        p.variant,
+        root,
+        p.color,
+        p.count,
+        p.thickness,
+      );
+      scene.add(application.group);
+      camera.position.set(...(application.camera as [number, number, number]));
+      controls.target.set(...(application.target as [number, number, number]));
     }
+    // Project product annotations from component anchors; they follow orbit and exploded motion.
+    const overlay = document.createElement("div");
+    overlay.className = "scene-annotations";
+    container.appendChild(overlay);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "callout-lines");
+    overlay.appendChild(svg);
+    const calloutNodes = (application?.callouts ?? []).map((c) => {
+      const label = document.createElement("div");
+      label.className = "scene-callout";
+      label.textContent = c.label;
+      overlay.appendChild(label);
+      const line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polyline",
+      );
+      line.setAttribute("fill", "none");
+      line.setAttribute("stroke", "#d4e4e999");
+      line.setAttribute("stroke-width", "1");
+      svg.appendChild(line);
+      const dot = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle",
+      );
+      dot.setAttribute("r", "3");
+      dot.setAttribute("fill", p.color);
+      svg.appendChild(dot);
+      return { c, label, line, dot };
+    });
+    const motionLabel = document.createElement("div");
+    motionLabel.className = "motion-phase";
+    if (application) container.appendChild(motionLabel);
+    const updateCallouts = () => {
+      overlay.style.display = latest.current.labels ? "block" : "none";
+      const w = container.clientWidth,
+        h = container.clientHeight;
+      svg.setAttribute("width", String(w));
+      svg.setAttribute("height", String(h));
+      for (const { c, label, line, dot } of calloutNodes) {
+        const v = c.anchor.getWorldPosition(new T.Vector3()).project(camera);
+        const px = ((v.x + 1) * w) / 2,
+          py = ((1 - v.y) * h) / 2;
+        const compact = w < 560;
+        const lw = compact ? 112 : 168;
+        const lx =
+            c.side === "left"
+              ? compact
+                ? 8
+                : 18
+              : w - lw - (compact ? 8 : 30),
+          ly = h * 0.28 + c.slot * h * 0.18;
+        label.style.left = lx + "px";
+        label.style.top = ly + "px";
+        const edge = c.side === "left" ? lx + lw : lx;
+        line.setAttribute(
+          "points",
+          `${edge},${ly + 13} ${edge + (c.side === "left" ? 16 : -16)},${ly + 13} ${px},${py}`,
+        );
+        dot.setAttribute("cx", String(px));
+        dot.setAttribute("cy", String(py));
+      }
+    };
     const clip = new T.Plane(new T.Vector3(-1, 0, 0), 0.3);
     renderer.localClippingEnabled = true;
     if (p.section)
@@ -546,18 +516,28 @@ export default function Scene(p: SceneProps) {
     let frame = 0,
       time = 0,
       last = performance.now();
+    let previousExplode = p.explode,
+      previousLabels = p.labels;
     const baseScale = root.scale.clone();
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const animate = (now: number) => {
       frame = requestAnimationFrame(animate);
-      const dt = Math.min((now - last) / 1000, 0.05);
+      const dt = Math.min((now - last) / 1000, 0.15);
       last = now;
       const active = latest.current.playing && !reduced;
-      if (active) time += dt;
+      if (active) time += dt * latest.current.speed;
+      if (
+        previousExplode !== latest.current.explode ||
+        previousLabels !== latest.current.labels
+      ) {
+        firstRender = true;
+        previousExplode = latest.current.explode;
+        previousLabels = latest.current.labels;
+      }
       controls.autoRotate = active && p.mode === "structure";
       controls.autoRotateSpeed = 0.35;
       const cameraChanged = controls.update();
-      if (p.mode === "deform" || p.mode === "application") {
+      if (p.mode === "deform") {
         const wave = reduced ? 0 : (1 - Math.cos(time * 2.6)) / 2;
         root.scale.y = baseScale.y * (1 - wave * 0.22);
         root.scale.x =
@@ -574,25 +554,20 @@ export default function Scene(p: SceneProps) {
             }
           });
         }
-        if (runner) {
-          runner.rotation.z = -0.12;
-          runner.position.y = -0.85 + Math.abs(Math.sin(time * 3.5)) * 0.12;
-          runner.userData.legs.forEach((leg: T.Group, i: number) => {
-            const phase = time * 3.5 + i * Math.PI;
-            leg.rotation.z = Math.sin(phase) * 0.75;
-            runner!.userData.knees[i].rotation.z =
-              -Math.max(0, Math.cos(phase)) * 0.95;
-            runner!.userData.arms[i].rotation.z = -Math.sin(phase) * 0.8;
-          });
-        }
       }
+      if (application)
+        motionLabel.textContent = application.update(
+          time,
+          latest.current.explode / 100,
+        );
       if (
         (active || cameraChanged || firstRender) &&
-        (!software || firstRender || now - lastDraw > 160)
+        (!software || firstRender || now - lastDraw > 180)
       ) {
         renderer.render(scene, camera);
+        if (application) updateCallouts();
         firstRender = false;
-        lastDraw = now;
+        lastDraw = performance.now();
       }
     };
     frame = requestAnimationFrame(animate);
@@ -611,6 +586,8 @@ export default function Scene(p: SceneProps) {
       pmrem?.dispose();
       renderer.dispose();
       renderer.domElement.remove();
+      overlay.remove();
+      motionLabel.remove();
     };
   }, [
     p.kind,

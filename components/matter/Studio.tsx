@@ -53,6 +53,9 @@ export default function Studio() {
     [wire, setWire] = useState(false),
     [section, setSection] = useState(false),
     [reset, setReset] = useState(0),
+    [explode, setExplode] = useState(35),
+    [showLabels, setShowLabels] = useState(true),
+    [speed, setSpeed] = useState(1),
     [notice, setNotice] = useState(""),
     [records, setRecords] = useState<RecordRow[]>([]),
     [filter, setFilter] = useState("All structures");
@@ -376,10 +379,13 @@ export default function Studio() {
                 wire={wire}
                 section={section}
                 reset={reset}
+                explode={explode}
+                labels={showLabels}
+                speed={speed}
               />
               <div className="viewport-tag">
                 {mode === "application"
-                  ? f.application + " · concept study"
+                  ? f.application + " · product anatomy"
                   : mode === "deform"
                     ? "Illustrative compression"
                     : "Periodic unit-cell architecture"}
@@ -466,6 +472,43 @@ export default function Studio() {
               </Tabs>
               <span>SCHEMATIC MOTION</span>
             </div>
+            {mode === "application" && (
+              <div className="application-controls">
+                <div>
+                  <label>
+                    Explode components <output>{explode}%</output>
+                  </label>
+                  <Slider
+                    aria-label="Explode components"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={[explode]}
+                    onValueChange={(v) => setExplode(v[0])}
+                  />
+                </div>
+                <div>
+                  <label>
+                    Motion speed <output>{speed.toFixed(1)}×</output>
+                  </label>
+                  <Slider
+                    aria-label="Motion speed"
+                    min={0.3}
+                    max={1.5}
+                    step={0.1}
+                    value={[speed]}
+                    onValueChange={(v) => setSpeed(v[0])}
+                  />
+                </div>
+                <button
+                  className={"outline-button " + (showLabels ? "on" : "")}
+                  aria-pressed={showLabels}
+                  onClick={() => setShowLabels(!showLabels)}
+                >
+                  Component labels {showLabels ? "on" : "off"}
+                </button>
+              </div>
+            )}
             <div className="insight">
               <div className="insight-icon">
                 <Activity size={21} />
@@ -477,11 +520,20 @@ export default function Studio() {
                     : "WHY IT WORKS"}
                 </span>
                 <h3>{mode === "application" ? f.application : f.tag}</h3>
-                <p>{f.mechanism}</p>
+                <p>
+                  {mode === "application" ? f.applicationLesson : f.mechanism}
+                </p>
+                {mode === "application" && (
+                  <p className="variant-lesson">
+                    <strong>{f.variants[variant]}</strong>{" "}
+                    {f.variantLessons[variant]}
+                  </p>
+                )}
                 {mode !== "structure" && (
                   <small>
-                    Concept animation, not a physical simulation. Platens
-                    represent an application test coupon.
+                    Application geometry and motion are educational design
+                    studies. Material performance has not been simulated or
+                    certified.
                   </small>
                 )}
               </div>
