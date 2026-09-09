@@ -6,19 +6,58 @@ export type LatticeOptions = {
   count: number;
   thickness: number;
   color: string;
+  /** A second, visibly allocated phase used only for the teaching preview. */
+  secondaryColor?: string;
+  /** Secondary-phase share from 0–1. This is not a manufacturing layout. */
+  blend?: number;
   wire?: boolean;
 };
 /** Shared geometry for the studio and interactive field guide. */
 export function createLattice(p: LatticeOptions, software = false) {
   const root = new T.Group();
+  const blend = Math.max(0, Math.min(1, p.blend ?? 0));
+  const showSecondPhase = Boolean(p.secondaryColor && blend > 0);
+  const baseColor = new T.Color(p.color);
+  const secondaryColor = new T.Color(p.secondaryColor ?? p.color);
   const material = new T.MeshPhysicalMaterial({
-    color: p.color,
+    // When a phase allocation is on, per-vertex/per-instance colours carry
+    // the visible materials. Keeping the material white prevents it tinting
+    // either chosen phase.
+    color: showSecondPhase ? "#ffffff" : p.color,
+    vertexColors: showSecondPhase,
     metalness: 0.28,
     roughness: 0.28,
     clearcoat: 0.22,
     wireframe: p.wire ?? false,
     side: T.DoubleSide,
   });
+  const phaseColor = (v: T.Vector3) => {
+    if (!showSecondPhase) return baseColor;
+    // A smooth, deterministic micro-zone pattern makes the allocation legible
+    // from every orbit angle without pretending to be an optimised print path.
+    const wave =
+      (Math.sin(v.x * 4.71 + v.y * 2.17) +
+        Math.sin(v.y * 5.13 - v.z * 3.31) +
+        Math.sin(v.z * 4.07 + v.x * 2.61) +
+        3) /
+      6;
+    return wave < blend ? secondaryColor : baseColor;
+  };
+  const paintGeometry = (geo: T.BufferGeometry) => {
+    if (!showSecondPhase) return;
+    const positions = geo.getAttribute("position");
+    if (!positions) return;
+    const colors = new Float32Array(positions.count * 3);
+    const point = new T.Vector3();
+    for (let i = 0; i < positions.count; i++) {
+      point.fromBufferAttribute(positions, i);
+      const c = phaseColor(point);
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+    geo.setAttribute("color", new T.BufferAttribute(colors, 3));
+  };
   const addMesh = (
     geo: T.BufferGeometry,
     mat: T.Material = material,
@@ -109,6 +148,7 @@ export function createLattice(p: LatticeOptions, software = false) {
         }
     mc.update();
     mc.geometry.setDrawRange(0, mc.count);
+    paintGeometry(mc.geometry);
     root.add(mc);
   } else if (p.kind === "kelvin") {
     const verts: number[][] = [];
@@ -309,11 +349,26 @@ export function createLattice(p: LatticeOptions, software = false) {
       dummy.scale.set(seg.r, a.distanceTo(b), seg.r);
       dummy.updateMatrix();
       cylinders.setMatrixAt(i, dummy.matrix);
+      if (showSecondPhase) cylinders.setColorAt(i, phaseColor(dummy.position));
     });
+    if (showSecondPhase && cylinders.instanceColor)
+      cylinders.instanceColor.needsUpdate = true;
     cylinders.castShadow = true;
     cylinders.receiveShadow = true;
     root.add(cylinders);
   }
+
+  // Rods created as individual meshes (for example, resonator springs) need
+  // the same visible phase allocation as the batched lattice struts.
+  if (showSecondPhase)
+    root.traverse((object) => {
+      if (
+        object instanceof T.Mesh &&
+        !(object instanceof T.InstancedMesh) &&
+        object.material === material
+      )
+        paintGeometry(object.geometry);
+    });
 
   return root;
 }

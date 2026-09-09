@@ -48,10 +48,10 @@ export default function ResearchExplorer() {
       <div className="research-head">
         <div>
           <span className="eyebrow">OPEN RESEARCH / UCI</span>
-          <h2>Find a structure by its sound response.</h2>
+          <h2>Find a simulated structure that blocks a chosen vibration range.</h2>
           <p>
             {rows.length ? rows.length.toLocaleString() : "Loading"} simulated
-            designs ·{" "}
+            2D repeating designs ·{" "}
             <GlossaryText>2D elastodynamic metamaterials</GlossaryText>
           </p>
         </div>
@@ -70,7 +70,7 @@ export default function ResearchExplorer() {
       >
         <div className="research-controls">
           <label>
-            <GlossaryText>Target band-gap center</GlossaryText>{" "}
+            <GlossaryText>Frequency to block near</GlossaryText>{" "}
             <strong>{target} Hz</strong>
           </label>
           <Slider
@@ -85,7 +85,7 @@ export default function ResearchExplorer() {
             }}
           />
           <label>
-            <GlossaryText>Minimum band-gap width</GlossaryText>{" "}
+            <GlossaryText>Minimum blocked range</GlossaryText>{" "}
             <strong>{width} Hz</strong>
           </label>
           <Slider
@@ -101,13 +101,15 @@ export default function ResearchExplorer() {
           />
           <p>
             <GlossaryText>
-              A band gap is a range of frequencies that cannot travel through
-              the ideal repeating structure in this simulation.
+              A band gap is a frequency interval that cannot travel through the
+              ideal repeating model. Choose the middle of the range you care
+              about, then choose how wide the blocked range should be.
             </GlossaryText>
           </p>
           <small>
-            Finds the closest center among records meeting your width threshold.
-            These data are separate from the 3D mechanical catalog.
+            The explorer keeps records with a wide-enough reported gap, then
+            ranks them by how close their center is to your target. These
+            simulations are separate from the 3D product lessons.
           </small>
         </div>
         <div className="research-plot">
@@ -119,13 +121,13 @@ export default function ResearchExplorer() {
           />
 
           <span>
-            Band-gap center (Hz) →{" "}
-            <em>Vertical: width (Hz) · Every 21st record shown</em>
+            Middle of band gap (Hz) →{" "}
+            <em>Vertical: width (Hz) · One of every 21 records is shown</em>
           </span>
         </div>
         <div className="research-result">
           <span className="eyebrow">
-            {selected ? "SELECTED DESIGN" : "CLOSEST MATCH"}
+            {selected ? "SELECTED SIMULATED DESIGN" : "NEAREST SIMULATED MATCH"}
           </span>
           {best ? (
             <>
@@ -144,15 +146,15 @@ export default function ResearchExplorer() {
                 ))}
               </div>
               <small>
-                15-bit source encoding, not a spatial reconstruction of the unit
-                cell.
+                The 15-bit code is the dataset’s identifier for this geometry;
+                it is not a drawing of the unit cell.
               </small>
               <p className="source-label">SIMULATED / UCI 2021</p>
             </>
           ) : (
             <p>
               {rows.length
-                ? "No designs meet this threshold. Try a smaller minimum width."
+                ? "No simulated designs meet both choices. Reduce the minimum blocked range or choose another center frequency."
                 : "Loading research data…"}
             </p>
           )}

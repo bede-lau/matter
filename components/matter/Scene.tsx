@@ -12,6 +12,8 @@ export type SceneProps = {
   count: number;
   thickness: number;
   color: string;
+  secondaryColor?: string;
+  blend?: number;
   playing: boolean;
   mode: string;
   wire: boolean;
@@ -315,6 +317,8 @@ export default function Scene(p: SceneProps) {
     p.count,
     p.thickness,
     p.color,
+    p.secondaryColor,
+    p.blend,
     p.mode,
     p.wire,
     p.section,

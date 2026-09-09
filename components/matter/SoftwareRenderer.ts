@@ -68,6 +68,11 @@ export class SoftwareRenderer {
       normB = new T.Vector3(),
       normC = new T.Vector3(),
       normalMatrix = new T.Matrix3();
+    const colorA = new T.Color(),
+      colorB = new T.Color(),
+      colorC = new T.Color(),
+      phaseColor = new T.Color(),
+      instanceColor = new T.Color();
     const light = new T.Vector3(-0.4, 0.8, 0.5).normalize(),
       matrix = new T.Matrix4(),
       im = new T.Matrix4();
@@ -85,6 +90,7 @@ export class SoftwareRenderer {
         Array.isArray(obj.material) ? obj.material[0] : obj.material
       ) as T.MeshStandardMaterial;
       const idx = geo.index;
+      const vertexColors = geo.attributes.color;
       const len = Math.min(geo.drawRange.count, idx ? idx.count : pos.count);
       const instances = obj instanceof T.InstancedMesh ? obj.count : 1;
       for (let inst = 0; inst < instances; inst++) {
@@ -92,6 +98,7 @@ export class SoftwareRenderer {
         if (obj instanceof T.InstancedMesh) {
           obj.getMatrixAt(inst, im);
           matrix.multiply(im);
+          if (obj.instanceColor) obj.getColorAt(inst, instanceColor);
         }
         normalMatrix.getNormalMatrix(matrix);
         for (let i = 0; i < len; i += 3) {
@@ -145,7 +152,25 @@ export class SoftwareRenderer {
               .normalize();
           }
           let intensity = 0.27 + 0.62 * Math.abs(normal.dot(light));
-          const color = mat.color ?? new T.Color("#c2ef72");
+          const color = vertexColors
+            ? phaseColor
+                .copy(colorA).fromBufferAttribute(vertexColors, idx ? idx.getX(i) : i)
+                .add(
+                  colorB.fromBufferAttribute(
+                    vertexColors,
+                    idx ? idx.getX(i + 1) : i + 1,
+                  ),
+                )
+                .add(
+                  colorC.fromBufferAttribute(
+                    vertexColors,
+                    idx ? idx.getX(i + 2) : i + 2,
+                  ),
+                )
+                .multiplyScalar(1 / 3)
+            : obj instanceof T.InstancedMesh && obj.instanceColor
+              ? instanceColor
+              : mat.color ?? new T.Color("#c2ef72");
           const shade = (c: number) =>
             Math.min(255, Math.round(Math.pow(c, 1 / 2.2) * 255 * intensity));
           const rgb = `rgb(${shade(color.r)},${shade(color.g)},${shade(color.b)})`;

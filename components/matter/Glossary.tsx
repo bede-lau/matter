@@ -121,10 +121,6 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
               </div>
               <h2>{entry.term}</h2>
               <p>{entry.definition}</p>
-              <div className="definition-context">
-                <span>In this app</span>
-                {entry.context}
-              </div>
             </>
           )}
         </PopoverContent>

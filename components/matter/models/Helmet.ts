@@ -359,10 +359,10 @@ export function buildHelmet(lattice: T.Group, color: string): Application {
     side: "left" | "right",
     slot: number,
   ) => callouts.push({ label, anchor: anchor(parent, pos, label), side, slot });
-  label("Vented outer shell", shell, [-0.25, 0.91, -0.19], "left", 0);
-  label("Kelvin cellular liner", core, [0.0, 0.7, 0.52], "right", 1);
-  label("Anatomical headform", head, [0.49, -0.43, 0.26], "left", 2);
-  label("Chin retention system", group, [0.3, -0.83, 0.12], "right", 2);
+  label("Vented shell — spreads contact over the liner", shell, [-0.25, 0.91, -0.19], "left", 0);
+  label("Kelvin-cell liner — energy-management concept", core, [0.0, 0.7, 0.52], "right", 1);
+  label("Headform — rigid fit and test model", head, [0.49, -0.43, 0.26], "left", 2);
+  label("Retention straps — keep the helmet positioned", group, [0.3, -0.83, 0.12], "right", 2);
   return {
     group,
     callouts,

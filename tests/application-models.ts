@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import * as T from "three";
 import { createApplication } from "../components/matter/models/Applications";
 import { kneeFor, buildAthlete } from "../components/matter/models/Athlete";
+import { warpLattice } from "../components/matter/models/primitives";
+import { createLattice } from "../lib/matter/geometry";
 for (const kind of [
   "gyroid",
   "octet",
@@ -207,3 +209,62 @@ for (let i = 0; i < 150; i++) {
 console.log(
   "PASS: ballistic drop, dissipative rebound, collision bounds, brace/shoe fit, aft-swept tail and stable exact nearest matches",
 );
+
+// A secondary material must change the rendered lattice, not only a number in
+// the estimate panel. The product warp must keep the phase colours as well.
+const singlePhase = createLattice({
+  kind: "octet",
+  variant: 0,
+  count: 2,
+  thickness: 0.8,
+  color: "#c2ef72",
+  secondaryColor: "#e6e5de",
+  blend: 0,
+});
+const singleStruts = singlePhase.children.find(
+  (o): o is T.InstancedMesh => o instanceof T.InstancedMesh,
+)!;
+assert.equal(singleStruts.instanceColor, null, "single phase has no phase map");
+const twoPhase = createLattice({
+  kind: "octet",
+  variant: 0,
+  count: 3,
+  thickness: 0.8,
+  color: "#c2ef72",
+  secondaryColor: "#e6e5de",
+  blend: 0.45,
+});
+const phaseStruts = twoPhase.children.find(
+  (o): o is T.InstancedMesh => o instanceof T.InstancedMesh,
+)!;
+assert.ok(phaseStruts.instanceColor, "two-phase view creates per-strut colours");
+const phaseColours = new Set<string>();
+const sampledColor = new T.Color();
+for (let i = 0; i < phaseStruts.count; i++) {
+  phaseStruts.getColorAt(i, sampledColor);
+  phaseColours.add(sampledColor.getHexString());
+}
+assert.ok(phaseColours.size >= 2, "two-phase view visibly contains both phases");
+const curvedPhase = warpLattice(twoPhase, (v) => v);
+const curvedMesh = curvedPhase.getObjectByName("curved-cellular-liner") as T.Mesh;
+assert.ok(
+  curvedMesh.geometry.getAttribute("color"),
+  "product-shaped lattice keeps its phase allocation",
+);
+const softwareGyroid = createLattice(
+  {
+    kind: "gyroid",
+    variant: 0,
+    count: 3,
+    thickness: 0.8,
+    color: "#c2ef72",
+  },
+  true,
+);
+const gyroidSurface = softwareGyroid.children[0] as T.Mesh;
+assert.ok(
+  gyroidSurface.geometry.getAttribute("position").count > 9 &&
+    gyroidSurface.geometry.drawRange.count > 9,
+  "software gyroid has a non-empty surface",
+);
+console.log("PASS: visible secondary-phase allocation survives product shaping");

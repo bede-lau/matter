@@ -20,12 +20,15 @@ import {
   Check,
   Atom,
   X,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Choice, ExportMenu, ModeTabs } from "./ReuiControls";
 import MiniLattice from "./MiniLattice";
 import { GlossaryProvider, GlossaryText } from "./Glossary";
 import { families, bases } from "@/lib/matter/catalog";
+import { learningSteps, materialCards, structureCards } from "@/lib/matter/learning";
 import Scene from "./Scene";
 import ResearchExplorer from "./ResearchExplorer";
 type RecordRow = {
@@ -79,6 +82,16 @@ export default function Studio() {
     1 / ((1 - fraction) / bases[base].e + fraction / bases[second].e);
   const estimated = upper * Math.pow(density, f.id === "octet" ? 1 : 2) * 0.3;
   const estimateLow = lower * Math.pow(density, f.id === "octet" ? 1 : 2) * 0.3;
+  const baseMaterial = bases[base];
+  const secondaryMaterial = bases[second];
+  const chooseBase = (index: number) => {
+    setBase(index);
+    if (index === second) setSecond((index + 1) % bases.length);
+  };
+  const chooseSecondary = (index: number) => {
+    setSecond(index);
+    if (index === base) setBase((index + 1) % bases.length);
+  };
   const choose = (i: number) => {
     setFamily(i);
     setVariant(0);
@@ -259,14 +272,14 @@ export default function Studio() {
                 ? "Material studio"
                 : tab === "data"
                   ? "Explore the evidence"
-                  : "A field guide to extraordinary structures"}
+                  : "A field guide to designed structures"}
             </h1>
             <p>
               {tab === "studio"
-                ? "Choose a structure. Adjust its geometry. See where it could be used."
+                ? "Choose what it is made from. Change the repeating cell. Then connect that behavior to a possible use."
                 : tab === "data"
-                  ? "Combine material, geometry, and property records with their original sources."
-                  : "Explore how repeating geometry changes the behavior of a material."}
+                  ? "Explore source-backed measurements and simulations while keeping evidence labels attached to every result."
+                  : "Learn each structure as a simple chain: reference → engineered cell → changed behavior → possible use."}
             </p>
           </div>
           <ExportMenu
@@ -298,8 +311,8 @@ export default function Studio() {
         <div className="learning-hint">
           <BookOpen size={15} />
           <span>
-            New to the terminology? <strong>Tap a dotted term</strong> or
-            highlight a phrase for a quick definition.
+            New here? <strong>Tap a dotted term</strong> or highlight a known
+            phrase for a short, plain-language definition.
           </span>
         </div>
         {tab === "studio" && (
@@ -361,10 +374,11 @@ export default function Studio() {
               <div className="catalog-note">
                 <BookOpen size={19} />
                 <div>
-                  <strong>Geometry is the ingredient.</strong>
+                  <strong>Shape is a second design ingredient.</strong>
                   <p>
-                    Unusual behavior comes from architecture, not just
-                    chemistry.
+                    Chemistry sets the base material. Internal geometry changes
+                    how the finished structure carries force, deforms, or
+                    vibrates.
                   </p>
                   <button onClick={() => setTab("learn")}>
                     Explore the field guide <ArrowUpRight size={14} />
@@ -397,7 +411,9 @@ export default function Studio() {
                   variant={variant}
                   count={count}
                   thickness={(thick * 10) / size}
-                  color={base === 0 ? f.color : bases[base].color}
+                  color={baseMaterial.color}
+                  secondaryColor={secondaryMaterial.color}
+                  blend={fraction}
                   playing={play}
                   mode={mode}
                   wire={wire}
@@ -413,6 +429,22 @@ export default function Studio() {
                     : mode === "deform"
                       ? "Illustrative compression"
                       : "Periodic unit-cell architecture"}
+                </div>
+                <div className="material-phase-key" aria-live="polite">
+                  <span className="phase-key-item">
+                    <i style={{ backgroundColor: baseMaterial.color }} />
+                    Base · {baseMaterial.name} <strong>{100 - blend}%</strong>
+                  </span>
+                  {blend > 0 && (
+                    <>
+                      <ArrowRight size={14} aria-hidden="true" />
+                      <span className="phase-key-item">
+                        <i style={{ backgroundColor: secondaryMaterial.color }} />
+                        Secondary · {secondaryMaterial.name}{" "}
+                        <strong>{blend}%</strong>
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="view-tools">
                   <button
@@ -544,15 +576,19 @@ export default function Studio() {
                 <div>
                   <span className="eyebrow">
                     {mode === "application"
-                      ? "STRUCTURE → APPLICATION"
-                      : "WHY IT WORKS"}
+                      ? "BASE MATERIAL → CELL → CANDIDATE USE"
+                      : "BASE MATERIAL → REPEATED CELL"}
                   </span>
-                  <h3>{mode === "application" ? f.application : f.tag}</h3>
+                  <h3>
+                    {mode === "application"
+                      ? f.application
+                      : `${baseMaterial.name} + ${f.name}`}
+                  </h3>
                   <p>
                     <GlossaryText>
                       {mode === "application"
                         ? f.applicationLesson
-                        : f.mechanism}
+                        : `${baseMaterial.intro} ${f.mechanism}`}
                     </GlossaryText>
                   </p>
                   {mode === "application" && (
@@ -563,9 +599,8 @@ export default function Studio() {
                   )}
                   {mode !== "structure" && (
                     <small>
-                      Application geometry and motion are educational design
-                      studies. Material performance has not been simulated or
-                      certified.
+                      This is illustrative geometry and motion—not a tested
+                      product or an engineering result.
                     </small>
                   )}
                 </div>
@@ -604,30 +639,64 @@ export default function Studio() {
                   id="material"
                   label="Base material"
                   value={String(base)}
-                  onChange={(v) => setBase(Number(v))}
+                  onChange={(v) => chooseBase(Number(v))}
                   options={bases.map((b, i) => ({
                     value: String(i),
                     label: b.name,
                   }))}
                 />
                 <span className="control-hint">
-                  Illustrative base-material values
+                  {baseMaterial.intro}
                 </span>
               </div>
-              <div className="control-block">
+              <div className="control-block material-blend-block">
                 <label htmlFor="secondary">
-                  Secondary material <output>{blend}%</output>
+                  <GlossaryText>Secondary material</GlossaryText>{" "}
+                  <output>{blend}%</output>
                 </label>
                 <Choice
                   id="secondary"
                   label="Secondary material"
                   value={String(second)}
-                  onChange={(v) => setSecond(Number(v))}
-                  options={bases.map((b, i) => ({
-                    value: String(i),
-                    label: b.name,
-                  }))}
+                  onChange={(v) => chooseSecondary(Number(v))}
+                  options={bases
+                    .map((b, i) => ({ value: String(i), label: b.name }))
+                    .filter((option) => option.value !== String(base))}
                 />
+                <div className="blend-lesson">
+                  <div>
+                    <span>
+                      <i style={{ backgroundColor: baseMaterial.color }} />
+                      {baseMaterial.name}
+                    </span>
+                    <strong>{100 - blend}%</strong>
+                  </div>
+                  <div>
+                    <span>
+                      <i style={{ backgroundColor: secondaryMaterial.color }} />
+                      {secondaryMaterial.name}
+                    </span>
+                    <strong>{blend}%</strong>
+                  </div>
+                  <div className="blend-bar" aria-hidden="true">
+                    <span
+                      style={{
+                        width: `${100 - blend}%`,
+                        backgroundColor: baseMaterial.color,
+                      }}
+                    />
+                    <span
+                      style={{
+                        width: `${blend}%`,
+                        backgroundColor: secondaryMaterial.color,
+                      }}
+                    />
+                  </div>
+                  <small>
+                    Placement rule: repeating coloured micro-zones across the
+                    lattice, shown only to make the two phases visible.
+                  </small>
+                </div>
                 <Slider
                   aria-label="Secondary material volume percent"
                   min={0}
@@ -638,7 +707,9 @@ export default function Studio() {
                   className="mt-4"
                 />
                 <span className="control-hint">
-                  Ideal two-phase mixture; manufacturability is not evaluated.
+                  The lattice colours both phases so you can see the share you
+                  chose. This is an explanatory material map, not a
+                  manufacturing recipe or a performance claim.
                 </span>
               </div>
               <div className="control-block">
@@ -700,7 +771,7 @@ export default function Studio() {
                 />
               </div>
               <div className="property-card">
-                <div className="eyebrow">EXPLORATORY ESTIMATES</div>
+                <div className="eyebrow">ILLUSTRATIVE TEACHING ESTIMATES</div>
                 <div>
                   <span>
                     <GlossaryText>Relative density</GlossaryText>
@@ -712,7 +783,7 @@ export default function Studio() {
                 </div>
                 <div>
                   <span>
-                    <GlossaryText>Modulus range</GlossaryText>
+                    <GlossaryText>Illustrative lattice stiffness</GlossaryText>
                   </span>
                   <strong>
                     {estimateLow.toFixed(2)}–
@@ -723,9 +794,10 @@ export default function Studio() {
                   </strong>
                 </div>
                 <p>
-                  Ideal solid bounds: {lower.toFixed(0)}–{upper.toFixed(0)} MPa
-                  (Reuss–Voigt). Lattice estimate uses an illustrative scaling
-                  law, not geometry-derived density or a solver.
+                  Ideal solid-material mixture range: {lower.toFixed(0)}–
+                  {upper.toFixed(0)} MPa (Reuss–Voigt). Numbers marked
+                  “illustrative” help compare settings; do not use them to
+                  design a safety-critical part.
                 </p>
               </div>
               <button
@@ -749,8 +821,113 @@ export default function Studio() {
           </div>
         )}
         {tab === "learn" && (
-          <section className="guide-grid" aria-label="Structure field guide">
-            {families.map((v, i) => (
+          <section className="field-guide" aria-label="Structure field guide">
+            <header className="guide-learning-head">
+              <div>
+                <span className="eyebrow">BEGINNER FIELD GUIDE</span>
+                <h1>Start with the material. Then change its inner shape.</h1>
+                <p>
+                  Every lesson follows the same path: a familiar reference, an
+                  engineered repeating cell, a changed behavior, and one
+                  possible use. Dotted terms open a short definition.
+                </p>
+              </div>
+              <div className="guide-tutor-note">
+                <Sparkles size={19} />
+                <span>
+                  <strong>Tutor tip</strong>
+                  Do not judge a lattice by its shape alone. Its material,
+                  dimensions, and test conditions matter too.
+                </span>
+              </div>
+            </header>
+            <section className="learning-steps" aria-label="How a metamaterial is designed">
+              {learningSteps.map((step, i) => (
+                <article key={step.number}>
+                  <span>{step.number}</span>
+                  <h2>{step.title}</h2>
+                  <p>{step.text}</p>
+                  {i < learningSteps.length - 1 && <ArrowRight aria-hidden="true" />}
+                </article>
+              ))}
+            </section>
+            <section className="real-materials" aria-labelledby="material-references">
+              <div className="guide-section-heading">
+                <div>
+                  <span className="eyebrow">REAL MATERIAL REFERENCES</span>
+                  <h2 id="material-references">The substance comes first.</h2>
+                </div>
+                <p>
+                  These are real examples of the four base materials used for
+                  comparisons in the studio. Grades and processes can change
+                  their properties.
+                </p>
+              </div>
+              <div className="source-gallery material-source-gallery">
+                {materialCards.map((card) => (
+                  <article className="source-card" key={card.id}>
+                    <img src={card.image} alt={card.alt} loading="lazy" />
+                    <div>
+                      <span className="eyebrow">{card.eyebrow}</span>
+                      <h3>{card.title}</h3>
+                      <p>{card.note}</p>
+                      <a href={card.sourceUrl} target="_blank" rel="noreferrer">
+                        {card.sourceLabel} ↗
+                      </a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <section className="structure-lineage" aria-labelledby="structure-references">
+              <div className="guide-section-heading">
+                <div>
+                  <span className="eyebrow">FROM REFERENCE TO METAMATERIAL</span>
+                  <h2 id="structure-references">How the repeating structures are derived.</h2>
+                </div>
+                <p>
+                  A source can be natural, mathematical, engineered, or a
+                  physical principle. The arrow shows the teaching connection,
+                  not a claim that each structure occurs in nature.
+                </p>
+              </div>
+              <div className="source-gallery structure-source-gallery">
+                {structureCards.map((card) => (
+                  <article className="source-card structure-source-card" key={card.id}>
+                    <img src={card.image} alt={card.alt} loading="lazy" />
+                    <div>
+                      <span className="eyebrow">{card.eyebrow}</span>
+                      <h3>{card.title}</h3>
+                      <div className="source-flow" aria-label={`${card.title} learning path`}>
+                        <span>Real reference</span>
+                        <ArrowRight size={15} aria-hidden="true" />
+                        <span>repeat the cell</span>
+                        <ArrowRight size={15} aria-hidden="true" />
+                        <span>new behavior</span>
+                      </div>
+                      <p>{card.note}</p>
+                      <a href={card.sourceUrl} target="_blank" rel="noreferrer">
+                        {card.sourceLabel} ↗
+                      </a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <div className="guide-section-heading structure-cards-heading">
+              <div>
+                <span className="eyebrow">EXPLORE THE CELLS</span>
+                <h2>See the geometry, then inspect a candidate use.</h2>
+              </div>
+              <p>
+                These interactive scenes are concept studies. Their motions
+                explain a mechanism; they do not certify a product.
+              </p>
+            </div>
+            <div className="guide-grid">
+            {families.map((v, i) => {
+              const reference = structureCards.find((card) => card.id === v.id);
+              return (
               <article
                 className="guide-card"
                 key={v.id}
@@ -784,6 +961,15 @@ export default function Studio() {
                       }
                     </GlossaryText>
                   </p>
+                  {reference && (
+                    <div className="guide-chain">
+                      <span>{reference.eyebrow.split(" · ")[0]}</span>
+                      <ArrowRight size={14} aria-hidden="true" />
+                      <strong>repeated {v.name} cell</strong>
+                      <ArrowRight size={14} aria-hidden="true" />
+                      <span>{v.tag.toLowerCase()}</span>
+                    </div>
+                  )}
                   <div className="guide-application">
                     <Layers3 size={17} />
                     <span>
@@ -792,7 +978,7 @@ export default function Studio() {
                   </div>
                   <details className="guide-details">
                     <summary>
-                      Origin & how it works <ChevronRight size={15} />
+                      Trace the idea: reference → cell → behavior <ChevronRight size={15} />
                     </summary>
                     <h3>Where it comes from</h3>
                     <p>
@@ -839,7 +1025,9 @@ export default function Studio() {
                   </button>
                 </div>
               </article>
-            ))}
+              );
+            })}
+            </div>
           </section>
         )}
         {tab === "data" && (
@@ -848,10 +1036,11 @@ export default function Studio() {
             <div className="dataset-intro">
               <div>
                 <Upload size={30} />
-                <h2>One schema. Multiple inputs.</h2>
+                <h2>Bring in evidence without losing its meaning.</h2>
                 <p>
-                  Import CSV or JSON with geometry, composition, properties, and
-                  provenance. Evidence labels remain attached to every record.
+                  Import geometry, material, property, source, and evidence
+                  fields together. A measured value should never be displayed
+                  as if it were a teaching estimate.
                 </p>
                 <button
                   className="primary-button"

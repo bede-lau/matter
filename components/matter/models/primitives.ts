@@ -196,6 +196,7 @@ export function fitLattice(
 export function warpLattice(root: T.Group, fn: (v: T.Vector3) => T.Vector3) {
   root.updateMatrixWorld(true);
   const positions: number[] = [];
+  const colors: number[] = [];
   const originals = new Set<T.BufferGeometry>();
   let material: T.Material | T.Material[] | undefined;
   const instance = new T.Matrix4();
@@ -215,10 +216,29 @@ export function warpLattice(root: T.Group, fn: (v: T.Vector3) => T.Vector3) {
         : o.geometry.clone();
       geo.applyMatrix4(mat);
       const pos = geo.attributes.position;
+      const vertexColors = geo.getAttribute("color");
+      const instanceColor = new T.Color();
+      if (o instanceof T.InstancedMesh && o.instanceColor)
+        o.getColorAt(n, instanceColor);
+      const sourceMaterial = Array.isArray(o.material) ? o.material[0] : o.material;
+      const materialColor =
+        "color" in sourceMaterial
+          ? (sourceMaterial as T.MeshStandardMaterial).color
+          : new T.Color("#ffffff");
       const limit = Math.min(pos.count, geo.drawRange.count);
       for (let i = 0; i < limit; i++) {
         const v = fn(new T.Vector3().fromBufferAttribute(pos, i));
         positions.push(v.x, v.y, v.z);
+        const c = vertexColors
+          ? new T.Color(
+              vertexColors.getX(i),
+              vertexColors.getY(i),
+              vertexColors.getZ(i),
+            )
+          : o instanceof T.InstancedMesh && o.instanceColor
+            ? instanceColor
+            : materialColor;
+        colors.push(c.r, c.g, c.b);
       }
       geo.dispose();
     }
@@ -230,6 +250,8 @@ export function warpLattice(root: T.Group, fn: (v: T.Vector3) => T.Vector3) {
   root.scale.set(1, 1, 1);
   const geo = new T.BufferGeometry();
   geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
+  if (colors.length === positions.length)
+    geo.setAttribute("color", new T.Float32BufferAttribute(colors, 3));
   const smooth = mergeVertices(geo, 0.00001);
   geo.dispose();
   smooth.computeVertexNormals();

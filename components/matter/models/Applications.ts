@@ -228,10 +228,10 @@ export function createApplication(
         "fuselage-stripe",
       );
     }
-    label("Airfoil skin", access, [0.2, 0.5, 1.6], "left", 0);
-    label("Octet core inside the wing", core, [0, 0, 0], "right", 1);
-    label("Engine / load-bearing wing", plane, [0.45, -0.45, 1.42], "left", 2);
-    label("Lightweight airframe concept", plane, [-1.1, 0.36, 0], "right", 0);
+    label("Wing skin — keeps the airfoil shape", access, [0.2, 0.5, 1.6], "left", 0);
+    label("Octet core — separates & supports the skins", core, [0, 0, 0], "right", 1);
+    label("Engine mount area — transfers concentrated loads", plane, [0.45, -0.45, 1.42], "left", 2);
+    label("Airframe — shown for context", plane, [-1.1, 0.36, 0], "right", 0);
     camera = [8.2, 5.2, 11.5];
     target = [0, 0, 0];
     update = (t, e) => {
@@ -408,10 +408,10 @@ export function createApplication(
       false,
       "deck-stripe",
     );
-    label("Grip tape / upper skin", grip, [0.8, 0.48, 0.6], "left", 0);
-    label("Honeycomb deck core", core, [0, 0, 0], "right", 1);
-    label("Metal trucks + axles", board, [2.1, -0.35, 0.2], "left", 2);
-    label("Rolling urethane wheels", board, [2.1, -0.4, 0.85], "right", 2);
+    label("Grip tape & upper skin — rider contact", grip, [0.8, 0.48, 0.6], "left", 0);
+    label("Honeycomb core — keeps the skins apart", core, [0, 0, 0], "right", 1);
+    label("Trucks & axles — transfer load to wheels", board, [2.1, -0.35, 0.2], "left", 2);
+    label("Polyurethane wheels — rolling contact", board, [2.1, -0.4, 0.85], "right", 2);
     camera = [7.6, 4.9, 10];
     target = [0, 0, 0];
     update = (t, e) => {
@@ -507,10 +507,10 @@ export function createApplication(
           [0.09, 0.035, 0.09],
           "anchor-bolt",
         );
-    label("Motor + rotating drive", motor, [0.2, 0.67, 0.2], "left", 0);
-    label("Locally resonant supports", core, [0, 0, 0], "right", 1);
-    label("Oscillating internal masses", core, [0.6, 0, 0.5], "left", 2);
-    label("Anchored mounting skid", system, [1.4, -1, 0.82], "right", 2);
+    label("Motor — source of rotation & vibration", motor, [0.2, 0.67, 0.2], "left", 0);
+    label("Resonator frame — carries the machine load", core, [0, 0, 0], "right", 1);
+    label("Internal masses — move near tuned frequencies", core, [0.6, 0, 0.5], "left", 2);
+    label("Mounting skid — anchors the assembly", system, [1.4, -1, 0.82], "right", 2);
     camera = [7.3, 4.3, 9.4];
     target = [0, 0.05, 0];
     update = (t, e) => {
