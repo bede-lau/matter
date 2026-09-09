@@ -15,6 +15,8 @@ import {
 } from "./primitives";
 import { buildShoe } from "./Shoe";
 import { buildAthlete } from "./Athlete";
+import { buildHelmet } from "./Helmet";
+import { buildKneeBrace } from "./KneeBrace";
 export type Application = {
   group: T.Group;
   callouts: Callout[];
@@ -169,8 +171,8 @@ export function createApplication(
         6,
         6,
         (u, v) => [
-          -2.4 + v * 0.75 + u * 0.5,
-          0.15 + Math.abs(u) * 0.07,
+          -1.85 - u * 0.78 - v * (0.92 - u * 0.47),
+          0.15 + u * 0.1 + Math.sin(v * Math.PI) * 0.045,
           side * (0.25 + u * 1.35),
         ],
         "horizontal-tail",
@@ -180,7 +182,11 @@ export function createApplication(
         p.accent,
         6,
         6,
-        (u, v) => [-2.65 + v * 0.7 + u * 0.65, 0.15 + u * 1.15, side * 0.04],
+        (u, v) => [
+          -1.84 - u * 0.82 - v * (1.02 - u * 0.65),
+          0.23 + u * 1.2,
+          side * (0.07 - u * 0.045) * Math.sin(v * Math.PI),
+        ],
         "tail-fin",
       );
       const nacelle = mesh(
@@ -235,202 +241,9 @@ export function createApplication(
       return "Aircraft wing · internal load path";
     };
   } else if (kind === "auxetic") {
-    const leg = new T.Group();
-    group.add(leg);
-    leg.position.set(-0.25, -0.2, 0);
-    const thigh = ellipsoid(
-      leg,
-      p.textile,
-      [0, 1.14, 0],
-      [0.47, 1.03, 0.45],
-      "thigh-and-sleeve",
-    );
-    thigh.rotation.z = -0.1;
-    const calf = new T.Group();
-    leg.add(calf);
-    calf.position.set(0.1, 0.12, 0);
-    const shin = ellipsoid(
-      calf,
-      p.skin,
-      [-0.05, -0.95, 0],
-      [0.32, 0.9, 0.3],
-      "lower-leg",
-    );
-    shin.rotation.z = 0.1;
-    const foot = buildShoe(null, color, variant, false);
-    calf.add(foot.group);
-    foot.group.scale.setScalar(0.33);
-    foot.group.position.set(0.25, -1.85, 0);
-    const pad = new T.Group();
-    leg.add(pad);
-    pad.position.set(0.45, 0.2, 0);
-    lattice.rotation.y = Math.PI / 2;
-    const core = fitLattice(lattice, [0.24, 1.22, 0.9], [0.25, 0.02, 0], pad);
-    tube(
-      pad,
-      p.dark,
-      Array.from({ length: 30 }, (_, i) => {
-        const a = (i / 30) * Math.PI * 2;
-        return [0.22, Math.cos(a) * 0.83, Math.sin(a) * 0.64];
-      }),
-      0.09,
-      true,
-      "knee-pad-rim",
-    );
-    const cap = surface(
-      pad,
-      p.ivory,
-      12,
-      16,
-      (u, v) => {
-        const a = u * Math.PI * 2;
-        return [
-          0.29 + Math.sin(v * Math.PI) * 0.15,
-          Math.cos(a) * (0.63 + v * 0.12),
-          Math.sin(a) * (0.48 + v * 0.11),
-        ];
-      },
-      "protective-shell-edge",
-    );
-    const straps: T.Mesh[] = [];
-    for (let y of [-0.57, 0.62]) {
-      const ring = mesh(
-        new T.TorusGeometry(0.43, 0.085, 8, 30),
-        p.dark,
-        leg,
-        "retention-strap",
-      );
-      ring.rotation.x = Math.PI / 2;
-      ring.position.set(0.05, y + 0.2, 0);
-      straps.push(ring);
-      box(
-        leg,
-        p.metal,
-        [0.12, 0.18, 0.22],
-        [0.38, y + 0.2, 0.35],
-        "strap-buckle",
-      );
-    }
-    label("Re-entrant cushioning", core, [0, 0, 0], "right", 1);
-    label("Flexible protective shell", cap, [0.38, 0.48, 0.36], "left", 0);
-    label("Adjustable retention straps", leg, [0.35, 0.82, 0.35], "right", 0);
-    label("Textile sleeve", leg, [0, 1.5, 0.4], "left", 1);
-    camera = [6.7, 2.9, 8.1];
-    target = [0, 0, 0];
-    update = (t, e) => {
-      calf.rotation.z = -0.15 - (1 - Math.cos(t * 1.8)) * 0.2;
-      core.position.x = 0.25 + e * 0.65;
-      cap.position.x = e * 1.05;
-      leg.rotation.z = Math.sin(t * 1.8) * 0.05;
-      return "Knee protection · flex and conform";
-    };
+    return buildKneeBrace(lattice, color, variant);
   } else if (kind === "kelvin") {
-    const helmet = new T.Group();
-    group.add(helmet);
-    helmet.position.set(0, 0.1, 0);
-    ellipsoid(
-      group,
-      p.skin,
-      [0, -0.05, 0],
-      [0.79, 1.04, 0.74],
-      "anatomical-headform",
-    );
-    ellipsoid(
-      group,
-      p.skin,
-      [0.77, -0.25, 0],
-      [0.15, 0.12, 0.13],
-      "headform-nose",
-    );
-    ellipsoid(
-      group,
-      p.dark,
-      [-0.1, -1.25, 0],
-      [0.47, 0.4, 0.42],
-      "neck-support",
-    );
-    // Shell strips leave actual ventilation gaps and a side inspection window.
-    const shell = new T.Group();
-    helmet.add(shell);
-    for (let strip = 0; strip < 10; strip++) {
-      if (strip === 0 || strip === 1) continue;
-      const start = (strip / 10) * Math.PI * 2 + 0.045;
-      surface(
-        shell,
-        p.ivory,
-        10,
-        14,
-        (u, v) => {
-          const a = start + u * (Math.PI * 0.2 - 0.09),
-            polar = 0.1 + v * 1.28;
-          return [
-            1.3 * Math.sin(polar) * Math.cos(a),
-            0.92 * Math.cos(polar),
-            1.05 * Math.sin(polar) * Math.sin(a),
-          ];
-        },
-        "vented-helmet-shell",
-      );
-    }
-    const core = warpLattice(lattice, (v) => {
-      const az = 0.06 + ((v.x + 1.75) / 3.5) * 1.14,
-        polar = 0.25 + ((v.y + 1.75) / 3.5) * 1.06,
-        r = 1.07 + (v.z / 3.5) * 0.17;
-      return new T.Vector3(
-        r * Math.sin(polar) * Math.cos(az) * 1.14,
-        r * Math.cos(polar) * 0.83,
-        r * Math.sin(polar) * Math.sin(az) * 0.98,
-      );
-    });
-    helmet.add(core);
-    tube(
-      helmet,
-      p.dark,
-      Array.from({ length: 40 }, (_, i) => {
-        const a = (i / 40) * Math.PI * 2;
-        return [Math.cos(a) * 1.22, 0.19, Math.sin(a) * 1.0];
-      }),
-      0.065,
-      true,
-      "helmet-rim",
-    );
-    for (let side of [-1, 1]) {
-      tube(
-        group,
-        p.dark,
-        [
-          [-0.7, 0.5, side * 0.73],
-          [-0.42, -0.7, side * 0.68],
-          [0.35, -1.47, side * 0.3],
-          [0.8, 0.49, side * 0.55],
-        ],
-        0.034,
-        false,
-        "chin-strap",
-      );
-    }
-    box(group, p.metal, [0.2, 0.09, 0.18], [0.35, -1.5, 0.32], "strap-buckle");
-    const striker = ellipsoid(
-      group,
-      p.metal,
-      [-0.3, 2.7, 0],
-      [0.24, 0.24, 0.24],
-      "impact-marker",
-    );
-    label("Vented outer shell", shell, [-0.4, 0.76, 0.45], "left", 0);
-    label("Kelvin cellular liner", core, [0.88, 0.5, 0.5], "right", 1);
-    label("Headform / fitting geometry", group, [0.62, -0.3, 0.48], "left", 2);
-    label("Chin retention system", group, [0.35, -1.4, 0.3], "right", 2);
-    camera = [6.4, 3.9, 8.4];
-    target = [0, -0.05, 0];
-    update = (t, e) => {
-      const cycle = (t * 0.36) % 1;
-      const pulse = Math.pow(Math.max(0, Math.sin(cycle * Math.PI)), 8);
-      striker.position.y = 2.7 - pulse * (1.44 - e * 0.95);
-      shell.position.y = e * 0.95;
-      core.scale.y = 1 - pulse * 0.06;
-      return "Helmet liner · illustrative impact cycle";
-    };
+    return buildHelmet(lattice, color);
   } else if (kind === "honeycomb") {
     const board = new T.Group();
     group.add(board);

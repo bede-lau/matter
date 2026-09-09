@@ -1,7 +1,21 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useDeferredValue } from "react";
 import { Slider } from "@/components/ui/slider";
-type Row = [string, number, number];
+import { nearestDesigns, type ResearchRow as Row } from "@/lib/matter/research";
+import ResearchPlot from "./ResearchPlot";
+import { GlossaryText } from "./Glossary";
+let dataset: Promise<{ rows: Row[] }> | undefined;
+function loadDataset() {
+  return (dataset ??= fetch("/data/elastodynamic.json")
+    .then((r) => {
+      if (!r.ok) throw Error("Dataset could not load.");
+      return r.json() as Promise<{ rows: Row[] }>;
+    })
+    .catch((e) => {
+      dataset = undefined;
+      throw e;
+    }));
+}
 export default function ResearchExplorer() {
   const [rows, setRows] = useState<Row[]>([]),
     [target, setTarget] = useState(600),
@@ -10,25 +24,22 @@ export default function ResearchExplorer() {
     [selected, setSelected] = useState<Row | null>(null);
   useEffect(() => {
     let active = true;
-    fetch("/data/elastodynamic.json")
-      .then((r) => {
-        if (!r.ok) throw Error("Dataset could not load.");
-        return r.json() as Promise<{ rows: Row[] }>;
-      })
+    loadDataset()
       .then((d) => {
         if (active) setRows(d.rows);
       })
-      .catch((e) => setError(e.message));
+      .catch((e) => {
+        if (active) setError(e.message);
+      });
     return () => {
       active = false;
     };
   }, []);
+  const deferredTarget = useDeferredValue(target),
+    deferredWidth = useDeferredValue(width);
   const matches = useMemo(
-    () =>
-      rows
-        .filter((r) => r[2] >= width)
-        .sort((a, b) => Math.abs(a[1] - target) - Math.abs(b[1] - target)),
-    [rows, target, width],
+    () => nearestDesigns(rows, deferredTarget, deferredWidth),
+    [rows, deferredTarget, deferredWidth],
   );
   const best = selected ?? matches[0];
   const sample = useMemo(() => rows.filter((_, i) => i % 21 === 0), [rows]);
@@ -40,7 +51,8 @@ export default function ResearchExplorer() {
           <h2>Find a structure by its sound response.</h2>
           <p>
             {rows.length ? rows.length.toLocaleString() : "Loading"} simulated
-            designs · 2D elastodynamic metamaterials
+            designs ·{" "}
+            <GlossaryText>2D elastodynamic metamaterials</GlossaryText>
           </p>
         </div>
         <a
@@ -52,10 +64,14 @@ export default function ResearchExplorer() {
         </a>
       </div>
       {error && <p role="alert">{error}</p>}
-      <div className="research-body">
+      <div
+        className="research-body"
+        aria-busy={target !== deferredTarget || width !== deferredWidth}
+      >
         <div className="research-controls">
           <label>
-            Target band-gap center <strong>{target} Hz</strong>
+            <GlossaryText>Target band-gap center</GlossaryText>{" "}
+            <strong>{target} Hz</strong>
           </label>
           <Slider
             aria-label="Target band-gap center"
@@ -69,7 +85,8 @@ export default function ResearchExplorer() {
             }}
           />
           <label>
-            Minimum band-gap width <strong>{width} Hz</strong>
+            <GlossaryText>Minimum band-gap width</GlossaryText>{" "}
+            <strong>{width} Hz</strong>
           </label>
           <Slider
             aria-label="Minimum band-gap width"
@@ -83,9 +100,10 @@ export default function ResearchExplorer() {
             }}
           />
           <p>
-            A band gap is a frequency interval where waves cannot propagate
-            through an ideal infinite periodic structure in the modeled
-            conditions.
+            <GlossaryText>
+              A band gap is a range of frequencies that cannot travel through
+              the ideal repeating structure in this simulation.
+            </GlossaryText>
           </p>
           <small>
             Finds the closest center among records meeting your width threshold.
@@ -93,66 +111,13 @@ export default function ResearchExplorer() {
           </small>
         </div>
         <div className="research-plot">
-          <svg
-            viewBox="0 0 560 250"
-            role="img"
-            aria-label="Sample of dataset band-gap center versus width"
-          >
-            <path d="M45 15V212H540" fill="none" stroke="#566675" />
-            {[0, 500, 1000, 1500, 2000].map((v) => (
-              <g key={v}>
-                <path d={`M${45 + (v / 2000) * 475} 15V212`} stroke="#293843" />
-                <text
-                  x={45 + (v / 2000) * 475}
-                  y="235"
-                  fill="#9eb0bd"
-                  fontSize="12"
-                  textAnchor="middle"
-                >
-                  {v}
-                </text>
-              </g>
-            ))}
-            {[0, 250, 500].map((v) => (
-              <text
-                key={v}
-                x="36"
-                y={215 - (v / 500) * 190}
-                fill="#9eb0bd"
-                fontSize="12"
-                textAnchor="end"
-              >
-                {v}
-              </text>
-            ))}
-            {sample
-              .filter((r) => r[1] <= 2000 && r[2] <= 500)
-              .map((r, i) => (
-                <circle
-                  key={i}
-                  cx={45 + (r[1] / 2000) * 475}
-                  cy={212 - (r[2] / 500) * 190}
-                  r="2"
-                  fill={r[2] >= width ? "#a7d866" : "#4d606f"}
-                  opacity=".55"
-                />
-              ))}
-            <path
-              d={`M${45 + (target / 2000) * 475} 15V212`}
-              stroke="#e7f4d4"
-              strokeDasharray="4 4"
-            />
-            {best && best[1] <= 2000 && best[2] <= 500 && (
-              <circle
-                cx={45 + (best[1] / 2000) * 475}
-                cy={212 - (best[2] / 500) * 190}
-                r="6"
-                fill="#fff"
-                stroke="#c2ef72"
-                strokeWidth="3"
-              />
-            )}
-          </svg>
+          <ResearchPlot
+            sample={sample}
+            target={deferredTarget}
+            width={deferredWidth}
+            best={best}
+          />
+
           <span>
             Band-gap center (Hz) →{" "}
             <em>Vertical: width (Hz) · Every 21st record shown</em>
@@ -185,13 +150,21 @@ export default function ResearchExplorer() {
               <p className="source-label">SIMULATED / UCI 2021</p>
             </>
           ) : (
-            <p>No designs meet this threshold.</p>
+            <p>
+              {rows.length
+                ? "No designs meet this threshold. Try a smaller minimum width."
+                : "Loading research data…"}
+            </p>
           )}
         </div>
       </div>
       <div className="match-buttons">
-        {matches.slice(0, 5).map((r) => (
-          <button key={r[0]} onClick={() => setSelected(r)}>
+        {matches.map((r, i) => (
+          <button
+            key={r[0] + i}
+            aria-pressed={best === r}
+            onClick={() => setSelected(r)}
+          >
             {r[1].toFixed(1)} Hz <span>{r[2].toFixed(1)} Hz wide</span>
           </button>
         ))}

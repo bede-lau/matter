@@ -23,8 +23,11 @@ For a production Cloudflare Workers build, run `npm run build` from macOS/Linux,
 - Shoe anatomy includes mesh vamp, tongue, laces, eyelets, padded collar, heel counter, sockliner, strobel board, cellular midsole and traction outsole.
 - Exploded product assemblies, projected component labels, motion speed and 18 variant-specific learning notes. The running animation uses two-link leg IK, opposing arms, stance and airborne intervals.
 - Two-phase material composition exploration with ideal Voigt/Reuss solid-modulus bounds and an illustrative lattice scaling law.
-- Field guide with distinctions between natural analogy and mathematical origin.
-- 20,520 real UCI elastodynamic dataset rows, center/width filtering, nearest matches, source attribution and export.
+- ReUI dropdown action menu and full-width icon tabs, matching accessible material selectors, self-hosted Inter typography and a 3D lattice logo.
+- Visual field guide with demand-rendered, rotatable lattices, concise explanations, expandable origins and direct variant links.
+- 77 contextual definitions: click dotted terms, highlight known jargon, or activate a 3D component label. Keyboard activation and Escape dismissal are supported.
+- Detailed fitted knee brace with tension dial and patella ring, ankle/collar alignment, vented helmet with a gravity-based slow-motion drop, and aft-swept aircraft tail surfaces.
+- 20,520 real UCI elastodynamic dataset rows, center/width filtering, exact stable top-five matches, a batched canvas plot, source attribution and export.
 - CSV/JSON import, positive-unit validation, evidence labels, source URLs, supported-family 3D mapping and JSON export. Imported data is kept only for the current tab session; export to retain it.
 - A source research catalog of nine families and three open datasets.
 
@@ -43,7 +46,11 @@ The catalog is curated, not exhaustive. Optical, thermal and electromagnetic fam
 ## Main files
 
 - `components/matter/Studio.tsx`: workspace, controls and import/export.
-- `components/matter/Scene.tsx`: procedural lattices, WebGL rendering and projected annotations.
+- `components/matter/Scene.tsx`: WebGL rendering and projected annotations.
+- `lib/matter/geometry.ts`: shared procedural lattice topology for the studio and card previews.
+- `components/matter/Glossary.tsx` and `lib/matter/glossary.json`: contextual definitions.
+- `components/matter/ReuiControls.tsx`: adapted ReUI c-dropdown-menu-1 and c-tabs-6 patterns.
+- `lib/matter/research.ts` and `components/matter/ResearchPlot.tsx`: exact nearest-match query and canvas rendering.
 - `components/matter/models/`: separate product assemblies, shoe anatomy, kinematic athlete and shared mesh primitives.
 - `components/matter/SoftwareRenderer.ts`: software geometry projection fallback.
 - `components/matter/ResearchExplorer.tsx`: actual UCI dataset exploration.

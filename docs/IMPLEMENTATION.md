@@ -25,7 +25,7 @@ For a realistic athlete: obtain an appropriately licensed rigged character and r
 
 These are scope boundaries and a continuation roadmap, not implemented capabilities.
 
-## Verification performed
+## Verification performed in earlier releases
 
 Production build and TypeScript no-emit validation passed. Browser checks covered rendered gyroid/octet software geometry, cutaway state, structure/behavior/application navigation, the animated shoe study, dataset loading and nearest-match selection. Imported JSON and quoted CSV append behavior was exercised; invalid dimensions, evidence labels, source URL schemes, numeric properties and unclosed CSV quotes were rejected. All 20,520 normalized research rows passed encoding and finite-number checks. No claim of real mobile-device or GPU performance benchmarking is made.
 
@@ -55,3 +55,19 @@ Geometry checks exercise all 18 product factories at three explosion states and 
 5. GPU and mobile visual regression checks for every family, variant, explosion state and reduced-motion setting.
 
 Blender and Unity MCP are still not connected to this Work environment. The source includes the existing manual connection guidance; this revision introduces no paid service dependency.
+
+## Readability and application anatomy revision (v3)
+
+The action menu is adapted from ReUI `c-dropdown-menu-1`, and visualization tabs from `c-tabs-6` (Radix Nova). Both requested `pnpm dlx shadcn@latest add ... --yes` commands were attempted. The runtime proxy refused the shadcn/ReUI registry connections, so the exact MIT-licensed patterns were read from the official `keenthemes/reui` repository and integrated locally with the already installed Radix primitives. `components.json` now records the canonical ReUI registry. No internal ReUI demo imports or new package-manager lockfiles remain. Value-bearing fields use Radix Select with the same menu treatment.
+
+The design system uses self-hosted Inter Variable, semantic dark-surface tokens, larger body text, visible focus states, equal-width icon tabs and progressive disclosure. Cards render the same mathematical topology as the studio, on demand rather than through six continuous animation loops. The logo uses a small 3D octet. A 77-entry glossary provides short contextual definitions through inline buttons, known-term text selection and component-label activation. The glossary is local; no external model call is required.
+
+Research exploration now caches the parsed dataset for revisits, keeps slider updates immediate, defers result work, and draws marks in one requestAnimationFrame canvas pass. ResizeObserver handles canvas sizing. Stable O(n·5) selection replaces filtering and sorting all qualifying rows. The exact 20,520-row dataset passed 500 equivalence checks, including ties. A local Node microbenchmark measured 1.908 ms/query for the old filter/sort and 0.182 ms/query for the new top-five scan; these measurements describe query work, not browser frame time. The result cards and sliders remain semantic HTML.
+
+The helmet has a continuous vented shell with thickness, a shaped headform, ear-side Y straps, a chin buckle and a fitted curved Kelvin liner. Free fall follows constant gravity; three damped rebounds settle at the contact surface. Scene scale for the ball is 0.1 m/unit, gravity is 98.1 units/s², and the display runs at 0.28 physical seconds per animation second. The repeat includes an explicitly labelled hidden reset stage. Exploding the assembly pauses the drop. Restitution is illustrative, not calibrated to helmet material; this is not an impact or injury solver.
+
+The brace includes a contoured knit sleeve, cuffs and seams, patella support ring, re-entrant cushioning, hinged side stays and a tension dial. The lower leg and shoe share a joint transform, and the ankle is aligned to the shoe's actual collar centre throughout flexion. Tail stabilizers and the fin now sweep aft, away from the aircraft's +X nose.
+
+Verification adds ballistic acceleration, energy loss, nonpenetration and settling checks; 120 knee poses with exact ankle/collar alignment; tail sweep orientation; and 150 randomized ranking checks. The existing 18-factory geometry and 240-frame gait checks remain. Local assembled/exploded geometry renders were inspected for the helmet, brace and aircraft. Browser inspection verified the field guide layout and interactive control structure before the session's preview connection became unavailable (`ERR_BLOCKED_BY_CLIENT` while the preview server remained healthy). Final dropdown, glossary, chart interaction and mobile browser QA could not be completed in that session. Full GPU lighting remains unverified in the available environment.
+
+Additional source review corrected inward face winding, disposed procedural textures on scene changes, and released unused WebGL contexts. The software fallback now respects face culling and parent visibility. These changes improve fallback rendering but do not make it a substitute for GPU visual verification.

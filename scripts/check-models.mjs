@@ -1,12 +1,15 @@
 import { build } from "esbuild";
-const result = await build({
+import { mkdir } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import path from "node:path";
+const out = path.resolve("node_modules/.cache/matter-model-tests.mjs");
+await mkdir(path.dirname(out), { recursive: true });
+await build({
   entryPoints: ["tests/application-models.ts"],
   bundle: true,
   platform: "node",
   format: "esm",
-  write: false,
+  outfile: out,
   logLevel: "warning",
 });
-await import(
-  `data:text/javascript;base64,${Buffer.from(result.outputFiles[0].contents).toString("base64")}`
-);
+await import(pathToFileURL(out).href);

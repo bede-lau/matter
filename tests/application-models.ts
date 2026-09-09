@@ -109,3 +109,101 @@ for (const phase of [0.36, 1]) {
 console.log(
   "PASS: fixed arm lengths, outsole-ground contact and continuous toe-off over 240 gait samples",
 );
+
+// Regression checks for the v3 gravity and equipment fit fixes.
+import {
+  sampleDrop,
+  DROP_GRAVITY,
+  DROP_HEIGHT,
+  DROP_RESTITUTION,
+} from "../components/matter/models/Helmet";
+import { nearestDesigns, type ResearchRow } from "../lib/matter/research";
+const impactTime = Math.sqrt((2 * DROP_HEIGHT) / DROP_GRAVITY);
+for (let i = 0; i < 100; i++) {
+  const t = (i / 100) * impactTime,
+    result = sampleDrop(t);
+  assert.ok(
+    Math.abs(result.height - (DROP_HEIGHT - 0.5 * DROP_GRAVITY * t * t)) <
+      1e-10,
+    "free fall obeys constant gravity",
+  );
+  assert.ok(
+    Math.abs(result.velocity + DROP_GRAVITY * t) < 1e-10,
+    "free-fall velocity accelerates downward",
+  );
+}
+const reboundSpeed =
+  Math.sqrt(2 * DROP_GRAVITY * DROP_HEIGHT) * DROP_RESTITUTION;
+assert.ok(
+  Math.abs(
+    sampleDrop(impactTime + reboundSpeed / DROP_GRAVITY).height -
+      DROP_HEIGHT * DROP_RESTITUTION ** 2,
+  ) < 1e-10,
+  "rebound loses energy",
+);
+for (let i = 0; i < 2000; i++)
+  assert.ok(
+    sampleDrop(i / 2000).height >= 0,
+    "ball never penetrates contact surface",
+  );
+assert.equal(sampleDrop(1).height, 0, "ball settles at rest");
+const fitRoot = new T.Group();
+fitRoot.add(
+  new T.Mesh(new T.BoxGeometry(3.5, 3.5, 3.5), new T.MeshStandardMaterial()),
+);
+const brace = createApplication("auxetic", 0, fitRoot, "#ffae82");
+for (let i = 0; i < 120; i++) {
+  brace.update(i / 12, 0);
+  brace.group.updateMatrixWorld(true);
+  const ankle = brace.group
+    .getObjectByName("ankle-centre")!
+    .getWorldPosition(new T.Vector3());
+  const collar = brace.group
+    .getObjectByName("shoe-collar-centre")!
+    .getWorldPosition(new T.Vector3());
+  assert.ok(
+    ankle.distanceTo(collar) < 1e-10,
+    "ankle remains seated at shoe collar throughout knee flexion",
+  );
+}
+const tailRoot = new T.Group();
+tailRoot.add(
+  new T.Mesh(new T.BoxGeometry(3.5, 3.5, 3.5), new T.MeshStandardMaterial()),
+);
+const aircraft = createApplication("octet", 0, tailRoot, "#86caff");
+for (const tail of aircraft.group.getObjectsByProperty(
+  "name",
+  "horizontal-tail",
+) as T.Mesh[]) {
+  const pos = tail.geometry.attributes.position;
+  assert.ok(
+    pos.getX(42) < pos.getX(0),
+    "horizontal tail tips sweep aft, away from +X nose",
+  );
+}
+let seed = 414;
+const random = () => {
+  seed = (seed * 1664525 + 1013904223) >>> 0;
+  return seed / 2 ** 32;
+};
+const queryRows: ResearchRow[] = Array.from({ length: 2500 }, (_, i) => [
+  String(i),
+  Math.floor(random() * 2000),
+  Math.floor(random() * 500),
+]);
+for (let i = 0; i < 150; i++) {
+  const target = Math.round(random() * 2000),
+    width = Math.round(random() * 500);
+  const expected = queryRows
+    .filter((r) => r[2] >= width)
+    .sort((a, b) => Math.abs(a[1] - target) - Math.abs(b[1] - target))
+    .slice(0, 5);
+  assert.deepEqual(
+    nearestDesigns(queryRows, target, width),
+    expected,
+    "fast lookup preserves exact ranking and ties",
+  );
+}
+console.log(
+  "PASS: ballistic drop, dissipative rebound, collision bounds, brace/shoe fit, aft-swept tail and stable exact nearest matches",
+);

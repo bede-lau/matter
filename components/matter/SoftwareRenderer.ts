@@ -71,7 +71,7 @@ export class SoftwareRenderer {
     const light = new T.Vector3(-0.4, 0.8, 0.5).normalize(),
       matrix = new T.Matrix4(),
       im = new T.Matrix4();
-    scene.traverse((obj) => {
+    scene.traverseVisible((obj) => {
       if (
         !(obj instanceof T.Mesh) ||
         obj.geometry.type === "PlaneGeometry" ||
@@ -118,6 +118,12 @@ export class SoftwareRenderer {
           normal
             .crossVectors(ab.subVectors(vb, va), ac.subVectors(vc, va))
             .normalize();
+          const facing = normal.dot(ab.copy(camera.position).sub(va));
+          if (
+            (mat.side === T.FrontSide && facing <= 0) ||
+            (mat.side === T.BackSide && facing >= 0)
+          )
+            continue;
           if (geo.attributes.normal) {
             normA.fromBufferAttribute(
               geo.attributes.normal,

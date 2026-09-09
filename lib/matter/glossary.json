@@ -1,0 +1,800 @@
+[
+  {
+    "id": "metamaterial",
+    "term": "Metamaterial",
+    "aliases": [
+      "engineered material",
+      "mechanical metamaterial",
+      "structural metamaterial",
+      "acoustic metamaterial",
+      "vibration metamaterial"
+    ],
+    "definition": "A metamaterial is an engineered material whose internal shape can be designed to influence mechanical, acoustic, or other behavior.",
+    "context": "Matter uses repeating cells to show how architecture can change a material concept."
+  },
+  {
+    "id": "geometry",
+    "term": "Geometry",
+    "aliases": [
+      "shape",
+      "material architecture",
+      "architecture"
+    ],
+    "definition": "Geometry, or material architecture, is the arrangement of shapes and spaces that makes up a structure.",
+    "context": "Changing the cell geometry is the main design action in the studio."
+  },
+  {
+    "id": "lattice",
+    "term": "Lattice",
+    "aliases": [
+      "cellular lattice",
+      "cellular network",
+      "network",
+      "cellular",
+      "cells"
+    ],
+    "definition": "A lattice is a connected framework of repeated small units with solid parts and open spaces.",
+    "context": "The studio renders lattices as repeated cells inside midsoles, cores, and liners."
+  },
+  {
+    "id": "unit-cell",
+    "term": "Unit cell",
+    "aliases": [
+      "periodic unit cell"
+    ],
+    "definition": "A unit cell is the smallest repeatable piece used to build a larger periodic structure.",
+    "context": "Structure view isolates the pattern that repeats across the 3D model."
+  },
+  {
+    "id": "periodic",
+    "term": "Periodic structure",
+    "aliases": [
+      "repetition",
+      "periodic architecture"
+    ],
+    "definition": "A periodic structure repeats the same unit cell at regular intervals.",
+    "context": "The Repetition control changes how many cells appear along X, Y, and Z."
+  },
+  {
+    "id": "cell-size",
+    "term": "Cell size",
+    "aliases": [
+      "unit-cell size"
+    ],
+    "definition": "Cell size is the overall dimension of one repeating lattice cell.",
+    "context": "Matter lets you set an illustrative cell size in millimetres."
+  },
+  {
+    "id": "strut",
+    "term": "Strut",
+    "aliases": [
+      "lattice member",
+      "rib",
+      "strut diameter",
+      "strut thickness"
+    ],
+    "definition": "A strut is a slender solid member that links points in a framework, and its diameter is its width.",
+    "context": "Octet and Kelvin models use struts to make their open networks visible."
+  },
+  {
+    "id": "wall-thickness",
+    "term": "Wall thickness",
+    "aliases": [
+      "sheet thickness"
+    ],
+    "definition": "Wall thickness is the distance through a sheet-like solid surface.",
+    "context": "For the sheet gyroid, the Thickness control changes wall thickness rather than a strut diameter."
+  },
+  {
+    "id": "relative-density",
+    "term": "Density and relative density",
+    "aliases": [
+      "density",
+      "density_kg_m3",
+      "relative density",
+      "solid fraction",
+      "volume fraction"
+    ],
+    "definition": "Density is mass per unit volume, while relative density is the fraction of a lattice volume occupied by solid material.",
+    "context": "The property card shows a rough illustrative estimate; it does not calculate the actual solid volume of the 3D mesh."
+  },
+  {
+    "id": "load-path",
+    "term": "Load path",
+    "aliases": [
+      "force path"
+    ],
+    "definition": "A load path is the route through which an applied force travels through a structure.",
+    "context": "The octet lesson asks you to inspect the triangular paths inside the wing core."
+  },
+  {
+    "id": "deformation",
+    "term": "Deformation",
+    "aliases": [
+      "compression",
+      "deflection"
+    ],
+    "definition": "Deformation is a change in an object\u2019s shape or size caused by forces or motion.",
+    "context": "Behavior mode shows schematic deformation for learning, not a calculated result."
+  },
+  {
+    "id": "stiffness",
+    "term": "Stiffness",
+    "aliases": [
+      "rigidity"
+    ],
+    "definition": "Stiffness describes how strongly an object resists being deformed by a load.",
+    "context": "The app uses \u201clight but stiff\u201d as a qualitative label for the octet truss."
+  },
+  {
+    "id": "modulus",
+    "term": "Modulus",
+    "aliases": [
+      "elastic modulus",
+      "Young\u2019s modulus"
+    ],
+    "definition": "Modulus is a number that describes a material\u2019s elastic resistance to being stretched or compressed.",
+    "context": "The property card presents an illustrative modulus range in MPa."
+  },
+  {
+    "id": "mpa",
+    "term": "MPa",
+    "aliases": [
+      "megapascal"
+    ],
+    "definition": "A megapascal is one million pascals, a unit commonly used for stress and modulus.",
+    "context": "Matter labels material modulus values and bounds in MPa."
+  },
+  {
+    "id": "voigt-bound",
+    "term": "Voigt and Reuss bounds",
+    "aliases": [
+      "Voigt estimate",
+      "upper mixture bound",
+      "Reuss bound",
+      "Reuss estimate",
+      "lower mixture bound",
+      "Voigt bound",
+      "Reuss\u2013Voigt",
+      "Reuss-Voigt"
+    ],
+    "definition": "Voigt and Reuss bounds are ideal mixture estimates based on equal strain and equal stress assumptions, respectively.",
+    "context": "Matter reports both bounds for an ideal solid mixture and uses neither as a lattice-performance result."
+  },
+  {
+    "id": "two-phase-mixture",
+    "term": "Two-phase mixture",
+    "aliases": [
+      "two-material blend",
+      "secondary material"
+    ],
+    "definition": "A two-phase mixture combines two different materials in specified proportions.",
+    "context": "The secondary-material slider makes an ideal blend and does not assess manufacturability."
+  },
+  {
+    "id": "tpu",
+    "term": "TPU elastomer",
+    "aliases": [
+      "TPU",
+      "thermoplastic polyurethane",
+      "elastomer"
+    ],
+    "definition": "TPU is a thermoplastic polyurethane that can behave like a flexible, rubber-like solid.",
+    "context": "TPU elastomer is one of Matter\u2019s illustrative base-material choices."
+  },
+  {
+    "id": "pa12",
+    "term": "Nylon PA12",
+    "aliases": [
+      "PA12",
+      "polyamide 12",
+      "nylon"
+    ],
+    "definition": "PA12 is a nylon polymer known as polyamide 12.",
+    "context": "Nylon PA12 is available as a contrasting illustrative base material."
+  },
+  {
+    "id": "metals",
+    "term": "Aluminium and titanium",
+    "aliases": [
+      "aluminum",
+      "titanium"
+    ],
+    "definition": "Aluminium and titanium are metals included as higher-modulus illustrative base-material choices.",
+    "context": "Selecting either metal changes the app\u2019s ideal solid-mixture inputs, not a validated lattice result."
+  },
+  {
+    "id": "gyroid",
+    "term": "Gyroid",
+    "aliases": [
+      "gyroid geometry"
+    ],
+    "definition": "A gyroid is a continuously curved, repeating geometry that divides space into intertwined passages.",
+    "context": "Matter places a gyroid-inspired network in the shoe midsole study."
+  },
+  {
+    "id": "sheet-gyroid",
+    "term": "Sheet gyroid",
+    "aliases": [
+      "gyroid sheet"
+    ],
+    "definition": "A sheet gyroid makes the gyroid pattern from continuous curved walls.",
+    "context": "The Sheet gyroid variant lets you inspect curved walls through the open midsole."
+  },
+  {
+    "id": "skeletal-gyroid",
+    "term": "Skeletal gyroid",
+    "aliases": [
+      "solid-network gyroid"
+    ],
+    "definition": "A skeletal gyroid represents the gyroid pattern as connected solid branches instead of a continuous sheet.",
+    "context": "Matter contrasts the branch-like voids with the sheet-gyroid version."
+  },
+  {
+    "id": "minimal-surface",
+    "term": "Minimal surface",
+    "aliases": [
+      "minimal-area surface"
+    ],
+    "definition": "A minimal surface is a surface that locally minimizes area and has zero average curvature at each point.",
+    "context": "The field guide identifies the gyroid as a mathematical minimal-surface geometry."
+  },
+  {
+    "id": "octet-truss",
+    "term": "Octet truss",
+    "aliases": [
+      "octet lattice",
+      "tetrahedron",
+      "tetrahedral cell",
+      "octahedron",
+      "octahedral cell"
+    ],
+    "definition": "An octet truss is a repeating framework built from tetrahedra (four triangular faces) and octahedra (eight triangular faces).",
+    "context": "Matter uses an octet core in its aircraft-wing cutaway study."
+  },
+  {
+    "id": "anisotropic",
+    "term": "Anisotropic",
+    "aliases": [
+      "directional"
+    ],
+    "definition": "An anisotropic structure responds differently in different directions, while an isotropic one responds the same in every direction.",
+    "context": "The Anisotropic octet stretches cells to make a preferred geometric direction visible."
+  },
+  {
+    "id": "graded",
+    "term": "Graded",
+    "aliases": [
+      "spatially graded",
+      "zoned"
+    ],
+    "definition": "A graded structure changes a feature from place to place, while a uniform structure keeps that feature the same throughout the shown region.",
+    "context": "Graded variants change wall, strut, or resonator dimensions across the study object."
+  },
+  {
+    "id": "reentrant",
+    "term": "Re-entrant cell",
+    "aliases": [
+      "re-entrant honeycomb",
+      "inward-folded cell"
+    ],
+    "definition": "A re-entrant cell has ribs that point inward, creating an indented geometry.",
+    "context": "Matter shows these inward ribs in the wearable knee-protection insert."
+  },
+  {
+    "id": "auxetic",
+    "term": "Auxetic",
+    "aliases": [
+      "negative-Poisson-ratio structure"
+    ],
+    "definition": "An auxetic structure can become wider when it is pulled longer in a chosen direction.",
+    "context": "The re-entrant lesson uses rib rotation to explain this idealized response."
+  },
+  {
+    "id": "poisson-ratio",
+    "term": "Poisson ratio",
+    "aliases": [
+      "negative Poisson ratio"
+    ],
+    "definition": "Poisson ratio is the negative of sideways strain divided by lengthwise strain: a negative value means a structure gets wider as it gets longer.",
+    "context": "A negative value is the geometric idea behind Matter\u2019s auxetic re-entrant cell."
+  },
+  {
+    "id": "kelvin-cell",
+    "term": "Kelvin cell",
+    "aliases": [
+      "Kelvin foam cell"
+    ],
+    "definition": "A Kelvin cell is a space-filling cell based on a truncated octahedron.",
+    "context": "Matter curves a patch of Kelvin cells beneath a cycling-helmet shell."
+  },
+  {
+    "id": "truncated-octahedron",
+    "term": "Truncated octahedron",
+    "aliases": [
+      "Kelvin tetrakaidecahedron"
+    ],
+    "definition": "A truncated octahedron is a 14-faced solid with eight hexagonal faces and six square faces.",
+    "context": "Its edge network is the geometric basis for the Kelvin-cell liner study."
+  },
+  {
+    "id": "honeycomb",
+    "term": "Honeycomb",
+    "aliases": [
+      "hexagonal honeycomb"
+    ],
+    "definition": "A honeycomb is a cellular structure made from repeating wall-enclosed cells, often hexagons.",
+    "context": "Matter places honeycomb walls between the skins of a skateboard deck."
+  },
+  {
+    "id": "hexagonal-cell",
+    "term": "Hexagonal cell",
+    "aliases": [
+      "hexagon"
+    ],
+    "definition": "A hexagonal cell is a six-sided cell shape.",
+    "context": "The Honeycomb variants compare regular and elongated hexagonal cells."
+  },
+  {
+    "id": "local-resonator",
+    "term": "Local resonator",
+    "aliases": [
+      "resonant unit",
+      "locally resonant supports"
+    ],
+    "definition": "A local resonator is an internal part that can oscillate relative to the surrounding structure.",
+    "context": "Matter animates internal masses inside a motor isolation mount to explain the idea."
+  },
+  {
+    "id": "resonance",
+    "term": "Resonance",
+    "aliases": [
+      "resonant frequency"
+    ],
+    "definition": "Resonance occurs when a system responds strongly near one of its natural frequencies.",
+    "context": "The local-resonator guide describes wave effects near resonance without quantifying a mount."
+  },
+  {
+    "id": "mass-spring",
+    "term": "Mass\u2013spring oscillator",
+    "aliases": [
+      "mass-spring system",
+      "oscillator",
+      "oscillating internal masses"
+    ],
+    "definition": "A mass\u2013spring oscillator is a simple model in which a mass moves back and forth against a restoring spring force.",
+    "context": "Matter uses this model to introduce the motion of a local resonator."
+  },
+  {
+    "id": "elastodynamic",
+    "term": "Elastodynamic",
+    "aliases": [
+      "elastodynamics"
+    ],
+    "definition": "Elastodynamic describes elastic waves and vibrations moving through a solid over time.",
+    "context": "The Research Explorer filters a separate dataset of 2D elastodynamic designs."
+  },
+  {
+    "id": "band-gap",
+    "term": "Band gap",
+    "aliases": [
+      "frequency band gap",
+      "band-gap center",
+      "gap center",
+      "band-gap width",
+      "gap width"
+    ],
+    "definition": "A band gap is a frequency interval in which waves cannot propagate in the dataset\u2019s ideal infinite periodic model; its center is the midpoint and its width is the interval\u2019s span.",
+    "context": "The dataset controls search for records by their reported band-gap location and span."
+  },
+  {
+    "id": "frequency",
+    "term": "Frequency",
+    "aliases": [
+      "Hz",
+      "hertz"
+    ],
+    "definition": "Frequency is the number of repeated cycles of a vibration or wave that occur each second.",
+    "context": "Research Explorer expresses band-gap center and width in hertz."
+  },
+  {
+    "id": "wave-propagation",
+    "term": "Wave propagation",
+    "aliases": [
+      "wave transmission"
+    ],
+    "definition": "Wave propagation is the movement of a wave through a material or structure.",
+    "context": "The band-gap note describes conditions where waves cannot propagate through an ideal model."
+  },
+  {
+    "id": "simulated-design",
+    "term": "Simulated design",
+    "aliases": [
+      "simulation",
+      "modeled design"
+    ],
+    "definition": "A simulated design is evaluated with a computational model rather than directly measured on a physical specimen.",
+    "context": "The UCI rows in Research Explorer are labeled simulated and remain separate from the 3D catalog."
+  },
+  {
+    "id": "evidence-label",
+    "term": "Evidence label",
+    "aliases": [
+      "measured",
+      "simulated",
+      "illustrative"
+    ],
+    "definition": "An evidence label states whether a record is measured, simulated, or illustrative.",
+    "context": "Imported records must retain one of these labels alongside their source URL."
+  },
+  {
+    "id": "source-encoding",
+    "term": "15-bit source encoding",
+    "aliases": [
+      "binary encoding",
+      "encoded design"
+    ],
+    "definition": "A 15-bit source encoding is a string of 15 zeros and ones used by the dataset to represent a design record.",
+    "context": "Matter displays the dataset code but says it is not a spatial reconstruction of a unit cell."
+  },
+  {
+    "id": "midsole",
+    "term": "Midsole",
+    "aliases": [
+      "cushioning midsole"
+    ],
+    "definition": "The midsole is the shoe layer between the upper and outsole that commonly provides cushioning and structure.",
+    "context": "Matter places the gyroid lattice in the midsole of its athletic-shoe anatomy study."
+  },
+  {
+    "id": "outsole",
+    "term": "Outsole",
+    "aliases": [
+      "rubber outsole",
+      "traction"
+    ],
+    "definition": "The outsole is the bottom shoe layer that contacts the ground and can provide grip.",
+    "context": "Matter labels the lowermost shoe part as the rubber outsole plus traction."
+  },
+  {
+    "id": "insole",
+    "term": "Insole and sockliner",
+    "aliases": [
+      "insole",
+      "sockliner",
+      "footbed"
+    ],
+    "definition": "An insole or sockliner is the layer inside a shoe that sits directly below the foot.",
+    "context": "The shoe cutaway separates this foot-support layer above the midsole."
+  },
+  {
+    "id": "strobel",
+    "term": "Strobel board",
+    "aliases": [
+      "strobel structural layer",
+      "strobel"
+    ],
+    "definition": "A Strobel board is a thin shoe construction layer that forms a base for the upper and sits above the midsole.",
+    "context": "Matter labels it as a structural layer in the exploded shoe view."
+  },
+  {
+    "id": "shoe-upper",
+    "term": "Shoe upper",
+    "aliases": [
+      "upper",
+      "tongue",
+      "laces",
+      "eyestay",
+      "padded collar",
+      "heel counter",
+      "collar"
+    ],
+    "definition": "The shoe upper is the part surrounding the foot, with components such as the tongue, laces, collar, and heel counter helping fit and hold it in place.",
+    "context": "Matter groups the upper, tongue, and laces in one label and shows the collar and heel counter separately."
+  },
+  {
+    "id": "airfoil",
+    "term": "Airfoil",
+    "aliases": [
+      "aerofoil"
+    ],
+    "definition": "An airfoil is a wing cross-section shaped to guide airflow and generate aerodynamic forces.",
+    "context": "Matter keeps the wing\u2019s outer airfoil shape while revealing its internal octet core."
+  },
+  {
+    "id": "wing-skin",
+    "term": "Wing skin",
+    "aliases": [
+      "airfoil skin",
+      "inspection skin",
+      "core",
+      "wing core",
+      "sandwich core"
+    ],
+    "definition": "Wing skin is the thin outer aerodynamic covering, while a core is the internal layer held between outer skins in a lightweight built-up structure.",
+    "context": "The cutaway moves an inspection skin aside to expose the core beneath it."
+  },
+  {
+    "id": "core",
+    "term": "Core",
+    "aliases": [
+      "wing core",
+      "sandwich core"
+    ],
+    "definition": "A core is the internal layer between outer skins in a lightweight built-up structure.",
+    "context": "Matter\u2019s octet core sits inside the aircraft-wing cutaway."
+  },
+  {
+    "id": "cutaway",
+    "term": "Cutaway",
+    "aliases": [
+      "inspection cutaway",
+      "section view"
+    ],
+    "definition": "A cutaway is a view made by removing or moving part of an outer surface to reveal the inside.",
+    "context": "The Cutaway button exposes lattice geometry inside application models."
+  },
+  {
+    "id": "helmet",
+    "term": "Helmet shell, liner, and vent",
+    "aliases": [
+      "helmet shell",
+      "helmet liner",
+      "vented shell",
+      "vent",
+      "vented outer shell",
+      "cellular liner",
+      "helmet liner"
+    ],
+    "definition": "A helmet shell is the outer covering, a liner is the layer beneath it, and vents are openings through the shell.",
+    "context": "Matter shows a Kelvin-cell liner beneath a vented helmet shell as an illustrative design study."
+  },
+  {
+    "id": "knee-protection",
+    "term": "Knee-pad shell and insert",
+    "aliases": [
+      "knee pad",
+      "protective shell",
+      "cellular insert"
+    ],
+    "definition": "A knee pad can combine an outer shell with an inner insert that follows the joint area.",
+    "context": "Matter uses the re-entrant insert to illustrate geometric conformity around a flexed knee."
+  },
+  {
+    "id": "motor-mount",
+    "term": "Motor isolation mount",
+    "aliases": [
+      "isolation mount",
+      "motor excitation"
+    ],
+    "definition": "A motor isolation mount is a support placed between a motor and its surroundings to manage transmitted vibration.",
+    "context": "Matter animates a motor above local resonators without claiming a calculated vibration reduction."
+  },
+  {
+    "id": "uniform",
+    "term": "Uniform",
+    "aliases": [
+      "constant"
+    ],
+    "definition": "Uniform means the chosen feature stays the same throughout the structure.",
+    "context": "A uniform lattice uses the same cell dimensions and member thickness throughout."
+  },
+  {
+    "id": "isotropic",
+    "term": "Isotropic",
+    "aliases": [
+      "isotropy"
+    ],
+    "definition": "Isotropic means a property is the same in every direction.",
+    "context": "This contrasts with an anisotropic design, whose response depends on direction."
+  },
+  {
+    "id": "patella",
+    "term": "Patella support",
+    "aliases": [
+      "patella support ring",
+      "patella",
+      "kneecap"
+    ],
+    "definition": "The patella is your kneecap; a support ring surrounds it with a cushioned opening.",
+    "context": "The knee study places a contoured ring in front of the fitted textile sleeve."
+  },
+  {
+    "id": "sleeve",
+    "term": "Compression-knit sleeve",
+    "aliases": [
+      "textile sleeve",
+      "compression-knit sleeve",
+      "sleeve",
+      "textile"
+    ],
+    "definition": "A compression sleeve is a close-fitting stretch fabric that wraps around a limb.",
+    "context": "The brace sleeve follows the thigh and lower leg while the joint bends."
+  },
+  {
+    "id": "dial",
+    "term": "Brace adjustment",
+    "aliases": [
+      "tension dial",
+      "side stays",
+      "articulated side supports"
+    ],
+    "definition": "A tension dial tightens a cable, while side stays are reinforcing strips along the sides of a brace.",
+    "context": "The knee model shows a laced dial and side supports that pivot at the knee."
+  },
+  {
+    "id": "headform",
+    "term": "Headform",
+    "aliases": [
+      "anatomical headform",
+      "headform",
+      "fitting geometry"
+    ],
+    "definition": "A headform is a shaped model of a human head used to inspect fit or perform controlled tests.",
+    "context": "The helmet is fitted around a rigid mannequin head; it is not a biological injury simulation."
+  },
+  {
+    "id": "retention",
+    "term": "Retention system",
+    "aliases": [
+      "chin retention system",
+      "retention straps",
+      "chin strap",
+      "chin retention"
+    ],
+    "definition": "A retention system holds protective equipment in place using straps, buckles or fitted bands.",
+    "context": "The helmet straps join below each ear and pass under the chin."
+  },
+  {
+    "id": "gravity",
+    "term": "Gravity",
+    "aliases": [
+      "free fall",
+      "gravity"
+    ],
+    "definition": "Gravity is the attraction that accelerates a released object downward.",
+    "context": "The ball follows a parabolic path under constant gravity, shown in slow motion."
+  },
+  {
+    "id": "rebound",
+    "term": "Rebound",
+    "aliases": [
+      "restitution",
+      "impact energy",
+      "rebound"
+    ],
+    "definition": "A rebound is the upward motion after a collision; a less elastic collision gives a smaller rebound.",
+    "context": "The illustrative ball loses speed at each contact and eventually rests on the shell."
+  },
+  {
+    "id": "tail",
+    "term": "Tail stabilizer",
+    "aliases": [
+      "horizontal tail",
+      "tail fin",
+      "stabilizer"
+    ],
+    "definition": "Tail stabilizers are the small rear aerodynamic surfaces that help control an aircraft\u2019s orientation.",
+    "context": "The horizontal tail and vertical fin sweep backward, away from the nose."
+  },
+  {
+    "id": "stiff",
+    "term": "Stiff",
+    "aliases": [
+      "stiff"
+    ],
+    "definition": "A stiff object needs more force to bend or stretch by the same amount.",
+    "context": "The octet truss uses triangles to resist deformation with relatively little solid material."
+  },
+  {
+    "id": "vibration",
+    "term": "Vibration",
+    "aliases": [
+      "vibrations",
+      "oscillate",
+      "oscillation"
+    ],
+    "definition": "Vibration is repeated back-and-forth motion around a resting position.",
+    "context": "A local resonator uses an internal moving mass to influence particular vibration frequencies."
+  },
+  {
+    "id": "tetrahedra",
+    "term": "Tetrahedra and octahedra",
+    "aliases": [
+      "tetrahedra",
+      "octahedra"
+    ],
+    "definition": "A tetrahedron has four triangular faces; an octahedron has eight.",
+    "context": "Their edges form the repeating triangulated framework in the octet truss."
+  },
+  {
+    "id": "load",
+    "term": "Load",
+    "aliases": [
+      "loads",
+      "load"
+    ],
+    "definition": "A load is a force acting on a material or structure.",
+    "context": "A runner\u2019s weight loads the sole, while an impact briefly loads the helmet liner."
+  },
+  {
+    "id": "tension",
+    "term": "Tension",
+    "aliases": [
+      "strain",
+      "stretching"
+    ],
+    "definition": "Tension is a pulling force; strain describes how much a dimension changes compared with its starting size.",
+    "context": "Pulling a re-entrant lattice rotates its inward ribs and can make it widen."
+  },
+  {
+    "id": "airframe",
+    "term": "Airframe",
+    "aliases": [
+      "airframe"
+    ],
+    "definition": "An airframe is the load-carrying structure of an aircraft, including its fuselage, wings and tail.",
+    "context": "The wing cutaway shows one possible internal core within that structure."
+  },
+  {
+    "id": "engine",
+    "term": "Aircraft engine",
+    "aliases": [
+      "engine"
+    ],
+    "definition": "An aircraft engine provides thrust to move the aircraft through the air.",
+    "context": "The engine hangs beneath the wing, which must carry the engine and aerodynamic loads."
+  },
+  {
+    "id": "grip",
+    "term": "Grip tape and deck skin",
+    "aliases": [
+      "grip tape",
+      "upper skin",
+      "deck skin"
+    ],
+    "definition": "Grip tape is the rough surface under a skateboard rider\u2019s feet; the deck skin is a structural outer layer below it.",
+    "context": "Exploding the deck separates this upper layer from the honeycomb core."
+  },
+  {
+    "id": "truck",
+    "term": "Skateboard trucks and axles",
+    "aliases": [
+      "trucks",
+      "axles"
+    ],
+    "definition": "Trucks are the metal assemblies that attach the wheels to a skateboard; axles are the shafts the wheels turn around.",
+    "context": "The truck assemblies connect the lightweight deck to the four wheels."
+  },
+  {
+    "id": "urethane",
+    "term": "Urethane wheels",
+    "aliases": [
+      "urethane wheels",
+      "urethane",
+      "wheels"
+    ],
+    "definition": "Urethane is a polymer commonly used to make resilient skateboard wheels.",
+    "context": "The wheels rotate as a visual demonstration; grip and rolling resistance are not calculated."
+  },
+  {
+    "id": "motor",
+    "term": "Motor and rotating drive",
+    "aliases": [
+      "motor",
+      "rotating drive"
+    ],
+    "definition": "A motor converts energy into rotation and can also produce unwanted vibration.",
+    "context": "The local-resonator study shows a rotating motor mounted above an internal mass-and-spring network."
+  },
+  {
+    "id": "skid",
+    "term": "Mounting skid",
+    "aliases": [
+      "mounting skid",
+      "anchored mounting skid"
+    ],
+    "definition": "A mounting skid is a base frame that holds equipment in position.",
+    "context": "The skid stays anchored while the motor and internal resonator masses move."
+  }
+]
