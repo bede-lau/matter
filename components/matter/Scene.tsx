@@ -1,7 +1,7 @@
 "use client";
 import { createApplication, type Application } from "./models/Applications";
 import { SoftwareRenderer } from "./SoftwareRenderer";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as T from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
@@ -26,13 +26,15 @@ export type SceneProps = {
 export default function Scene(p: SceneProps) {
   const host = useRef<HTMLDivElement>(null);
   const latest = useRef(p);
-  latest.current = p;
-  const [error, setError] = useState("");
+  useEffect(() => {
+    latest.current = p;
+  }, [p]);
   useEffect(() => {
     if (!host.current) return;
     const container = host.current;
     let renderer: T.WebGLRenderer | SoftwareRenderer;
     let software = false;
+    let fallback: HTMLDivElement | undefined;
     try {
       renderer = new T.WebGLRenderer({
         antialias: true,
@@ -42,7 +44,6 @@ export default function Scene(p: SceneProps) {
     } catch {
       renderer = new SoftwareRenderer();
       software = true;
-      setError("Software 3D preview · Enable WebGL for full lighting");
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.shadowMap.enabled = true;
@@ -50,11 +51,16 @@ export default function Scene(p: SceneProps) {
     renderer.toneMapping = T.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.88;
     container.appendChild(renderer.domElement);
+    if (software) {
+      fallback = document.createElement("div");
+      fallback.className = "scene-fallback";
+      fallback.textContent = "Software 3D preview · Enable WebGL for full lighting";
+      container.appendChild(fallback);
+    }
     renderer.domElement.setAttribute(
       "aria-label",
       `${p.kind} interactive three-dimensional lattice`,
     );
-    if (!software) setError("");
     const scene = new T.Scene();
     scene.background = new T.Color(0x111820);
     scene.environmentIntensity = 0.45;
@@ -308,6 +314,7 @@ export default function Scene(p: SceneProps) {
       renderer.dispose();
       if (!software) (renderer as T.WebGLRenderer).forceContextLoss();
       renderer.domElement.remove();
+      fallback?.remove();
       overlay.remove();
       motionLabel.remove();
     };
@@ -325,8 +332,8 @@ export default function Scene(p: SceneProps) {
     p.reset,
   ]);
   return (
-    <div ref={host} className="scene">
-      {error && <div className="scene-fallback">{error}</div>}
+    <div className="scene">
+      <div ref={host} className="scene-canvas-host" />
     </div>
   );
 }

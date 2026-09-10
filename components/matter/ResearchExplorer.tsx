@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState, useDeferredValue } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { nearestDesigns, type ResearchRow as Row } from "@/lib/matter/research";
 import ResearchPlot from "./ResearchPlot";
@@ -35,11 +35,9 @@ export default function ResearchExplorer() {
       active = false;
     };
   }, []);
-  const deferredTarget = useDeferredValue(target),
-    deferredWidth = useDeferredValue(width);
   const matches = useMemo(
-    () => nearestDesigns(rows, deferredTarget, deferredWidth),
-    [rows, deferredTarget, deferredWidth],
+    () => nearestDesigns(rows, target, width),
+    [rows, target, width],
   );
   const best = selected ?? matches[0];
   const sample = useMemo(() => rows.filter((_, i) => i % 21 === 0), [rows]);
@@ -66,7 +64,7 @@ export default function ResearchExplorer() {
       {error && <p role="alert">{error}</p>}
       <div
         className="research-body"
-        aria-busy={target !== deferredTarget || width !== deferredWidth}
+        aria-busy={!rows.length && !error}
       >
         <div className="research-controls">
           <label>
@@ -115,8 +113,8 @@ export default function ResearchExplorer() {
         <div className="research-plot">
           <ResearchPlot
             sample={sample}
-            target={deferredTarget}
-            width={deferredWidth}
+            target={target}
+            width={width}
             best={best}
           />
 

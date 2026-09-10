@@ -21,16 +21,16 @@ import {
   Atom,
   X,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Choice, ExportMenu, ModeTabs } from "./ReuiControls";
 import MiniLattice from "./MiniLattice";
 import { GlossaryProvider, GlossaryText } from "./Glossary";
 import { families, bases } from "@/lib/matter/catalog";
-import { learningSteps, materialCards, structureCards } from "@/lib/matter/learning";
+import { structureCards } from "@/lib/matter/learning";
 import Scene from "./Scene";
 import ResearchExplorer from "./ResearchExplorer";
+import FieldGuide from "./FieldGuide";
 type RecordRow = {
   family: string;
   variant: string;
@@ -64,6 +64,12 @@ export default function Studio() {
     [notice, setNotice] = useState(""),
     [records, setRecords] = useState<RecordRow[]>([]),
     [filter, setFilter] = useState("All structures");
+  const [sceneParameters, setSceneParameters] = useState({
+    blend: 0,
+    count: 3,
+    thick: 0.8,
+    size: 10,
+  });
   const file = useRef<HTMLInputElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const f = families[family];
@@ -95,6 +101,20 @@ export default function Studio() {
   const choose = (i: number) => {
     setFamily(i);
     setVariant(0);
+  };
+  const resetParameters = () => {
+    const next = { blend: 0, count: 3, thick: 0.8, size: 10 };
+    setSize(next.size);
+    setThick(next.thick);
+    setCount(next.count);
+    setBase(0);
+    setBlend(next.blend);
+    setSecond(1);
+    setVariant(0);
+    setWire(false);
+    setSection(false);
+    setSceneParameters(next);
+    setReset((value) => value + 1);
   };
   const catalog = useMemo(
     () =>
@@ -257,7 +277,7 @@ export default function Studio() {
             INTERACTIVE MATERIAL ATLAS <span>LAB / 01</span>
           </div>
         </header>
-        <div className="workspace-heading">
+        {tab !== "learn" && <div className="workspace-heading">
           <div>
             <div className="eyebrow">
               EXPLORATION /{" "}
@@ -279,7 +299,7 @@ export default function Studio() {
                 ? "Choose what it is made from. Change the repeating cell. Then connect that behavior to a possible use."
                 : tab === "data"
                   ? "Explore source-backed measurements and simulations while keeping evidence labels attached to every result."
-                  : "Learn each structure as a simple chain: reference → engineered cell → changed behavior → possible use."}
+                  : "Explore one structure at a time, from a real reference to a live 3D lesson."}
             </p>
           </div>
           <ExportMenu
@@ -307,14 +327,14 @@ export default function Studio() {
             dataset={() => download(records, "matter-dataset.json")}
             guide={() => setTab("learn")}
           />
-        </div>
-        <div className="learning-hint">
+        </div>}
+        {tab !== "learn" && <div className="learning-hint">
           <BookOpen size={15} />
           <span>
             New here? <strong>Tap a dotted term</strong> or highlight a known
             phrase for a short, plain-language definition.
           </span>
-        </div>
+        </div>}
         {tab === "studio" && (
           <div className="studio-grid">
             <aside className="catalog">
@@ -342,31 +362,40 @@ export default function Studio() {
                 )}
               />
               <div className="structure-list">
-                {catalog.map((v) => (
-                  <button
-                    key={v.id}
-                    className={
-                      "structure-card " + (v.index === family ? "selected" : "")
-                    }
-                    onClick={() => choose(v.index)}
-                  >
-                    <span
-                      className={"mini-structure mini-" + v.id}
-                      style={{ color: v.color }}
+                {catalog.map((v) => {
+                  const reference = structureCards.find((card) => card.id === v.id);
+                  return (
+                    <button
+                      key={v.id}
+                      className={
+                        "structure-card " + (v.index === family ? "selected" : "")
+                      }
+                      onClick={() => choose(v.index)}
                     >
-                      <Box size={35} strokeWidth={1} />
-                    </span>
-                    <span>
-                      <strong>{v.name}</strong>
-                      <small>{v.tag}</small>
-                    </span>
-                    {v.index === family ? (
-                      <span className="selected-dot" />
-                    ) : (
-                      <ChevronRight size={14} />
-                    )}
-                  </button>
-                ))}
+                      <span className="mini-structure" aria-hidden="true">
+                        {reference && (
+                          <img
+                            src={reference.image}
+                            alt=""
+                            width={48}
+                            height={48}
+                            loading={v.index === family ? "eager" : "lazy"}
+                            decoding="async"
+                          />
+                        )}
+                      </span>
+                      <span>
+                        <strong>{v.name}</strong>
+                        <small>{v.tag}</small>
+                      </span>
+                      {v.index === family ? (
+                        <span className="selected-dot" />
+                      ) : (
+                        <ChevronRight size={14} />
+                      )}
+                    </button>
+                  );
+                })}
                 {catalog.length === 0 && (
                   <p className="empty">No matching structures.</p>
                 )}
@@ -409,11 +438,11 @@ export default function Studio() {
                 <Scene
                   kind={f.id}
                   variant={variant}
-                  count={count}
-                  thickness={(thick * 10) / size}
+                  count={sceneParameters.count}
+                  thickness={(sceneParameters.thick * 10) / sceneParameters.size}
                   color={baseMaterial.color}
                   secondaryColor={secondaryMaterial.color}
-                  blend={fraction}
+                  blend={sceneParameters.blend / 100}
                   playing={play}
                   mode={mode}
                   wire={wire}
@@ -423,28 +452,30 @@ export default function Studio() {
                   labels={showLabels}
                   speed={speed}
                 />
-                <div className="viewport-tag">
-                  {mode === "application"
-                    ? f.application + " · product anatomy"
-                    : mode === "deform"
-                      ? "Illustrative compression"
-                      : "Periodic unit-cell architecture"}
-                </div>
-                <div className="material-phase-key" aria-live="polite">
-                  <span className="phase-key-item">
-                    <i style={{ backgroundColor: baseMaterial.color }} />
-                    Base · {baseMaterial.name} <strong>{100 - blend}%</strong>
-                  </span>
-                  {blend > 0 && (
-                    <>
-                      <ArrowRight size={14} aria-hidden="true" />
-                      <span className="phase-key-item">
-                        <i style={{ backgroundColor: secondaryMaterial.color }} />
-                        Secondary · {secondaryMaterial.name}{" "}
-                        <strong>{blend}%</strong>
-                      </span>
-                    </>
-                  )}
+                <div className="viewport-meta">
+                  <div className="viewport-tag">
+                    {mode === "application"
+                      ? f.application + " · product anatomy"
+                      : mode === "deform"
+                        ? "Illustrative compression"
+                        : "Periodic unit-cell architecture"}
+                  </div>
+                  <div className="material-phase-key" aria-live="polite">
+                    <span className="phase-key-item">
+                      <i style={{ backgroundColor: baseMaterial.color }} />
+                      Base · {baseMaterial.name} <strong>{100 - blend}%</strong>
+                    </span>
+                    {blend > 0 && (
+                      <>
+                        <ArrowRight size={14} aria-hidden="true" />
+                        <span className="phase-key-item">
+                          <i style={{ backgroundColor: secondaryMaterial.color }} />
+                          Secondary · {secondaryMaterial.name}{" "}
+                          <strong>{blend}%</strong>
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="view-tools">
                   <button
@@ -599,7 +630,7 @@ export default function Studio() {
                   )}
                   {mode !== "structure" && (
                     <small>
-                      This is illustrative geometry and motion—not a tested
+                      This is illustrative geometry and motion, not a tested
                       product or an engineering result.
                     </small>
                   )}
@@ -704,6 +735,12 @@ export default function Studio() {
                   step={5}
                   value={[blend]}
                   onValueChange={(v) => setBlend(v[0])}
+                  onValueCommit={(v) =>
+                    setSceneParameters((current) => ({
+                      ...current,
+                      blend: v[0],
+                    }))
+                  }
                   className="mt-4"
                 />
                 <span className="control-hint">
@@ -726,6 +763,12 @@ export default function Studio() {
                   step={0.5}
                   value={[size]}
                   onValueChange={(v) => setSize(v[0])}
+                  onValueCommit={(v) =>
+                    setSceneParameters((current) => ({
+                      ...current,
+                      size: v[0],
+                    }))
+                  }
                 />
                 <div className="range-ends">
                   <span>5 mm</span>
@@ -748,6 +791,12 @@ export default function Studio() {
                   step={0.05}
                   value={[thick]}
                   onValueChange={(v) => setThick(v[0])}
+                  onValueCommit={(v) =>
+                    setSceneParameters((current) => ({
+                      ...current,
+                      thick: v[0],
+                    }))
+                  }
                 />
                 <div className="range-ends">
                   <span>0.3 mm</span>
@@ -768,6 +817,12 @@ export default function Studio() {
                   step={1}
                   value={[count]}
                   onValueChange={(v) => setCount(v[0])}
+                  onValueCommit={(v) =>
+                    setSceneParameters((current) => ({
+                      ...current,
+                      count: v[0],
+                    }))
+                  }
                 />
               </div>
               <div className="property-card">
@@ -802,18 +857,7 @@ export default function Studio() {
               </div>
               <button
                 className="reset-button"
-                onClick={() => {
-                  setSize(10);
-                  setThick(0.8);
-                  setCount(3);
-                  setBase(0);
-                  setBlend(0);
-                  setSecond(1);
-                  setVariant(0);
-                  setWire(false);
-                  setSection(false);
-                  setReset(reset + 1);
-                }}
+                onClick={resetParameters}
               >
                 <RotateCcw size={14} /> Reset parameters
               </button>
@@ -821,214 +865,15 @@ export default function Studio() {
           </div>
         )}
         {tab === "learn" && (
-          <section className="field-guide" aria-label="Structure field guide">
-            <header className="guide-learning-head">
-              <div>
-                <span className="eyebrow">BEGINNER FIELD GUIDE</span>
-                <h1>Start with the material. Then change its inner shape.</h1>
-                <p>
-                  Every lesson follows the same path: a familiar reference, an
-                  engineered repeating cell, a changed behavior, and one
-                  possible use. Dotted terms open a short definition.
-                </p>
-              </div>
-              <div className="guide-tutor-note">
-                <Sparkles size={19} />
-                <span>
-                  <strong>Tutor tip</strong>
-                  Do not judge a lattice by its shape alone. Its material,
-                  dimensions, and test conditions matter too.
-                </span>
-              </div>
-            </header>
-            <section className="learning-steps" aria-label="How a metamaterial is designed">
-              {learningSteps.map((step, i) => (
-                <article key={step.number}>
-                  <span>{step.number}</span>
-                  <h2>{step.title}</h2>
-                  <p>{step.text}</p>
-                  {i < learningSteps.length - 1 && <ArrowRight aria-hidden="true" />}
-                </article>
-              ))}
-            </section>
-            <section className="real-materials" aria-labelledby="material-references">
-              <div className="guide-section-heading">
-                <div>
-                  <span className="eyebrow">REAL MATERIAL REFERENCES</span>
-                  <h2 id="material-references">The substance comes first.</h2>
-                </div>
-                <p>
-                  These are real examples of the four base materials used for
-                  comparisons in the studio. Grades and processes can change
-                  their properties.
-                </p>
-              </div>
-              <div className="source-gallery material-source-gallery">
-                {materialCards.map((card) => (
-                  <article className="source-card" key={card.id}>
-                    <img src={card.image} alt={card.alt} loading="lazy" />
-                    <div>
-                      <span className="eyebrow">{card.eyebrow}</span>
-                      <h3>{card.title}</h3>
-                      <p>{card.note}</p>
-                      <a href={card.sourceUrl} target="_blank" rel="noreferrer">
-                        {card.sourceLabel} ↗
-                      </a>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-            <section className="structure-lineage" aria-labelledby="structure-references">
-              <div className="guide-section-heading">
-                <div>
-                  <span className="eyebrow">FROM REFERENCE TO METAMATERIAL</span>
-                  <h2 id="structure-references">How the repeating structures are derived.</h2>
-                </div>
-                <p>
-                  A source can be natural, mathematical, engineered, or a
-                  physical principle. The arrow shows the teaching connection,
-                  not a claim that each structure occurs in nature.
-                </p>
-              </div>
-              <div className="source-gallery structure-source-gallery">
-                {structureCards.map((card) => (
-                  <article className="source-card structure-source-card" key={card.id}>
-                    <img src={card.image} alt={card.alt} loading="lazy" />
-                    <div>
-                      <span className="eyebrow">{card.eyebrow}</span>
-                      <h3>{card.title}</h3>
-                      <div className="source-flow" aria-label={`${card.title} learning path`}>
-                        <span>Real reference</span>
-                        <ArrowRight size={15} aria-hidden="true" />
-                        <span>repeat the cell</span>
-                        <ArrowRight size={15} aria-hidden="true" />
-                        <span>new behavior</span>
-                      </div>
-                      <p>{card.note}</p>
-                      <a href={card.sourceUrl} target="_blank" rel="noreferrer">
-                        {card.sourceLabel} ↗
-                      </a>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-            <div className="guide-section-heading structure-cards-heading">
-              <div>
-                <span className="eyebrow">EXPLORE THE CELLS</span>
-                <h2>See the geometry, then inspect a candidate use.</h2>
-              </div>
-              <p>
-                These interactive scenes are concept studies. Their motions
-                explain a mechanism; they do not certify a product.
-              </p>
-            </div>
-            <div className="guide-grid">
-            {families.map((v, i) => {
-              const reference = structureCards.find((card) => card.id === v.id);
-              return (
-              <article
-                className="guide-card"
-                key={v.id}
-                style={{ "--family-color": v.color } as React.CSSProperties}
-              >
-                <div className="guide-visual">
-                  <MiniLattice kind={v.id} color={v.color} />
-                  <span className="guide-category">
-                    0{i + 1} / {v.category}
-                  </span>
-                  <span className="orbit-hint">
-                    <RotateCcw size={13} /> Drag to explore
-                  </span>
-                </div>
-                <div className="guide-copy">
-                  <div className="guide-title">
-                    <h2>{v.name}</h2>
-                    <span className="tag">{v.tag}</span>
-                  </div>
-                  <p className="guide-lead">
-                    <GlossaryText>
-                      {
-                        [
-                          "A flowing, curved surface that spreads forces through a connected network.",
-                          "A framework of triangles that makes a structure stiff while keeping it light.",
-                          "Inward-folded cells that can grow wider when you pull them longer.",
-                          "A foam-like network of cells that can compress to absorb an impact.",
-                          "Repeated hexagons that support a surface with very little solid material.",
-                          "Small masses on flexible links that respond to particular vibration frequencies.",
-                        ][i]
-                      }
-                    </GlossaryText>
-                  </p>
-                  {reference && (
-                    <div className="guide-chain">
-                      <span>{reference.eyebrow.split(" · ")[0]}</span>
-                      <ArrowRight size={14} aria-hidden="true" />
-                      <strong>repeated {v.name} cell</strong>
-                      <ArrowRight size={14} aria-hidden="true" />
-                      <span>{v.tag.toLowerCase()}</span>
-                    </div>
-                  )}
-                  <div className="guide-application">
-                    <Layers3 size={17} />
-                    <span>
-                      See it in use<strong>{v.application}</strong>
-                    </span>
-                  </div>
-                  <details className="guide-details">
-                    <summary>
-                      Trace the idea: reference → cell → behavior <ChevronRight size={15} />
-                    </summary>
-                    <h3>Where it comes from</h3>
-                    <p>
-                      <GlossaryText>{v.origin}</GlossaryText>
-                    </p>
-                    <h3>What the geometry does</h3>
-                    <p>
-                      <GlossaryText>{v.mechanism}</GlossaryText>
-                    </p>
-                    <a href={v.source} target="_blank" rel="noreferrer">
-                      Read the original source ↗
-                    </a>
-                  </details>
-                  <div className="guide-variants">
-                    <span>Explore a variant</span>
-                    <div>
-                      {v.variants.map((name, j) => (
-                        <button
-                          key={name}
-                          onClick={() => {
-                            choose(i);
-                            setVariant(j);
-                            setMode("structure");
-                            setPlay(false);
-                            setTab("studio");
-                          }}
-                        >
-                          {name}
-                          <ChevronRight size={13} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    className="guide-cta"
-                    onClick={() => {
-                      choose(i);
-                      setMode("application");
-                      setPlay(true);
-                      setTab("studio");
-                    }}
-                  >
-                    See the application <ArrowUpRight size={18} />
-                  </button>
-                </div>
-              </article>
-              );
-            })}
-            </div>
-          </section>
+          <FieldGuide
+            onOpenStudio={(familyIndex, variantIndex, nextMode) => {
+              choose(familyIndex);
+              setVariant(variantIndex);
+              setMode(nextMode);
+              setPlay(nextMode === "application");
+              setTab("studio");
+            }}
+          />
         )}
         {tab === "data" && (
           <section className="dataset-section">

@@ -151,7 +151,7 @@ export class SoftwareRenderer {
               .applyMatrix3(normalMatrix)
               .normalize();
           }
-          let intensity = 0.27 + 0.62 * Math.abs(normal.dot(light));
+          const intensity = 0.27 + 0.62 * Math.abs(normal.dot(light));
           const color = vertexColors
             ? phaseColor
                 .copy(colorA).fromBufferAttribute(vertexColors, idx ? idx.getX(i) : i)
@@ -202,10 +202,13 @@ export class SoftwareRenderer {
       ctx.lineTo(t.pts[4], t.pts[5]);
       ctx.closePath();
       ctx.fillStyle = t.color;
-      ctx.strokeStyle = t.color;
-      ctx.lineWidth = 0.45;
-      if (!t.wire) ctx.fill();
-      ctx.stroke();
+      if (t.wire) {
+        ctx.strokeStyle = t.color;
+        ctx.lineWidth = 0.45;
+        ctx.stroke();
+      } else {
+        ctx.fill();
+      }
     }
   }
 }

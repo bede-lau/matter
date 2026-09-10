@@ -133,22 +133,22 @@ export const structureCards: SourceCard[] = [
 export const learningSteps = [
   {
     number: "01",
-    title: "Choose the matter",
-    text: "Pick the substance: a flexible polymer, a tough polymer, or a metal. This sets the starting behaviour before any holes are added.",
+    title: "Pick a material",
+    text: "Choose the substance first. It sets the starting feel before the geometry changes anything.",
   },
   {
     number: "02",
-    title: "Change the small shape",
-    text: "Design one tiny repeat: a curved sheet, a triangle frame, or a folded cell. This is where a metamaterial becomes different from a solid block.",
+    title: "Shape one cell",
+    text: "Design one small repeat, such as a curved sheet, triangle frame, or folded cell.",
   },
   {
     number: "03",
-    title: "Repeat and tune it",
-    text: "Repeat that shape through a part, then vary its size or thickness where you need more give, support, airflow, or vibration control.",
+    title: "Repeat and tune",
+    text: "Copy the cell through a part, then vary its size or thickness where the job needs it.",
   },
   {
     number: "04",
-    title: "Test the real job",
-    text: "A useful idea still needs measured tests for its actual job—such as shoe cushioning, helmet impact, or a wing’s structural load.",
+    title: "Test the job",
+    text: "A promising idea still needs measured tests for its actual job, such as cushioning, impact, or structural load.",
   },
 ];

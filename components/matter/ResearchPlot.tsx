@@ -25,11 +25,16 @@ export default memo(function ResearchPlot({
         const w = el.clientWidth,
           h = el.clientHeight,
           dpr = Math.min(devicePixelRatio, 2);
-        el.width = Math.round(w * dpr);
-        el.height = Math.round(h * dpr);
+        const bitmapWidth = Math.round(w * dpr),
+          bitmapHeight = Math.round(h * dpr);
+        if (el.width !== bitmapWidth || el.height !== bitmapHeight) {
+          el.width = bitmapWidth;
+          el.height = bitmapHeight;
+        }
         const c = el.getContext("2d");
         if (!c) return;
-        c.scale(dpr, dpr);
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        c.clearRect(0, 0, w, h);
         const left = 43,
           right = w - 17,
           top = 16,

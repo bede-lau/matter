@@ -1,4 +1,4 @@
-# Metamaterial Learning App — concise PRD + ARD
+# Metamaterial Learning App | concise PRD + ARD
 
 **Status:** proposed; web-first educational visualizer. **Product boundary:** the material/property controls and all response visuals are qualitative illustrations, never solver-verified predictions or engineering guidance.
 
@@ -9,7 +9,7 @@ Help students, educators, and curious engineers build intuition for how repeatin
 
 ### Core experience
 1. Select a curated lattice or upload an approved dataset.
-2. Manipulate geometry sliders (cell size, strut thickness, porosity, orientation) and illustrative property sliders (stiffness, density, damping, frequency). A persistent badge says **Illustrative model — not simulation or design validation**.
+2. Manipulate geometry sliders (cell size, strut thickness, porosity, orientation) and illustrative property sliders (stiffness, density, damping, frequency). A persistent badge says **Illustrative model: not simulation or design validation**.
 3. Explore a procedural 3D cell and a larger tiled field; toggle deformation/field overlays that use labeled synthetic or cited measured series.
 4. Open the evidence drawer: source, sample/process context, units, test method, evidence grade, and whether a value is a measured datum, a digitized estimate, or an educational placeholder.
 5. Run an animated scene that shows a plausible use case and repeats the same qualification.
@@ -100,7 +100,7 @@ Partition observations by `property`, `lattice.family`, `baseMaterial`, and data
 |---|---|
 | Ingestion | Fixture CSV/JSON covers each evidence label, accepted unit conversion, and rejection cases; valid imports preserve raw value/unit, normalized SI value, SHA-256, source location, and schema version. |
 | Provenance | Every rendered numeric point links to a record. Records without persistent source/method/conditions cannot receive A/B and cannot be published. |
-| Boundary | On every slider change, scene mode change, chart view, share URL, and export, the **Illustrative—Not solver verified** marker remains visible for generated values. A visual regression test enforces this. |
+| Boundary | On every slider change, scene mode change, chart view, share URL, and export, the **Illustrative: not solver verified** marker remains visible for generated values. A visual regression test enforces this. |
 | 3D | A reference 10k-instance scene sustains the agreed device budget (define target hardware in CI); if it misses, automatic LOD/fallback occurs with no incorrect geometry or misleading legend. |
 | Accessibility | Keyboard users can operate every slider/toggle; WebGL failure presents the same data/evidence in semantic HTML; color is never the only evidence-state signal. |
 | Reliability | Invalid upload yields row-level diagnostics without publishing partial data; retry is idempotent by content hash; dataset versions are immutable and reproducible. |

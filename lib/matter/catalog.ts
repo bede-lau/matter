@@ -63,7 +63,7 @@ export const families: Family[] = [
     origin:
       "A re-entrant lattice is made by folding the ribs of a honeycomb-like cell inward. It is an engineered geometric transformation; an ordinary natural honeycomb is not generally auxetic.",
     mechanism:
-      "When the lattice is pulled, its inward-pointing ribs can rotate outward. That motion can make it wider as it becomes longer—a response called auxetic behavior or negative Poisson ratio.",
+      "When the lattice is pulled, its inward-pointing ribs can rotate outward. That motion can make it wider as it becomes longer. Engineers call this auxetic behavior, or a negative Poisson ratio.",
     application: "Conforming knee-protection insert",
     applicationLesson:
       "Begin with a flexible polymer or textile-supported insert. Fold its cells inward, then bend the brace around the knee. Rib rotation may help the insert conform and redistribute local pressure, while the sleeve and stays keep it positioned. Protection and fit must be verified on real anatomy and with impact tests.",

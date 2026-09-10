@@ -1,4 +1,4 @@
-# Matter — Metamaterial Studio
+# Matter | Metamaterial Studio
 
 An interactive, source-grounded learning prototype. React 19, TypeScript, Vinext, Three.js, and accessible Radix controls. No paid API or API key is required.
 

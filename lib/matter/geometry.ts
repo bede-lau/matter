@@ -47,9 +47,15 @@ export function createLattice(p: LatticeOptions, software = false) {
     if (!showSecondPhase) return;
     const positions = geo.getAttribute("position");
     if (!positions) return;
-    const colors = new Float32Array(positions.count * 3);
+    const activeCount = Math.min(
+      positions.count,
+      Number.isFinite(geo.drawRange.count)
+        ? geo.drawRange.count
+        : positions.count,
+    );
+    const colors = new Float32Array(activeCount * 3);
     const point = new T.Vector3();
-    for (let i = 0; i < positions.count; i++) {
+    for (let i = 0; i < activeCount; i++) {
       point.fromBufferAttribute(positions, i);
       const c = phaseColor(point);
       colors[i * 3] = c.r;
@@ -120,8 +126,22 @@ export function createLattice(p: LatticeOptions, software = false) {
     rod(a, b, radius);
   };
   if (p.kind === "gyroid") {
-    const res = software ? Math.min(48, 24 + n * 6) : Math.min(90, 38 + n * 9);
-    const mc = new MarchingCubes(res, material, false, false, 250000);
+    // The canvas fallback favors a bounded, recognizable silhouette over a
+    // slow high-poly tessellation. WebGL keeps the denser interactive mesh.
+    const res = software
+      ? Math.min(24, 14 + n * 3)
+      : n <= 3
+        ? 64
+        : n === 4
+          ? 60
+          : 56;
+    const mc = new MarchingCubes(
+      res,
+      material,
+      false,
+      false,
+      software ? 16000 : 220000,
+    );
     mc.isolation = 0;
     mc.scale.setScalar(1.9);
     mc.castShadow = true;

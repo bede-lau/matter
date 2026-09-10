@@ -284,10 +284,10 @@ export function buildKneeBrace(
     side: "left" | "right",
     slot: number,
   ) => callouts.push({ label, anchor: anchor(parent, pos, label), side, slot });
-  label("Re-entrant insert — inward-folded cushion cells", core, [0.49, 0.13, 0.25], "right", 1);
-  label("Patella ring — positions padding around the kneecap", cap, [0.43, 0.4, 0.18], "left", 1);
-  label("Dial & side stays — adjust fit and guide bending", sleeve, [0.18, 0.91, 0.42], "right", 0);
-  label("Compression sleeve — holds the brace on the leg", sleeve, [0.25, 1.09, 0.3], "left", 0);
+  label("Re-entrant insert: inward-folded cushion cells", core, [0.49, 0.13, 0.25], "right", 1);
+  label("Patella ring: positions padding around the kneecap", cap, [0.43, 0.4, 0.18], "left", 1);
+  label("Dial & side stays: adjust fit and guide bending", sleeve, [0.18, 0.91, 0.42], "right", 0);
+  label("Compression sleeve: holds the brace on the leg", sleeve, [0.25, 1.09, 0.3], "left", 0);
   return {
     group,
     callouts,

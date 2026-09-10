@@ -425,25 +425,25 @@ export function buildShoe(
   tongueBadge.rotation.z = -0.3;
   const callouts: Callout[] = [
     {
-      label: "Upper, tongue & laces — hold the foot",
+      label: "Upper, tongue & laces: hold the foot",
       anchor: anchor(upper, [0.1, 1.46, 0.24], "upper-anchor"),
       side: "left",
       slot: 0,
     },
     {
-      label: "Heel counter & collar — locate the heel",
+      label: "Heel counter & collar: locate the heel",
       anchor: anchor(upper, [-1.9, 1.5, 0.4], "collar-anchor"),
       side: "right",
       slot: 0,
     },
     {
-      label: "Sockliner — directly below the foot",
+      label: "Sockliner: directly below the foot",
       anchor: anchor(insole, [0.8, 0.73, 0.62], "sockliner-anchor"),
       side: "right",
       slot: 1,
     },
     {
-      label: "Strobel layer — joins upper to sole",
+      label: "Strobel layer: joins upper to sole",
       anchor: anchor(board, [1.2, 0.63, 0.65], "board-anchor"),
       side: "left",
       slot: 1,
@@ -451,14 +451,14 @@ export function buildShoe(
     {
       label:
         variant === 2
-          ? "Graded gyroid midsole — cellular cushion concept"
-          : "Gyroid midsole — cellular cushion concept",
+          ? "Graded gyroid midsole: cellular cushion concept"
+          : "Gyroid midsole: cellular cushion concept",
       anchor: anchor(midsole, [1.2, 0.36, 0.7], "midsole-anchor"),
       side: "right",
       slot: 2,
     },
     {
-      label: "Rubber outsole & tread — contact the ground",
+      label: "Rubber outsole & tread: contact the ground",
       anchor: anchor(outsole, [1.5, 0.08, 0.7], "outsole-anchor"),
       side: "left",
       slot: 2,
