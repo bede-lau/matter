@@ -22,6 +22,7 @@ export type SceneProps = {
   explode: number;
   labels: boolean;
   speed: number;
+  playNonce: number;
 };
 export default function Scene(p: SceneProps) {
   const host = useRef<HTMLDivElement>(null);
@@ -348,6 +349,7 @@ export default function Scene(p: SceneProps) {
     p.wire,
     p.section,
     p.reset,
+    p.playNonce,
   ]);
   return (
     <div className="scene">

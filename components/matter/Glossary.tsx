@@ -100,7 +100,8 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
     const found = lookupTerm(text);
     const range = selection.getRangeAt(0);
     if (found) {
-      explain(found, range.getBoundingClientRect());
+      const matched = text.match(pattern)?.[0] ?? found.term;
+      explain({ ...found, term: matched }, range.getBoundingClientRect());
       return;
     }
     // Do not invent a scientific explanation for unknown text. Still give the
@@ -191,7 +192,7 @@ export function GlossaryText({ children }: { children: string }) {
             aria-label={`Define ${part}`}
             onClick={(e) =>
               explain(
-                entry,
+                { ...entry, term: part },
                 e.currentTarget.getBoundingClientRect(),
                 e.currentTarget,
               )

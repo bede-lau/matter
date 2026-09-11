@@ -51,26 +51,6 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
 
   return (
     <section className="field-guide-v2" aria-label="Structure field guide">
-      <header className="field-guide-v2__hero">
-        <div className="field-guide-v2__hero-copy">
-          <span className="eyebrow">BEGINNER FIELD GUIDE</span>
-          <h2>Change the inside. Change what the material can do.</h2>
-          <p>
-            Begin with a real material, shape one small cell, and repeat it
-            until the whole part behaves differently.
-          </p>
-          <div className="field-guide-v2__hero-path" aria-label="Learning sequence">
-            <span>Material</span>
-            <ArrowRight aria-hidden="true" />
-            <span>Cell</span>
-            <ArrowRight aria-hidden="true" />
-            <span>Behavior</span>
-            <ArrowRight aria-hidden="true" />
-            <span>Use</span>
-          </div>
-        </div>
-      </header>
-
       <section className="field-guide-v2__map" aria-label="How a metamaterial is designed">
         {learningSteps.map((step, index) => (
           <article key={step.number}>

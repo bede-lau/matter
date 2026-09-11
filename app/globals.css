@@ -4678,3 +4678,91 @@ h1 {
     padding: 15px;
   }
 }
+
+/* A generous vertical rhythm keeps each control group easy to scan. The
+   parameter column can extend beyond the preview instead of compressing it. */
+@media (min-width: 921px) {
+  .studio-workbench .studio-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(410px, 440px);
+  }
+  .studio-workbench .viewport {
+    height: 500px;
+  }
+  .studio-workbench .parameters.design-dock {
+    height: 670px;
+    justify-content: flex-start;
+    gap: 24px;
+    padding: 21px 23px;
+  }
+  .design-dock .panel-heading {
+    min-height: 34px;
+  }
+  .compact-variant {
+    border-bottom: 1px solid #2e404c;
+    padding-bottom: 14px;
+  }
+  .compact-variant > label,
+  .compact-material-choice > label,
+  .compact-range > label {
+    margin-bottom: 9px;
+    font-size: 13px;
+  }
+  .compact-variant .variant-buttons {
+    gap: 8px;
+  }
+  .compact-variant .variant-buttons button {
+    min-height: 56px;
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+  .material-controls {
+    gap: 12px 14px;
+    border-top: 0;
+    padding-top: 0;
+  }
+  .compact-material-choice .matter-select {
+    height: 42px !important;
+    min-height: 42px;
+    font-size: 13px;
+  }
+  .phase-meter {
+    gap: 8px 16px;
+  }
+  .phase-meter > div:not(.blend-bar),
+  .phase-meter strong {
+    font-size: 12px;
+  }
+  .phase-meter .blend-bar {
+    height: 9px;
+    margin-top: 3px;
+  }
+  .geometry-grid {
+    gap: 16px;
+    padding-top: 15px;
+  }
+  .compact-properties {
+    gap: 10px 18px;
+    padding: 14px 15px;
+  }
+  .compact-properties .eyebrow {
+    margin-bottom: 2px;
+    font-size: 10px;
+  }
+  .compact-properties > div:not(:first-child):not(.estimate-note) {
+    gap: 5px;
+  }
+  .compact-properties > div:not(:first-child):not(.estimate-note) span {
+    font-size: 12px;
+  }
+  .compact-properties > div:not(:first-child) strong {
+    font-size: 18px;
+  }
+  .compact-properties > div.estimate-note {
+    margin-top: 11px;
+    padding-top: 10px;
+  }
+  .compact-properties > div.estimate-note p {
+    font-size: 11px;
+    line-height: 1.48;
+  }
+}

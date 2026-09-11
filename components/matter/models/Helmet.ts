@@ -59,6 +59,80 @@ export function sampleDrop(seconds: number) {
     contact: 0,
   };
 }
+type HelmetImpactSample = {
+  x: number;
+  y: number;
+  z: number;
+  phase: string;
+  visible: boolean;
+};
+
+/** A glancing helmet impact redirects the ball sideways, then gravity takes it away. */
+function sampleHelmetImpact(
+  seconds: number,
+  contactY: number,
+  direction: T.Vector2,
+): HelmetImpactSample {
+  const centreX = -0.12;
+  if (seconds <= 0)
+    return {
+      x: centreX,
+      y: contactY + DROP_HEIGHT,
+      z: 0,
+      phase: "Ready to release",
+      visible: true,
+    };
+  const contactTime = Math.sqrt((2 * DROP_HEIGHT) / DROP_GRAVITY);
+  if (seconds < contactTime)
+    return {
+      x: centreX,
+      y: contactY + DROP_HEIGHT - 0.5 * DROP_GRAVITY * seconds * seconds,
+      z: 0,
+      phase: "Free fall · gravity accelerates the ball",
+      visible: true,
+    };
+
+  // The curved shell guides a short sideways deflection before the ball
+  // leaves the helmet's support and continues in free fall.
+  const afterContact = seconds - contactTime;
+  const guideTime = 0.05;
+  const edgeDistance = 0.62;
+  if (afterContact < guideTime) {
+    const progress = afterContact / guideTime;
+    const lift = Math.max(
+      0,
+      2.45 * afterContact - 0.5 * DROP_GRAVITY * afterContact * afterContact,
+    );
+    return {
+      x: centreX + direction.x * edgeDistance * progress,
+      y: contactY + lift,
+      z: direction.y * edgeDistance * progress,
+      phase: "Impact and deflection · the liner slows the ball",
+      visible: true,
+    };
+  }
+
+  const flight = afterContact - guideTime;
+  const floorY = -2.29;
+  const floorFlight = Math.sqrt((2 * (contactY - floorY)) / DROP_GRAVITY);
+  const falling = Math.min(flight, floorFlight);
+  const y = Math.max(floorY, contactY - 0.5 * DROP_GRAVITY * falling * falling);
+  const landed = flight >= floorFlight;
+  return {
+    x: centreX + direction.x * (edgeDistance + 2.45 * falling),
+    y,
+    z: direction.y * (edgeDistance + 2.45 * falling),
+    phase: landed
+      ? "Ball at rest · it has fallen clear of the helmet"
+      : "Deflected path · gravity carries the ball away",
+    visible: true,
+  };
+}
+function directionForDrop(seed: number, cycle: number) {
+  const raw = Math.sin(seed * 97.31 + (cycle + 1) * 43.17) * 43758.5453;
+  const angle = (raw - Math.floor(raw)) * Math.PI * 2;
+  return new T.Vector2(Math.cos(angle), Math.sin(angle));
+}
 function helmetPoint(x: number, z: number, inset = 0) {
   const dome = Math.sqrt(Math.max(0, 1 - x * x - z * z));
   return new T.Vector3(
@@ -344,6 +418,9 @@ export function buildHelmet(lattice: T.Group, color: string): Application {
   // Local shell crown at x=-.12,z=0 is y=1.08. Radius offsets the collision centre.
   const ballRadius = 0.16,
     contactY = 1.08 + ballRadius;
+  // This seed is fixed for one run and refreshed whenever the learner starts
+  // a new animation. Each automatic replay also takes a different direction.
+  const dropSeed = Math.random();
   const ball = ellipsoid(
     group,
     p.metal,
@@ -376,14 +453,19 @@ export function buildHelmet(lattice: T.Group, color: string): Application {
         ball.visible = false;
         return "Exploded anatomy · assemble to run the drop";
       }
-      const cycle = t % 4.6;
+      const cycleLength = 4.6;
+      const cycle = t % cycleLength;
       const reset = cycle > 3.25;
-      ball.visible = !reset;
-      const sample = sampleDrop((cycle - 0.38) * 0.28);
-      ball.position.y = contactY + sample.height;
+      const drop = sampleHelmetImpact(
+        (cycle - 0.38) * 0.28,
+        contactY,
+        directionForDrop(dropSeed, Math.floor(t / cycleLength)),
+      );
+      ball.visible = !reset && drop.visible;
+      if (ball.visible) ball.position.set(drop.x, drop.y, drop.z);
       return reset
-        ? "Resetting the drop · next release follows"
-        : `Slow motion · ${sample.phase}`;
+        ? "Resetting the drop · next release takes a new path"
+        : `Slow motion · ${drop.phase}`;
     },
   };
 }

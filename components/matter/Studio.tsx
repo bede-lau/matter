@@ -65,6 +65,7 @@ export default function Studio() {
     [thick, setThick] = useState(0.8),
     [size, setSize] = useState(10),
     [play, setPlay] = useState(false),
+    [playNonce, setPlayNonce] = useState(0),
     [mode, setMode] = useState("structure"),
     [wire, setWire] = useState(false),
     [section, setSection] = useState(false),
@@ -115,6 +116,11 @@ export default function Studio() {
     setFamily(i);
     setVariant(0);
     setStructurePickerOpen(false);
+  };
+  const startAnimation = () => {
+    setPlay(true);
+    // A new run recreates application motion, including the Kelvin impact path.
+    setPlayNonce((value) => value + 1);
   };
   const resetParameters = () => {
     const next = { blend: 0, count: 3, thick: 0.8, size: 10 };
@@ -269,11 +275,6 @@ export default function Studio() {
                 id: "learn",
                 label: "Field guide",
                 icon: <BookOpen size={16} />,
-              },
-              {
-                id: "data",
-                label: "Research data",
-                icon: <Activity size={16} />,
               },
             ].map((item) => (
               <button
@@ -506,6 +507,7 @@ export default function Studio() {
                   explode={explode}
                   labels={showLabels}
                   speed={speed}
+                  playNonce={playNonce}
                 />
                 <div className="viewport-meta">
                   <div className="viewport-tag">
@@ -576,7 +578,7 @@ export default function Studio() {
                   <button
                     className="play-button"
                     aria-label={play ? "Pause animation" : "Play animation"}
-                    onClick={() => setPlay(!play)}
+                    onClick={() => (play ? setPlay(false) : startAnimation())}
                   >
                     {play ? <Pause size={16} /> : <Play size={16} />}
                   </button>
@@ -594,7 +596,9 @@ export default function Studio() {
                   value={mode}
                   onChange={(v) => {
                     setMode(v);
-                    setPlay(v !== "structure");
+                    if (v === "structure") setPlay(false);
+                    else if (v === "application") startAnimation();
+                    else setPlay(true);
                   }}
                   label="Visualization mode"
                   panelId="material-scene"
@@ -939,7 +943,8 @@ export default function Studio() {
               choose(familyIndex);
               setVariant(variantIndex);
               setMode(nextMode);
-              setPlay(nextMode === "application");
+              if (nextMode === "application") startAnimation();
+              else setPlay(false);
               setTab("studio");
             }}
           />
