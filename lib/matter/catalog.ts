@@ -13,6 +13,8 @@ export type Family = {
   variants: string[];
   color: string;
   source: string;
+  defaultBase?: number;
+  defaultSecondary?: number;
 };
 export const families: Family[] = [
   {
@@ -165,6 +167,168 @@ export const families: Family[] = [
     color: "#8ee0cf",
     source: "https://doi.org/10.1126/science.289.5485.1734",
   },
+  {
+    id: "metalens",
+    name: "Dielectric metalens",
+    category: "Optical",
+    tag: "Focuses light with tiny posts",
+    origin:
+      "Purpose: pair a transparent dielectric with a patterned surface that can replace some of the bulk of a curved lens. The reference is the familiar camera lens, redesigned at a much smaller scale.",
+    mechanism:
+      "Structure: a flat surface carries thousands of tiny posts. Each post delays light by a slightly different amount, so the whole surface shapes a focused wavefront.",
+    behavior:
+      "Behavior: the posts change the phase of incoming light. Together they make light converge on a chosen focal point.",
+    application: "Compact imaging optic",
+    applicationLesson:
+      "A metalens can focus light inside a miniature camera or experimental endoscope. The patterned surface does the wave-shaping work that a thicker curved lens normally does.",
+    applicationWhy:
+      "It is useful because a very thin optic can reduce the size and weight of an imaging system.",
+    variantLessons: [
+      "Uniform post field: posts share one height and show the starting surface before a focusing phase pattern is added.",
+      "Phase-graded metalens: post height changes across the surface so the outgoing wavefront bends toward a focus.",
+      "Polarization-selective metalens: post orientation changes the response for one polarization of light.",
+    ],
+    variants: ["Uniform post field", "Phase-graded metalens", "Polarization-selective"],
+    color: "#e7b5ff",
+    source: "https://capasso.seas.harvard.edu/metasurfaces-and-flat-optics",
+    defaultBase: 4,
+    defaultSecondary: 5,
+  },
+  {
+    id: "cloak",
+    name: "Microwave cloak",
+    category: "Electromagnetic",
+    tag: "Routes microwaves around an object",
+    origin:
+      "Purpose: guide selected electromagnetic waves around a region instead of letting them scatter directly from it. The reference principle is a coordinate map that treats wave paths as if space had been reshaped.",
+    mechanism:
+      "Structure: concentric rings carry carefully varied resonant elements. Their changing response bends microwave energy around a central object and brings the wave paths back together.",
+    behavior:
+      "Behavior: at its design frequency and direction, the shell can reduce the reflected shadow of the hidden region. It is wave steering, not human-visible invisibility.",
+    application: "Microwave scattering-control shell",
+    applicationLesson:
+      "A microwave cloak can surround a small object in a laboratory and reduce how strongly it reflects radar-like waves. Engineers use this setup to study wave routing and scattering control.",
+    applicationWhy:
+      "It is useful because it demonstrates how a patterned shell can redirect waves without moving the object itself.",
+    variantLessons: [
+      "Uniform rings: each ring has the same response, making the shell easy to compare with an uncloaked object.",
+      "Graded cloak: ring spacing or resonator size changes toward the center to make the wave path curve more smoothly.",
+      "Broad-angle cloak: the shell is tuned to reduce sensitivity to the incoming direction, but bandwidth still remains limited.",
+    ],
+    variants: ["Uniform rings", "Graded cloak", "Broad-angle cloak"],
+    color: "#ffb66d",
+    source: "https://www.science.org/doi/10.1126/science.1133628",
+    defaultBase: 5,
+    defaultSecondary: 4,
+  },
+  {
+    id: "membrane-absorber",
+    name: "Membrane absorber",
+    category: "Acoustic",
+    tag: "Soaks up selected low sounds",
+    origin:
+      "Purpose: turn a thin flexible membrane into a lightweight sound absorber. The reference principle is a drumhead, tuned so its motion dissipates a chosen low-frequency sound.",
+    mechanism:
+      "Structure: stretched membranes carry small rigid platelets inside a repeating panel. The membrane moves around each platelet and concentrates strain where sound energy can be lost.",
+    behavior:
+      "Behavior: near its resonance, the membrane moves strongly and converts part of the incoming sound into heat. Away from that range, absorption is weaker.",
+    application: "Low-frequency noise-control panel",
+    applicationLesson:
+      "A membrane absorber could line a machine enclosure, cabin, or room where a low hum is a problem. The thin panel targets that hum without needing a thick block of foam.",
+    applicationWhy:
+      "It is useful because it can target low frequencies in a shallow package, although it does not absorb every sound equally.",
+    variantLessons: [
+      "Plain membrane: one flexible sheet shows the basic resonance before adding a tuned platelet.",
+      "Platelet membrane: a rigid offset mass changes the local resonance and increases useful damping near the target tone.",
+      "Multi-tone panel: several membrane sizes create several nearby absorption peaks.",
+    ],
+    variants: ["Plain membrane", "Platelet membrane", "Multi-tone panel"],
+    color: "#78d6f4",
+    source: "https://www.nature.com/articles/ncomms1758",
+    defaultBase: 6,
+    defaultSecondary: 1,
+  },
+  {
+    id: "thermal-cloak",
+    name: "Thermal cloak",
+    category: "Thermal",
+    tag: "Diverts heat around a core",
+    origin:
+      "Purpose: control the path of conducted heat around a protected region. The reference principle is a river splitting around an island and rejoining downstream, translated into thermal conductivity.",
+    mechanism:
+      "Structure: alternating high- and low-conductivity rings create a direction-dependent thermal path. Copper-like paths carry heat quickly while silicone-like paths slow it down.",
+    behavior:
+      "Behavior: heat spreads around the center and can make the downstream temperature look less disturbed for a limited time. The protected core eventually warms.",
+    application: "Temporary hot-spot protection",
+    applicationLesson:
+      "A thermal cloak can sit around a sensitive component during a short heat pulse. It redirects conducted heat around the center while the rest of the plate carries the pulse onward.",
+    applicationWhy:
+      "It is useful because it can delay a hot spot without refrigeration or an active pump.",
+    variantLessons: [
+      "Uniform rings: equal radial layers make the heat path easy to read but less carefully matched at the boundary.",
+      "Conductivity-graded cloak: ring values change smoothly so heat turns around the core with less reflection.",
+      "Transient shield: the layer thickness is tuned for a short pulse rather than steady-state protection.",
+    ],
+    variants: ["Uniform rings", "Conductivity-graded", "Transient shield"],
+    color: "#ff7f6d",
+    source: "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.110.195901",
+    defaultBase: 5,
+    defaultSecondary: 6,
+  },
+  {
+    id: "topological",
+    name: "Topological edge lattice",
+    category: "Wave",
+    tag: "Carries waves along an edge",
+    origin:
+      "Purpose: create a repeating wave medium with a protected boundary route. The reference principle is the one-way edge current seen in the quantum Hall effect, recreated with classical waves.",
+    mechanism:
+      "Structure: a periodic lattice is biased so its bulk blocks a frequency range while its boundary supports a special edge mode. The missing or changed boundary cells become the route.",
+    behavior:
+      "Behavior: a wave can follow the edge and bend around some defects with less backscatter than an ordinary path. Protection depends on the band gap and operating conditions.",
+    application: "Robust waveguide",
+    applicationLesson:
+      "A topological edge lattice can guide a microwave or optical signal around a corner on a chip. The signal stays near the boundary while the periodic interior blocks the same frequency.",
+    applicationWhy:
+      "It is useful because a carefully designed edge route can be less sensitive to some local defects than a conventional waveguide.",
+    variantLessons: [
+      "Straight edge: a clean boundary carries the wave along one side of the lattice.",
+      "Bent edge: the boundary turns a corner so the wave path changes direction without opening a gap in the route.",
+      "Defect-tested edge: small cells are changed on purpose to show which imperfections the edge mode can tolerate.",
+    ],
+    variants: ["Straight edge", "Bent edge", "Defect-tested edge"],
+    color: "#aa9cff",
+    source: "https://www.nature.com/articles/nature08293",
+    defaultBase: 4,
+    defaultSecondary: 5,
+  },
+  {
+    id: "flux",
+    name: "Magnetic flux shell",
+    category: "Magnetic",
+    tag: "Concentrates an existing field",
+    origin:
+      "Purpose: gather an externally supplied magnetic field into a small sensing region. The reference principle is a magnetic circuit with funnels that guide flux where a sensor can use it.",
+    mechanism:
+      "Structure: nested soft-magnetic funnels create a strongly direction-dependent shell. The wider outside gathers field and the narrower inside opening concentrates it.",
+    behavior:
+      "Behavior: the shell redistributes magnetic flux toward the center. It does not create energy, and performance changes with orientation, saturation, and frequency.",
+    application: "Magnetic-sensor enhancer",
+    applicationLesson:
+      "A flux shell can surround a small magnetic sensor and make an existing field stronger at the sensing gap. This can improve sensitivity without increasing the source magnet.",
+    applicationWhy:
+      "It is useful because passive geometry can collect field that would otherwise miss a small sensor.",
+    variantLessons: [
+      "Open funnels: a simple pair of magnetic funnels shows the basic concentration effect.",
+      "Nested shell: several funnel layers collect field in stages for a stronger central response.",
+      "Saturation-aware shell: the funnel widths change to leave more headroom before the magnetic material saturates.",
+    ],
+    variants: ["Open funnels", "Nested shell", "Saturation-aware"],
+    color: "#ff82b7",
+    source: "https://www.nature.com/articles/srep44762",
+    defaultBase: 7,
+    defaultSecondary: 5,
+  },
 ];
 export const bases = [
   {
@@ -194,5 +358,33 @@ export const bases = [
     rho: 4430,
     color: "#bfc0ca",
     intro: "A strong metal. Use it to compare a high-stiffness starting material with softer choices.",
+  },
+  {
+    name: "Silicon",
+    e: 130000,
+    rho: 2330,
+    color: "#9aa8b4",
+    intro: "A semiconductor used in many optical microstructures and sensors.",
+  },
+  {
+    name: "Copper",
+    e: 110000,
+    rho: 8960,
+    color: "#d88d68",
+    intro: "A highly conductive metal used in microwave patterns and heat-flow prototypes.",
+  },
+  {
+    name: "PDMS silicone",
+    e: 2.5,
+    rho: 970,
+    color: "#e4d7c7",
+    intro: "A soft silicone often used for flexible membranes and low-conductivity layers.",
+  },
+  {
+    name: "Soft magnetic alloy",
+    e: 180000,
+    rho: 7500,
+    color: "#8799b4",
+    intro: "A magnetically responsive alloy that can guide an existing field.",
   },
 ];

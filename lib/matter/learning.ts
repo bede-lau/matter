@@ -58,6 +58,46 @@ export const materialCards: SourceCard[] = [
     sourceUrl: "https://www.weerg.com/de/lernen/titan",
     note: "A strong, corrosion-resistant metal often considered for demanding engineering and medical parts.",
   },
+  {
+    id: "silicon",
+    title: "Silicon",
+    eyebrow: "BASE MATERIAL · OPTICAL SEMICONDUCTOR",
+    image: "https://www.atomic-energy.ru/files/images/2025/04/7d2a5404.jpg",
+    alt: "A technician inspecting a patterned silicon wafer in a laboratory.",
+    sourceLabel: "Atomic Energy · silicon wafer inspection",
+    sourceUrl: "https://www.atomic-energy.ru/statements/2025/04/09/155196",
+    note: "A semiconductor used in many tiny optical structures and light sensors.",
+  },
+  {
+    id: "copper",
+    title: "Copper",
+    eyebrow: "BASE MATERIAL · HIGH-CONDUCTIVITY METAL",
+    image: "https://images.forbesjapan.com/media/article/86248/images/main_image_487dd93000d751154d762a3910b03e6274e7d63f.jpg",
+    alt: "A warm-toned copper ingot on a dark surface.",
+    sourceLabel: "Forbes Japan · copper ingot",
+    sourceUrl: "https://forbesjapan.com/articles/detail/86248",
+    note: "A conductive metal used in microwave resonators and heat-flow experiments.",
+  },
+  {
+    id: "pdms",
+    title: "PDMS silicone",
+    eyebrow: "BASE MATERIAL · SOFT ELASTOMER",
+    image: "https://cdn.open-pr.com/V/b/Vb04940201_g.jpg",
+    alt: "A gloved hand bending a transparent PDMS silicone sample.",
+    sourceLabel: "OpenPR · flexible PDMS sample",
+    sourceUrl: "https://www.openpr.com/news/2793119/polydimethylsiloxane-pdms-market-research-and-analysis",
+    note: "A flexible silicone used for membranes, microfluidics, and low-conductivity layers.",
+  },
+  {
+    id: "soft-magnetic-alloy",
+    title: "Soft magnetic alloy",
+    eyebrow: "BASE MATERIAL · FIELD-GUIDING METAL",
+    image: "https://ja.nc-net.or.jp/up/library/84533/73325/287359b7e49088a5a31ea9217d4f544d.JPG",
+    alt: "Laminated soft magnetic alloy cores in several industrial shapes.",
+    sourceLabel: "Otama · permalloy magnetic cores",
+    sourceUrl: "https://ja.nc-net.or.jp/company/84533/product/detail/22980/",
+    note: "A magnetically responsive alloy that can guide an existing field toward a sensor.",
+  },
 ];
 
 export const structureCards: SourceCard[] = [
@@ -128,6 +168,72 @@ export const structureCards: SourceCard[] = [
     sourceUrl:
       "https://siwonewmaterial.en.made-in-china.com/product/DEjYnQCMsXRG/China-Tmd-Tuned-Mass-Damper-for-Seismic-Reduction-and-Isolation-of-Buildings.html",
     note: "Start with a moving mass on a flexible connection. Repeating many small versions can target selected vibration ranges instead of every vibration.",
+  },
+  {
+    id: "metalens",
+    title: "Dielectric metalens",
+    eyebrow: "OPTICAL METASURFACE · NANOPILLARS",
+    image:
+      "https://www.researchgate.net/profile/Andrea-Vogliardi/publication/371865142/figure/fig4/AS%3A11431281170584436%401687834789445/SEM-images-of-the-fabricated-metalens-a-Overall-top-view-of-the-entire-metasurface.jpg",
+    alt: "Microscope images of the repeating nanopillars on a fabricated metalens.",
+    sourceLabel: "Vogliardi et al. · metalens SEM images",
+    sourceUrl: "https://capasso.seas.harvard.edu/metasurfaces-and-flat-optics",
+    note: "A microscope reveals the tiny post pattern that lets a flat surface focus light.",
+  },
+  {
+    id: "cloak",
+    title: "Microwave cloak",
+    eyebrow: "TRANSFORMATION OPTICS · WAVE ROUTING",
+    image:
+      "https://npr.brightspotcdn.com/dims4/default/23d0ce3/2147483647/strip/true/crop/894x621%2B0%2B0/resize/880x611%21/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Flegacy%2Fsites%2Fkut%2Ffiles%2F201303%2FInvisibiltiyCloak+copy.jpg",
+    alt: "A laboratory setup measuring electromagnetic waves around a cloaked cylindrical sample.",
+    sourceLabel: "KUT / NPR · cloak measurement setup",
+    sourceUrl: "https://www.science.org/doi/10.1126/science.1133628",
+    note: "A real lab setup measures how a patterned shell changes the waves scattered by a small object.",
+  },
+  {
+    id: "membrane-absorber",
+    title: "Membrane absorber",
+    eyebrow: "ACOUSTIC METAMATERIAL · RESONANT PANEL",
+    image:
+      "https://www.mdpi.com/acoustics/acoustics-01-00035/article_deploy/html/images/acoustics-01-00035-g003.png",
+    alt: "Acoustic metamaterial panels and a test setup with microphones in an anechoic room.",
+    sourceLabel: "MDPI Acoustics · panel testing",
+    sourceUrl: "https://www.nature.com/articles/ncomms1758",
+    note: "Thin membranes and small masses can target low-frequency noise in a shallow panel.",
+  },
+  {
+    id: "thermal-cloak",
+    title: "Thermal cloak",
+    eyebrow: "THERMAL METAMATERIAL · COPPER + PDMS",
+    image:
+      "https://scitechdaily.com/images/Researchers-Develop-Invisibility-Cloak-for-Thermal-Flow.jpg",
+    alt: "A circular copper and PDMS plate with concentric rings for redirecting heat flow.",
+    sourceLabel: "SciTechDaily · thermal cloak sample",
+    sourceUrl: "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.110.195901",
+    note: "The alternating rings bend a heat pulse around a centre, like a river around an island.",
+  },
+  {
+    id: "topological",
+    title: "Topological edge lattice",
+    eyebrow: "PHOTONIC LATTICE · PROTECTED EDGE",
+    image:
+      "https://scx2.b-cdn.net/gfx/news/2021/directquanti.jpg",
+    alt: "A photonic crystal lattice with a highlighted edge route and wave amplitude map.",
+    sourceLabel: "Phys.org · photonic edge-state image",
+    sourceUrl: "https://www.nature.com/articles/nature08293",
+    note: "The repeating crystal blocks the bulk while a boundary route carries a selected wave.",
+  },
+  {
+    id: "flux",
+    title: "Magnetic flux shell",
+    eyebrow: "MAGNETIC METAMATERIAL · FIELD CONCENTRATOR",
+    image:
+      "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fsrep44762/MediaObjects/41598_2017_Article_BFsrep44762_Fig2_HTML.jpg",
+    alt: "Nested magnetic metamaterial funnels arranged to concentrate a field in a central region.",
+    sourceLabel: "Scientific Reports · magnetic shell prototype",
+    sourceUrl: "https://www.nature.com/articles/srep44762",
+    note: "Nested magnetic funnels gather an existing field where a small sensor can measure it.",
   },
 ];
 

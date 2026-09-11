@@ -87,7 +87,16 @@ export default function Studio() {
   const viewport = useRef<HTMLDivElement>(null);
   const f = families[family];
   const activeReference = structureCards.find((card) => card.id === f.id);
-  const familyFactor = [0.13, 0.16, 0.08, 0.1, 0.12, 0.14][family];
+  const familyFactor = [0.13, 0.16, 0.08, 0.1, 0.12, 0.14][family] ?? 0.12;
+  const isMechanical = f.category === "Mechanical";
+  const metricLabel = isMechanical
+    ? "Illustrative lattice stiffness"
+    : f.category === "Thermal"
+      ? "Heat-path contrast"
+      : f.category === "Magnetic"
+        ? "Flux concentration"
+        : "Wave response index";
+  const metricUnit = isMechanical ? "MPa" : "relative";
   const variantFactor = 1 + variant * 0.12;
   const density = Math.min(
     0.65,
@@ -115,6 +124,10 @@ export default function Studio() {
   const choose = (i: number) => {
     setFamily(i);
     setVariant(0);
+    const nextFamily = families[i];
+    if (nextFamily.defaultBase !== undefined) setBase(nextFamily.defaultBase);
+    if (nextFamily.defaultSecondary !== undefined)
+      setSecond(nextFamily.defaultSecondary);
     setStructurePickerOpen(false);
   };
   const startAnimation = () => {
@@ -146,6 +159,10 @@ export default function Studio() {
             `${v.name} ${v.tag}`.toLowerCase().includes(query.toLowerCase()),
         ),
     [query, filter],
+  );
+  const filterOptions = useMemo(
+    () => ["All structures", ...Array.from(new Set(families.map((v) => v.category)))],
+    [],
   );
   const download = (data: unknown, name: string) => {
     const u = URL.createObjectURL(
@@ -401,9 +418,7 @@ export default function Studio() {
                       label="Filter structures"
                       value={filter}
                       onChange={setFilter}
-                      options={["All structures", "Mechanical", "Acoustic"].map(
-                        (v) => ({ value: v, label: v }),
-                      )}
+                      options={filterOptions.map((v) => ({ value: v, label: v }))}
                     />
                   </div>
                   <div className="structure-picker-grid">
@@ -863,7 +878,13 @@ export default function Studio() {
                 <div className="control-block compact-range">
                   <label>
                     <GlossaryText>
-                      {f.id === "gyroid" ? "Wall thickness" : "Strut diameter"}
+                      {isMechanical
+                        ? f.id === "gyroid"
+                          ? "Wall thickness"
+                          : "Strut diameter"
+                        : f.category === "Thermal"
+                          ? "Layer thickness"
+                          : "Element thickness"}
                     </GlossaryText>
                     <output>{thick.toFixed(2)} mm</output>
                   </label>
@@ -916,14 +937,17 @@ export default function Studio() {
                 </div>
                 <div>
                   <span>
-                    <GlossaryText>Illustrative lattice stiffness</GlossaryText>
+                    <GlossaryText>{metricLabel}</GlossaryText>
                   </span>
                   <strong>
-                    {estimateLow.toFixed(2)}–
-                    {estimated < 10
-                      ? estimated.toFixed(2)
-                      : Math.round(estimated).toLocaleString()}
-                    <small>MPa</small>
+                    {isMechanical
+                      ? `${estimateLow.toFixed(2)}–${
+                          estimated < 10
+                            ? estimated.toFixed(2)
+                            : Math.round(estimated).toLocaleString()
+                        }`
+                      : `${(0.8 + density * 2.4 + variant * 0.12).toFixed(2)}`}
+                    <small>{metricUnit}</small>
                   </strong>
                 </div>
                 <div className="estimate-note">

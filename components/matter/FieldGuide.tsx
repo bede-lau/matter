@@ -33,6 +33,18 @@ const beginnerSummaries: Record<string, string> = {
     "A familiar hexagonal core that supports differently depending on its direction.",
   resonator:
     "A small mass on a flexible link that reacts most strongly near one vibration range.",
+  metalens:
+    "A flat optical surface whose tiny posts shape light into a focused wavefront.",
+  cloak:
+    "A graded shell that routes selected microwaves around a hidden region.",
+  "membrane-absorber":
+    "A thin resonant sheet that turns selected low-frequency sound into heat.",
+  "thermal-cloak":
+    "A layered plate that sends conducted heat around a protected centre.",
+  topological:
+    "A patterned wave lattice with an edge route that can bend around some defects.",
+  flux:
+    "A nested magnetic shell that gathers an existing field into a small sensor gap.",
 };
 
 const tryPrompts: Record<string, string> = {
@@ -42,6 +54,12 @@ const tryPrompts: Record<string, string> = {
   kelvin: "Look at the open edges. Imagine them bending as the cell is squeezed.",
   honeycomb: "Rotate from top to side. Notice how the direction of the cells changes the support.",
   resonator: "Find the inner mass and the flexible link that lets it move near a selected frequency.",
+  metalens: "Compare equal-height posts with a height gradient. The gradient gives the light a curved wavefront.",
+  cloak: "Follow the microwave paths around the empty centre. Then switch variants and notice the shell spacing change.",
+  "membrane-absorber": "Watch the thin membranes move. They absorb best near their tuned resonance, not at every pitch.",
+  "thermal-cloak": "Trace the heat dots around the protected centre. The core warms later, but it does not stay cold forever.",
+  topological: "Follow the bright packet along the boundary, then inspect the corner where the edge route bends.",
+  flux: "Follow the field lines into the narrow centre. The shell gathers an existing field instead of creating one.",
 };
 
 export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
@@ -113,7 +131,7 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
           <nav className="field-guide-v2__cell-chooser" aria-label="Choose a structure">
             <div className="field-guide-v2__chooser-heading">
               <span>STRUCTURES</span>
-              <strong>{String(activeIndex + 1).padStart(2, "0")} / 06</strong>
+              <strong>{String(activeIndex + 1).padStart(2, "0")} / {String(families.length).padStart(2, "0")}</strong>
             </div>
             {families.map((item, index) => {
               const itemReference = structureCards.find((card) => card.id === item.id);

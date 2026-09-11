@@ -11,6 +11,12 @@ for (const kind of [
   "kelvin",
   "honeycomb",
   "resonator",
+  "metalens",
+  "cloak",
+  "membrane-absorber",
+  "thermal-cloak",
+  "topological",
+  "flux",
 ])
   for (let variant = 0; variant < 3; variant++) {
     const root = new T.Group();
