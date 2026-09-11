@@ -14,15 +14,22 @@ import {
   Grid3X3,
   Upload,
   Download,
-  ChevronRight,
+  ChevronDown,
   BookOpen,
   Activity,
   Check,
-  Atom,
   X,
   ArrowRight,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Choice, ExportMenu, ModeTabs } from "./ReuiControls";
 import MiniLattice from "./MiniLattice";
 import { GlossaryProvider, GlossaryText } from "./Glossary";
@@ -63,7 +70,8 @@ export default function Studio() {
     [speed, setSpeed] = useState(1),
     [notice, setNotice] = useState(""),
     [records, setRecords] = useState<RecordRow[]>([]),
-    [filter, setFilter] = useState("All structures");
+    [filter, setFilter] = useState("All structures"),
+    [structurePickerOpen, setStructurePickerOpen] = useState(false);
   const [sceneParameters, setSceneParameters] = useState({
     blend: 0,
     count: 3,
@@ -73,6 +81,7 @@ export default function Studio() {
   const file = useRef<HTMLInputElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const f = families[family];
+  const activeReference = structureCards.find((card) => card.id === f.id);
   const familyFactor = [0.13, 0.16, 0.08, 0.1, 0.12, 0.14][family];
   const variantFactor = 1 + variant * 0.12;
   const density = Math.min(
@@ -101,6 +110,7 @@ export default function Studio() {
   const choose = (i: number) => {
     setFamily(i);
     setVariant(0);
+    setStructurePickerOpen(false);
   };
   const resetParameters = () => {
     const next = { blend: 0, count: 3, thick: 0.8, size: 10 };
@@ -336,85 +346,126 @@ export default function Studio() {
           </span>
         </div>}
         {tab === "studio" && (
-          <div className="studio-grid">
-            <aside className="catalog">
-              <div className="panel-heading">
-                <span>STRUCTURE LIBRARY</span>
-                <span className="count">
-                  {families.length.toString().padStart(2, "0")}
-                </span>
-              </div>
-              <label className="search">
-                <Search size={16} />
-                <input
-                  aria-label="Find a structure"
-                  placeholder="Find a structure..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </label>
-              <Choice
-                label="Filter structures"
-                value={filter}
-                onChange={setFilter}
-                options={["All structures", "Mechanical", "Acoustic"].map(
-                  (v) => ({ value: v, label: v }),
-                )}
-              />
-              <div className="structure-list">
-                {catalog.map((v) => {
-                  const reference = structureCards.find((card) => card.id === v.id);
-                  return (
-                    <button
-                      key={v.id}
-                      className={
-                        "structure-card " + (v.index === family ? "selected" : "")
-                      }
-                      onClick={() => choose(v.index)}
-                    >
-                      <span className="mini-structure" aria-hidden="true">
-                        {reference && (
-                          <img
-                            src={reference.image}
-                            alt=""
-                            width={48}
-                            height={48}
-                            loading={v.index === family ? "eager" : "lazy"}
-                            decoding="async"
-                          />
-                        )}
-                      </span>
-                      <span>
-                        <strong>{v.name}</strong>
-                        <small>{v.tag}</small>
-                      </span>
-                      {v.index === family ? (
-                        <span className="selected-dot" />
-                      ) : (
-                        <ChevronRight size={14} />
+          <section className="studio-workbench">
+            <div className="studio-toolbar">
+              <Dialog
+                open={structurePickerOpen}
+                onOpenChange={setStructurePickerOpen}
+              >
+                <DialogTrigger asChild>
+                  <button className="structure-picker-trigger">
+                    <span className="structure-picker-trigger__image" aria-hidden="true">
+                      {activeReference && (
+                        <img
+                          src={activeReference.image}
+                          alt=""
+                          width={40}
+                          height={40}
+                          decoding="async"
+                        />
                       )}
-                    </button>
-                  );
-                })}
-                {catalog.length === 0 && (
-                  <p className="empty">No matching structures.</p>
-                )}
-              </div>
-              <div className="catalog-note">
-                <BookOpen size={19} />
-                <div>
-                  <strong>Shape is a second design ingredient.</strong>
-                  <p>
-                    Chemistry sets the base material. Internal geometry changes
-                    how the finished structure carries force, deforms, or
-                    vibrates.
-                  </p>
-                  <button onClick={() => setTab("learn")}>
-                    Explore the field guide <ArrowUpRight size={14} />
+                    </span>
+                    <span className="structure-picker-trigger__copy">
+                      <span>Structure library</span>
+                      <strong>{f.name}</strong>
+                    </span>
+                    <ChevronDown size={17} aria-hidden="true" />
                   </button>
-                </div>
+                </DialogTrigger>
+                <DialogContent className="structure-picker-dialog">
+                  <DialogHeader>
+                    <span className="eyebrow">STRUCTURE LIBRARY</span>
+                    <DialogTitle>Choose a repeating structure</DialogTitle>
+                    <DialogDescription>
+                      Select a structure, then tune its material and geometry in
+                      the workspace.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="structure-picker-filters">
+                    <label className="search">
+                      <Search size={16} />
+                      <input
+                        aria-label="Find a structure"
+                        placeholder="Find a structure..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        autoFocus
+                      />
+                    </label>
+                    <Choice
+                      label="Filter structures"
+                      value={filter}
+                      onChange={setFilter}
+                      options={["All structures", "Mechanical", "Acoustic"].map(
+                        (v) => ({ value: v, label: v }),
+                      )}
+                    />
+                  </div>
+                  <div className="structure-picker-grid">
+                    {catalog.map((v) => {
+                      const reference = structureCards.find((card) => card.id === v.id);
+                      const selected = v.index === family;
+                      return (
+                        <button
+                          key={v.id}
+                          className={
+                            "structure-picker-card " + (selected ? "selected" : "")
+                          }
+                          aria-pressed={selected}
+                          onClick={() => choose(v.index)}
+                        >
+                          <span className="structure-picker-card__image" aria-hidden="true">
+                            {reference && (
+                              <img
+                                src={reference.image}
+                                alt=""
+                                width={104}
+                                height={78}
+                                loading={selected ? "eager" : "lazy"}
+                                decoding="async"
+                              />
+                            )}
+                          </span>
+                          <span className="structure-picker-card__copy">
+                            <strong>{v.name}</strong>
+                            <small>{v.tag}</small>
+                          </span>
+                          {selected && <Check size={16} aria-label="Selected" />}
+                        </button>
+                      );
+                    })}
+                    {catalog.length === 0 && (
+                      <p className="empty">No matching structures.</p>
+                    )}
+                  </div>
+                  <div className="structure-picker-note">
+                    <BookOpen size={17} />
+                    <span>
+                      Need the plain-language version? The Field Guide explains
+                      each structure from material to real-world use.
+                    </span>
+                    <button
+                      onClick={() => {
+                        setStructurePickerOpen(false);
+                        setTab("learn");
+                      }}
+                    >
+                      Open Field Guide <ArrowUpRight size={15} />
+                    </button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <div className="studio-toolbar__summary" aria-live="polite">
+                <span>{f.category}</span>
+                <strong>{f.variants[variant]}</strong>
+                <small>{f.tag}</small>
               </div>
-            </aside>
+              <div className="studio-toolbar__instruction">
+                <SlidersHorizontal size={16} />
+                Tune material and geometry in one view
+              </div>
+            </div>
+            <div className="studio-grid">
             <section className="middle">
               <div
                 className="viewport"
@@ -643,13 +694,23 @@ export default function Studio() {
                 </button>
               </div>
             </section>
-            <aside className="parameters">
+            <aside className="parameters design-dock">
               <div className="panel-heading">
                 <span>DESIGN PARAMETERS</span>
-                <SlidersHorizontal size={16} />
+                <button
+                  className="compact-reset"
+                  aria-label="Reset parameters"
+                  onClick={resetParameters}
+                >
+                  <RotateCcw size={15} />
+                  Reset
+                </button>
               </div>
-              <div className="control-block">
-                <label>Structure variant</label>
+              <div className="control-block compact-variant">
+                <label>
+                  Structure variant
+                  <output>{String(variant + 1).padStart(2, "0")}</output>
+                </label>
                 <div className="variant-buttons">
                   {f.variants.map((v, i) => (
                     <button
@@ -664,37 +725,36 @@ export default function Studio() {
                   ))}
                 </div>
               </div>
-              <div className="control-block">
-                <label htmlFor="material">Base material</label>
-                <Choice
-                  id="material"
-                  label="Base material"
-                  value={String(base)}
-                  onChange={(v) => chooseBase(Number(v))}
-                  options={bases.map((b, i) => ({
-                    value: String(i),
-                    label: b.name,
-                  }))}
-                />
-                <span className="control-hint">
-                  {baseMaterial.intro}
-                </span>
-              </div>
-              <div className="control-block material-blend-block">
-                <label htmlFor="secondary">
-                  <GlossaryText>Secondary material</GlossaryText>{" "}
-                  <output>{blend}%</output>
-                </label>
-                <Choice
-                  id="secondary"
-                  label="Secondary material"
-                  value={String(second)}
-                  onChange={(v) => chooseSecondary(Number(v))}
-                  options={bases
-                    .map((b, i) => ({ value: String(i), label: b.name }))
-                    .filter((option) => option.value !== String(base))}
-                />
-                <div className="blend-lesson">
+              <div className="material-controls">
+                <div className="compact-material-choice">
+                  <label htmlFor="material">Base material</label>
+                  <Choice
+                    id="material"
+                    label="Base material"
+                    value={String(base)}
+                    onChange={(v) => chooseBase(Number(v))}
+                    options={bases.map((b, i) => ({
+                      value: String(i),
+                      label: b.name,
+                    }))}
+                  />
+                </div>
+                <div className="compact-material-choice">
+                  <label htmlFor="secondary">
+                    <GlossaryText>Secondary material</GlossaryText>
+                    <output>{blend}%</output>
+                  </label>
+                  <Choice
+                    id="secondary"
+                    label="Secondary material"
+                    value={String(second)}
+                    onChange={(v) => chooseSecondary(Number(v))}
+                    options={bases
+                      .map((b, i) => ({ value: String(i), label: b.name }))
+                      .filter((option) => option.value !== String(base))}
+                  />
+                </div>
+                <div className="phase-meter">
                   <div>
                     <span>
                       <i style={{ backgroundColor: baseMaterial.color }} />
@@ -723,109 +783,87 @@ export default function Studio() {
                       }}
                     />
                   </div>
-                  <small>
-                    Placement rule: repeating coloured micro-zones across the
-                    lattice, shown only to make the two phases visible.
-                  </small>
-                </div>
-                <Slider
-                  aria-label="Secondary material volume percent"
-                  min={0}
-                  max={100}
-                  step={5}
-                  value={[blend]}
-                  onValueChange={(v) => setBlend(v[0])}
-                  onValueCommit={(v) =>
-                    setSceneParameters((current) => ({
-                      ...current,
-                      blend: v[0],
-                    }))
-                  }
-                  className="mt-4"
-                />
-                <span className="control-hint">
-                  The lattice colours both phases so you can see the share you
-                  chose. This is an explanatory material map, not a
-                  manufacturing recipe or a performance claim.
-                </span>
-              </div>
-              <div className="control-block">
-                <label>
-                  <GlossaryText>Cell size</GlossaryText>{" "}
-                  <output>
-                    {size.toFixed(1)} <span>mm</span>
-                  </output>
-                </label>
-                <Slider
-                  aria-label="Cell size"
-                  min={5}
-                  max={20}
-                  step={0.5}
-                  value={[size]}
-                  onValueChange={(v) => setSize(v[0])}
-                  onValueCommit={(v) =>
-                    setSceneParameters((current) => ({
-                      ...current,
-                      size: v[0],
-                    }))
-                  }
-                />
-                <div className="range-ends">
-                  <span>5 mm</span>
-                  <span>20 mm</span>
+                  <Slider
+                    aria-label="Secondary material volume percent"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={[blend]}
+                    onValueChange={(v) => setBlend(v[0])}
+                    onValueCommit={(v) =>
+                      setSceneParameters((current) => ({
+                        ...current,
+                        blend: v[0],
+                      }))
+                    }
+                  />
                 </div>
               </div>
-              <div className="control-block">
-                <label>
-                  <GlossaryText>
-                    {f.id === "gyroid" ? "Wall thickness" : "Strut diameter"}
-                  </GlossaryText>
-                  <output>
-                    {thick.toFixed(2)} <span>mm</span>
-                  </output>
-                </label>
-                <Slider
-                  aria-label="Thickness"
-                  min={0.3}
-                  max={1.6}
-                  step={0.05}
-                  value={[thick]}
-                  onValueChange={(v) => setThick(v[0])}
-                  onValueCommit={(v) =>
-                    setSceneParameters((current) => ({
-                      ...current,
-                      thick: v[0],
-                    }))
-                  }
-                />
-                <div className="range-ends">
-                  <span>0.3 mm</span>
-                  <span>1.6 mm</span>
+              <div className="geometry-grid">
+                <div className="control-block compact-range">
+                  <label>
+                    <GlossaryText>Cell size</GlossaryText>
+                    <output>{size.toFixed(1)} mm</output>
+                  </label>
+                  <Slider
+                    aria-label="Cell size"
+                    min={5}
+                    max={20}
+                    step={0.5}
+                    value={[size]}
+                    onValueChange={(v) => setSize(v[0])}
+                    onValueCommit={(v) =>
+                      setSceneParameters((current) => ({
+                        ...current,
+                        size: v[0],
+                      }))
+                    }
+                  />
+                </div>
+                <div className="control-block compact-range">
+                  <label>
+                    <GlossaryText>
+                      {f.id === "gyroid" ? "Wall thickness" : "Strut diameter"}
+                    </GlossaryText>
+                    <output>{thick.toFixed(2)} mm</output>
+                  </label>
+                  <Slider
+                    aria-label="Thickness"
+                    min={0.3}
+                    max={1.6}
+                    step={0.05}
+                    value={[thick]}
+                    onValueChange={(v) => setThick(v[0])}
+                    onValueCommit={(v) =>
+                      setSceneParameters((current) => ({
+                        ...current,
+                        thick: v[0],
+                      }))
+                    }
+                  />
+                </div>
+                <div className="control-block compact-range">
+                  <label>
+                    Repetition
+                    <output>{count} × {count} × {count}</output>
+                  </label>
+                  <Slider
+                    aria-label="Repetition"
+                    min={1}
+                    max={5}
+                    step={1}
+                    value={[count]}
+                    onValueChange={(v) => setCount(v[0])}
+                    onValueCommit={(v) =>
+                      setSceneParameters((current) => ({
+                        ...current,
+                        count: v[0],
+                      }))
+                    }
+                  />
                 </div>
               </div>
-              <div className="control-block">
-                <label>
-                  Repetition{" "}
-                  <output>
-                    {count} × {count} × {count}
-                  </output>
-                </label>
-                <Slider
-                  aria-label="Repetition"
-                  min={1}
-                  max={5}
-                  step={1}
-                  value={[count]}
-                  onValueChange={(v) => setCount(v[0])}
-                  onValueCommit={(v) =>
-                    setSceneParameters((current) => ({
-                      ...current,
-                      count: v[0],
-                    }))
-                  }
-                />
-              </div>
-              <div className="property-card">
+              <div className="property-card compact-properties">
                 <div className="eyebrow">ILLUSTRATIVE TEACHING ESTIMATES</div>
                 <div>
                   <span>
@@ -848,21 +886,19 @@ export default function Studio() {
                     <small>MPa</small>
                   </strong>
                 </div>
-                <p>
-                  Ideal solid-material mixture range: {lower.toFixed(0)}–
-                  {upper.toFixed(0)} MPa (Reuss–Voigt). Numbers marked
-                  “illustrative” help compare settings; do not use them to
-                  design a safety-critical part.
-                </p>
+                <details>
+                  <summary>How to read these figures</summary>
+                  <p>
+                    Ideal solid-material mixture range: {lower.toFixed(0)}–
+                    {upper.toFixed(0)} MPa (Reuss–Voigt). Numbers marked
+                    “illustrative” help compare settings; do not use them to
+                    design a safety-critical part.
+                  </p>
+                </details>
               </div>
-              <button
-                className="reset-button"
-                onClick={resetParameters}
-              >
-                <RotateCcw size={14} /> Reset parameters
-              </button>
             </aside>
           </div>
+          </section>
         )}
         {tab === "learn" && (
           <FieldGuide

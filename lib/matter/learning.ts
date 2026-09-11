@@ -109,11 +109,12 @@ export const structureCards: SourceCard[] = [
     id: "honeycomb",
     title: "Honeycomb",
     eyebrow: "NATURAL REPEATING PATTERN · BEE COMB",
-    image: "https://pedagogika.bg/content/uploads/2021/09/untitled-design-26.png",
+    image:
+      "https://www.marbella.es/images/media/articles/delegaciones-y-areas/medio-ambiente-playas-y-puertos/medio-ambiente/normativas/28123_retirada-de-colmenas-de-abejas_introfull.jpg",
     alt: "A honeybee standing on golden hexagonal honeycomb cells.",
-    sourceLabel: "Pedagogika · bee honeycomb",
+    sourceLabel: "Marbella Environment · bee honeycomb",
     sourceUrl:
-      "https://pedagogika.bg/znachenieto-na-pchelite-za-horata-planetata-i-hranitelnite-zapasi/",
+      "https://www.marbella.es/web/medio-ambiente/area-de-medio-ambiente/normativas/retirada-de-colmenas-de-abejas.html",
     note: "Bee comb is a familiar hexagonal pattern. Engineers extrude and orient those cells to make a light core that supports two outer skins.",
   },
   {
