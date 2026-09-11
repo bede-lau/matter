@@ -46,11 +46,16 @@ export default function ResearchExplorer() {
       <div className="research-head">
         <div>
           <span className="eyebrow">OPEN RESEARCH / UCI</span>
-          <h2>Find a simulated structure that blocks a chosen vibration range.</h2>
+          <h2>Explore structures that filter vibration.</h2>
           <p>
-            {rows.length ? rows.length.toLocaleString() : "Loading"} simulated
-            2D repeating designs ·{" "}
+            {rows.length ? rows.length.toLocaleString() : "Loading"} computer-tested
+            designs ·{" "}
             <GlossaryText>2D elastodynamic metamaterials</GlossaryText>
+          </p>
+          <p className="research-intro">
+            Each dot is one simulated repeating structure. Use the controls to
+            describe the vibration range you want to block, then inspect the
+            closest matching design.
           </p>
         </div>
         <a
@@ -67,8 +72,14 @@ export default function ResearchExplorer() {
         aria-busy={!rows.length && !error}
       >
         <div className="research-controls">
+          <div className="research-section-heading">
+            <span className="eyebrow">YOUR SEARCH</span>
+            <h3>Describe the vibration you want to block</h3>
+            <p>Start with the middle of the range, then set its minimum width.</p>
+          </div>
           <label>
-            <GlossaryText>Frequency to block near</GlossaryText>{" "}
+            <span className="research-control-number">01</span>{" "}
+            <GlossaryText>Target frequency</GlossaryText>{" "}
             <strong>{target} Hz</strong>
           </label>
           <Slider
@@ -83,7 +94,8 @@ export default function ResearchExplorer() {
             }}
           />
           <label>
-            <GlossaryText>Minimum blocked range</GlossaryText>{" "}
+            <span className="research-control-number">02</span>{" "}
+            <GlossaryText>Minimum blocked width</GlossaryText>{" "}
             <strong>{width} Hz</strong>
           </label>
           <Slider
@@ -97,20 +109,25 @@ export default function ResearchExplorer() {
               setSelected(null);
             }}
           />
-          <p>
-            <GlossaryText>
-              A band gap is a frequency interval that cannot travel through the
-              ideal repeating model. Choose the middle of the range you care
-              about, then choose how wide the blocked range should be.
-            </GlossaryText>
-          </p>
-          <small>
-            The explorer keeps records with a wide-enough reported gap, then
-            ranks them by how close their center is to your target. These
-            simulations are separate from the 3D product lessons.
+          <div className="research-definition">
+            <strong><GlossaryText>Band gap</GlossaryText></strong>
+            <p>
+              A band gap is a frequency range that the repeating structure
+              does not let through in this computer model.
+            </p>
+          </div>
+          <small className="research-control-note">
+            The search keeps designs whose blocked width meets your minimum,
+            then sorts them by the closest center frequency. This dataset is
+            separate from the 3D product lessons.
           </small>
         </div>
         <div className="research-plot">
+          <div className="research-section-heading research-plot-heading">
+            <span className="eyebrow">03 / READ THE MAP</span>
+            <h3>Find the closest design</h3>
+            <p>Look for the highlighted dot. Higher dots represent wider blocked ranges.</p>
+          </div>
           <ResearchPlot
             sample={sample}
             target={target}
@@ -119,20 +136,27 @@ export default function ResearchExplorer() {
           />
 
           <span>
-            Middle of band gap (Hz) →{" "}
-            <em>Vertical: width (Hz) · One of every 21 records is shown</em>
+            Horizontal: middle frequency (Hz) · Vertical: blocked width (Hz)
+            <em>One of every 21 records is shown</em>
           </span>
         </div>
         <div className="research-result">
           <span className="eyebrow">
-            {selected ? "SELECTED SIMULATED DESIGN" : "NEAREST SIMULATED MATCH"}
+            {selected ? "YOUR SELECTED DESIGN" : "CLOSEST MATCH"}
           </span>
           {best ? (
             <>
+              <h3 className="research-result-heading">
+                {selected ? "Design you selected" : "Best match for your search"}
+              </h3>
               <h3>
                 {best[1].toFixed(1)} <small>Hz center</small>
               </h3>
               <p>{best[2].toFixed(1)} Hz band-gap width</p>
+              <p className="research-result-explanation">
+                Its blocked range is at least your chosen width, and its center
+                is closest to your target frequency.
+              </p>
               <div
                 className="binary-code"
                 aria-label={"Encoded design " + best[0]}
@@ -144,21 +168,25 @@ export default function ResearchExplorer() {
                 ))}
               </div>
               <small>
-                The 15-bit code is the dataset’s identifier for this geometry;
-                it is not a drawing of the unit cell.
+                This 15-bit code is only the dataset identifier for the design.
+                It is not a drawing of the structure.
               </small>
               <p className="source-label">SIMULATED / UCI 2021</p>
             </>
           ) : (
             <p>
               {rows.length
-                ? "No simulated designs meet both choices. Reduce the minimum blocked range or choose another center frequency."
+                ? "No designs meet both choices. Try a smaller minimum width or another target frequency."
                 : "Loading research data…"}
             </p>
           )}
         </div>
       </div>
       <div className="match-buttons">
+        <div className="research-matches-heading">
+          <span className="eyebrow">OTHER GOOD MATCHES</span>
+          <p>Choose a result to compare it with the highlighted design.</p>
+        </div>
         {matches.map((r, i) => (
           <button
             key={r[0] + i}

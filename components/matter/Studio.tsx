@@ -49,6 +49,10 @@ type RecordRow = {
   source_url: string;
   evidence: string;
 };
+
+const withoutTeachingLabel = (copy: string) =>
+  copy.replace(/^(Purpose|Structure|Behavior):\s*/i, "");
+
 export default function Studio() {
   const [family, setFamily] = useState(0),
     [variant, setVariant] = useState(0),
@@ -341,8 +345,8 @@ export default function Studio() {
         {tab !== "learn" && <div className="learning-hint">
           <BookOpen size={15} />
           <span>
-            New here? <strong>Tap a dotted term</strong> or highlight a known
-            phrase for a short, plain-language definition.
+            New here? <strong>Tap a dotted term</strong> or highlight any
+            phrase for a short, plain-language explanation.
           </span>
         </div>}
         {tab === "studio" && (
@@ -651,39 +655,71 @@ export default function Studio() {
                   </button>
                 </div>
               )}
-              <div className="insight">
+              <div className={`insight insight--${mode}`}>
                 <div className="insight-icon">
-                  <Activity size={21} />
-                </div>
-                <div>
-                  <span className="eyebrow">
-                    {mode === "application"
-                      ? "BASE MATERIAL → CELL → CANDIDATE USE"
-                      : "BASE MATERIAL → REPEATED CELL"}
-                  </span>
-                  <h3>
-                    {mode === "application"
-                      ? f.application
-                      : `${baseMaterial.name} + ${f.name}`}
-                  </h3>
-                  <p>
-                    <GlossaryText>
-                      {mode === "application"
-                        ? f.applicationLesson
-                        : `${baseMaterial.intro} ${f.mechanism}`}
-                    </GlossaryText>
-                  </p>
-                  {mode === "application" && (
-                    <p className="variant-lesson">
-                      <strong>{f.variants[variant]}</strong>{" "}
-                      <GlossaryText>{f.variantLessons[variant]}</GlossaryText>
-                    </p>
+                  {mode === "structure" ? (
+                    <Box size={21} />
+                  ) : mode === "application" ? (
+                    <Layers3 size={21} />
+                  ) : (
+                    <Activity size={21} />
                   )}
-                  {mode !== "structure" && (
-                    <small>
-                      This is illustrative geometry and motion, not a tested
-                      product or an engineering result.
-                    </small>
+                </div>
+                <div className="insight-copy">
+                  {mode === "structure" && (
+                    <>
+                      <span className="eyebrow">STRUCTURE AT A GLANCE</span>
+                      <h3>{baseMaterial.name} + {f.name}</h3>
+                      <div className="insight-points">
+                        <div>
+                          <span>Purpose</span>
+                          <p>
+                            <GlossaryText>
+                              {withoutTeachingLabel(f.origin)}
+                            </GlossaryText>
+                          </p>
+                        </div>
+                        <div>
+                          <span>Structure</span>
+                          <p>
+                            <GlossaryText>
+                              {withoutTeachingLabel(f.mechanism)}
+                            </GlossaryText>
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {mode === "deform" && (
+                    <>
+                      <span className="eyebrow">BEHAVIOR</span>
+                      <h3>{f.tag}</h3>
+                      <p>
+                        <GlossaryText>
+                          {withoutTeachingLabel(f.behavior)}
+                        </GlossaryText>
+                      </p>
+                      <p className="variant-lesson">
+                        <strong>This variant</strong>{" "}
+                        <GlossaryText>{f.variantLessons[variant]}</GlossaryText>
+                      </p>
+                    </>
+                  )}
+                  {mode === "application" && (
+                    <>
+                      <span className="eyebrow">IN THE REAL WORLD</span>
+                      <h3>{f.application}</h3>
+                      <div className="insight-points">
+                        <div>
+                          <span>How it is used</span>
+                          <p><GlossaryText>{f.applicationLesson}</GlossaryText></p>
+                        </div>
+                        <div>
+                          <span>Why it helps</span>
+                          <p><GlossaryText>{f.applicationWhy}</GlossaryText></p>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
                 <button
@@ -886,15 +922,12 @@ export default function Studio() {
                     <small>MPa</small>
                   </strong>
                 </div>
-                <details>
-                  <summary>How to read these figures</summary>
+                <div className="estimate-note">
                   <p>
-                    Ideal solid-material mixture range: {lower.toFixed(0)}–
-                    {upper.toFixed(0)} MPa (Reuss–Voigt). Numbers marked
-                    “illustrative” help compare settings; do not use them to
-                    design a safety-critical part.
+                    Compare settings in this model, not the performance of a
+                    finished part.
                   </p>
-                </details>
+                </div>
               </div>
             </aside>
           </div>

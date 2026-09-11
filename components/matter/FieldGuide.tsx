@@ -8,7 +8,6 @@ import {
   ChevronRight,
   CirclePlay,
   Layers3,
-  Sparkles,
 } from "lucide-react";
 import { families } from "@/lib/matter/catalog";
 import { learningSteps, materialCards, structureCards } from "@/lib/matter/learning";
@@ -70,16 +69,6 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
             <span>Use</span>
           </div>
         </div>
-        <aside className="field-guide-v2__tutor-note">
-          <Sparkles size={19} aria-hidden="true" />
-          <div>
-            <strong>Keep this in mind</strong>
-            <p>
-              Shape matters, but so do the material, dimensions, and the test
-              used to judge the result.
-            </p>
-          </div>
-        </aside>
       </header>
 
       <section className="field-guide-v2__map" aria-label="How a metamaterial is designed">

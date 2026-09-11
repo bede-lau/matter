@@ -4320,3 +4320,361 @@ h1 {
     transition: none !important;
   }
 }
+
+/* Studio clarity pass: a deliberately smaller preview leaves room for controls
+   without squeezing their rhythm. Fullscreen remains available for close study. */
+.studio-workbench .studio-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(352px, 392px);
+}
+.studio-workbench .viewport {
+  height: 570px;
+}
+.studio-workbench .parameters.design-dock {
+  height: 570px;
+  justify-content: space-between;
+  gap: 0;
+  overflow: clip;
+  padding: 20px;
+}
+.design-dock .panel-heading {
+  min-height: 31px;
+}
+.compact-variant > label,
+.compact-material-choice > label,
+.compact-range > label {
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.compact-variant .variant-buttons {
+  gap: 6px;
+}
+.compact-variant .variant-buttons button {
+  min-height: 54px;
+  padding: 8px;
+  font-size: 11px;
+}
+.material-controls {
+  gap: 11px 10px;
+  padding-top: 16px;
+}
+.compact-material-choice .matter-select {
+  height: 40px !important;
+  min-height: 40px;
+}
+.phase-meter {
+  gap: 7px 12px;
+}
+.phase-meter .blend-bar {
+  height: 8px;
+  margin-top: 2px;
+}
+.geometry-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 16px;
+}
+.geometry-grid .compact-range:nth-child(3) {
+  grid-column: 1 / -1;
+}
+.compact-range > label {
+  margin-bottom: 7px;
+}
+.compact-properties {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  padding: 12px 13px;
+}
+.compact-properties .eyebrow,
+.compact-properties > div.estimate-note {
+  grid-column: 1 / -1;
+}
+.compact-properties > div:not(:first-child) {
+  margin: 7px 0;
+}
+.compact-properties > div:not(:first-child):not(.estimate-note) {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  margin: 0;
+}
+.compact-properties > div:not(:first-child):not(.estimate-note) span {
+  line-height: 1.3;
+}
+.compact-properties > div.estimate-note {
+  display: grid;
+  gap: 3px;
+  margin: 9px -1px 0;
+  border-top: 1px solid #31434e;
+  padding-top: 8px;
+}
+.compact-properties > div.estimate-note strong {
+  color: #c8dcae;
+  font-size: 10px !important;
+  font-weight: 700;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+.compact-properties > div.estimate-note p {
+  margin: 0;
+  padding: 0;
+  color: #9fb4bd;
+  font-size: 10px;
+  line-height: 1.42;
+}
+
+/* Short, scan-friendly explanations make each visualization mode answer one question. */
+.insight {
+  align-items: flex-start;
+  padding: 21px 24px;
+}
+.insight-copy {
+  min-width: 0;
+  flex: 1;
+}
+.insight h3 {
+  margin: 6px 0 11px;
+  color: #eff5f7;
+  font-size: 18px;
+}
+.insight-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.insight-points > div {
+  min-width: 0;
+  border: 1px solid #304451;
+  border-radius: 9px;
+  background: #121e27;
+  padding: 10px 12px;
+}
+.insight-points > div > span {
+  color: #c2ef72;
+  font-size: 10px;
+  font-weight: 740;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.insight-points p,
+.insight--deform .insight-copy > p {
+  margin: 5px 0 0;
+  color: #bdcdd5;
+  font-size: 12px;
+  line-height: 1.58;
+}
+.insight--deform .insight-copy > p {
+  max-width: 67ch;
+}
+.insight .variant-lesson {
+  margin: 11px 0 0 !important;
+}
+
+/* Callouts use a reserved right-side lane so they never sit on the scene controls. */
+.scene-callout {
+  box-sizing: border-box;
+  max-width: calc(100% - 120px);
+  min-height: 44px;
+  padding: 8px 10px;
+  line-height: 1.42;
+}
+.scene-callout--right {
+  border-left-color: #b4db91;
+}
+
+/* Highlighted text belongs to the atlas palette, then opens a compact teaching card. */
+.glossary-selection-surface ::selection {
+  background: #c2ef72a8;
+  color: #102015;
+  text-shadow: none;
+}
+.glossary-selection-surface ::-moz-selection {
+  background: #c2ef72a8;
+  color: #102015;
+  text-shadow: none;
+}
+.jargon {
+  border-radius: 3px;
+  color: #dff5ba;
+  text-decoration-color: #87b877;
+  text-decoration-thickness: 1px;
+  transition:
+    color var(--motion-ui) var(--ease-out-ui),
+    background-color var(--motion-ui) var(--ease-out-ui),
+    text-decoration-color var(--motion-ui) var(--ease-out-ui);
+}
+.jargon:hover,
+.jargon:focus-visible {
+  background: #c2ef7217;
+  color: #efffd8;
+  text-decoration-color: #c2ef72;
+  outline: none;
+}
+.selection-definition-popover {
+  width: min(356px, calc(100vw - 30px));
+  border-color: #597a63;
+  background:
+    radial-gradient(circle at 94% 4%, #c2ef7220, transparent 33%),
+    #14222b;
+  box-shadow: 0 18px 48px #000a;
+}
+.selection-definition-popover .definition-kicker {
+  color: #d8f8a7;
+}
+.selection-definition-popover .definition-context {
+  margin-top: 10px;
+  border-top: 1px solid #385047;
+  padding-top: 10px;
+  color: #a9bdc6;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Research Data now reads like a small guided search, rather than a raw plot. */
+.research-head {
+  align-items: flex-start;
+}
+.research-head > div {
+  min-width: 0;
+}
+.research-intro {
+  max-width: 66ch;
+  margin: 10px 0 0 !important;
+  color: #b8cbd6;
+  font-size: 14px !important;
+  line-height: 1.58;
+}
+.research-body {
+  gap: 18px;
+  margin-top: 20px;
+  border: 1px solid #304450;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #131f28, #101921 76%);
+  padding: 18px;
+}
+.research-section-heading {
+  margin-bottom: 14px;
+}
+.research-section-heading h3 {
+  margin: 7px 0 5px;
+  color: #e9f1f4;
+  font-size: 15px;
+  font-weight: 620;
+}
+.research-section-heading p {
+  margin: 0;
+  color: #9db2be;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.research-controls label {
+  margin: 17px 0 11px;
+}
+.research-control-number {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #283e2b;
+  color: #c9f087;
+  font-size: 9px;
+  font-weight: 760;
+  vertical-align: middle;
+}
+.research-definition {
+  margin-top: 20px;
+  border-left: 2px solid #c2ef72;
+  border-radius: 0 8px 8px 0;
+  background: #1a2b26;
+  padding: 10px 12px;
+}
+.research-definition strong {
+  color: #e8f6d1;
+  font-size: 12px;
+}
+.research-definition p {
+  margin: 5px 0 0;
+  color: #b7c9c8;
+  font-size: 12px;
+  line-height: 1.52;
+}
+.research-control-note {
+  display: block;
+  margin-top: 16px;
+}
+.research-plot-heading {
+  padding-left: 2px;
+}
+.research-result {
+  align-self: stretch;
+}
+.research-result .research-result-heading {
+  margin: 10px 0 3px;
+  color: #c9d8df;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .035em;
+}
+.research-result-explanation {
+  margin-top: 12px !important;
+  color: #bacbc4;
+  font-size: 12px !important;
+  line-height: 1.54;
+}
+.research-matches-heading {
+  width: 100%;
+  margin-bottom: 2px;
+}
+.research-matches-heading p {
+  margin: 5px 0 0;
+  color: #9eb2bd;
+  font-size: 12px;
+}
+
+@media (max-width: 1250px) {
+  .studio-workbench .studio-grid {
+    grid-template-columns: minmax(0, 1fr) 334px;
+  }
+  .studio-workbench .parameters.design-dock {
+    height: 570px;
+  }
+}
+@media (max-width: 920px) {
+  .studio-workbench .studio-grid {
+    grid-template-columns: minmax(0, 1fr) 304px;
+  }
+  .studio-workbench .parameters.design-dock {
+    padding: 16px;
+  }
+  .compact-variant .variant-buttons button {
+    font-size: 10px;
+  }
+  .geometry-grid {
+    grid-template-columns: 1fr;
+  }
+  .geometry-grid .compact-range:nth-child(3) {
+    grid-column: auto;
+  }
+  .compact-properties {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .studio-workbench .viewport {
+    height: 480px;
+  }
+  .studio-workbench .parameters.design-dock {
+    height: auto;
+    min-height: 0;
+    gap: 19px;
+    overflow: visible;
+  }
+  .insight-points {
+    grid-template-columns: 1fr;
+  }
+  .research-body {
+    padding: 15px;
+  }
+}

@@ -16,6 +16,12 @@ import {
 import entries from "@/lib/matter/glossary.json";
 
 type Entry = (typeof entries)[number];
+type DefinitionEntry = Entry | {
+  id: "selected-phrase";
+  term: string;
+  definition: string;
+  context: string;
+};
 const normalize = (s: string) => s.toLowerCase().replace(/[–−]/g, "-").trim();
 const terms = new Map<string, Entry>();
 for (const e of entries)
@@ -24,6 +30,13 @@ for (const e of entries)
     terms.set(normalize(alias) + "s", e);
   }
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const conciseDefinition = (text: string) => {
+  const withoutLabel = text.replace(/^(Definition|Key point):\s*/i, "").trim();
+  // A quick definition should answer the question at a glance. The source copy
+  // can contain a follow-up sentence, but the popover deliberately keeps the
+  // first complete thought so it stays useful beside the 3D workbench.
+  return withoutLabel.match(/^[\s\S]*?[.!?](?=\s|$)/)?.[0] ?? withoutLabel;
+};
 const pattern = new RegExp(
   `\\b(${[...terms.keys()]
     .sort((a, b) => b.length - a.length)
@@ -37,11 +50,11 @@ export function lookupTerm(text: string) {
     terms.get(normalize(text.match(pattern)?.[0] ?? ""))
   );
 }
-type Explain = (entry: Entry, rect: DOMRect, source?: HTMLElement) => void;
+type Explain = (entry: DefinitionEntry, rect: DOMRect, source?: HTMLElement) => void;
 const Context = createContext<Explain>(() => {});
 
 export function GlossaryProvider({ children }: { children: ReactNode }) {
-  const [entry, setEntry] = useState<Entry | null>(null);
+  const [entry, setEntry] = useState<DefinitionEntry | null>(null);
   const [open, setOpen] = useState(false);
   const origin = useRef<HTMLElement | undefined>(undefined);
   const rect = useRef<DOMRect>({
@@ -77,19 +90,47 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
     window.addEventListener("matter:explain", show);
     return () => window.removeEventListener("matter:explain", show);
   }, []);
-  const selected = () => {
+  const selected = (target?: EventTarget | null) => {
+    // A click on a glossary button should use its precise anchor, not the
+    // browser's previous selection. Form controls and links are not lesson text.
+    if (target instanceof Element && target.closest("button, input, select, textarea, a")) return;
     const selection = window.getSelection();
-    const text = selection?.toString().trim();
-    if (!text || text.length > 90 || !selection?.rangeCount) return;
+    const text = selection?.toString().trim().replace(/\s+/g, " ");
+    if (!text || text.length < 2 || text.length > 90 || !selection?.rangeCount) return;
     const found = lookupTerm(text);
-    if (found) explain(found, selection.getRangeAt(0).getBoundingClientRect());
+    const range = selection.getRangeAt(0);
+    if (found) {
+      explain(found, range.getBoundingClientRect());
+      return;
+    }
+    // Do not invent a scientific explanation for unknown text. Still give the
+    // learner useful feedback and a clear route back to the curated glossary.
+    explain(
+      {
+        id: "selected-phrase",
+        term: text,
+        definition: "This phrase is not in the quick glossary yet, so no scientific definition is shown for it.",
+        context: "Try selecting a shorter technical term, or select a dotted term to open a verified beginner explanation.",
+      },
+      range.getBoundingClientRect(),
+    );
   };
   return (
     <Context.Provider value={explain}>
       <div
-        onPointerUp={selected}
+        className="glossary-selection-surface"
+        onPointerUp={(e) => {
+          // Let the browser finish updating the selection before measuring it.
+          window.requestAnimationFrame(() => selected(e.target));
+        }}
         onKeyUp={(e) => {
-          if (e.key === "Shift") selected();
+          if (
+            e.key === "Shift" ||
+            e.key === "a" ||
+            e.key.startsWith("Arrow")
+          ) {
+            window.requestAnimationFrame(() => selected(e.target));
+          }
         }}
       >
         {children}
@@ -97,7 +138,7 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverAnchor virtualRef={virtual} />
         <PopoverContent
-          className="definition-popover"
+          className="definition-popover selection-definition-popover"
           aria-label={entry ? `${entry.term} definition` : "Definition"}
           side="top"
           sideOffset={12}
@@ -111,7 +152,8 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
           {entry && (
             <>
               <div className="definition-kicker">
-                <BookOpen size={15} /> A QUICK DEFINITION
+                <BookOpen size={15} />
+                {entry.id === "selected-phrase" ? "SELECTED PHRASE" : "A QUICK DEFINITION"}
                 <button
                   aria-label="Close definition"
                   onClick={() => setOpen(false)}
@@ -120,7 +162,8 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
                 </button>
               </div>
               <h2>{entry.term}</h2>
-              <p>{entry.definition}</p>
+              <p>{conciseDefinition(entry.definition)}</p>
+              <p className="definition-context">{conciseDefinition(entry.context)}</p>
             </>
           )}
         </PopoverContent>

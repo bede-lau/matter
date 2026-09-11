@@ -5,8 +5,10 @@ export type Family = {
   tag: string;
   origin: string;
   mechanism: string;
+  behavior: string;
   application: string;
   applicationLesson: string;
+  applicationWhy: string;
   variantLessons: string[];
   variants: string[];
   color: string;
@@ -19,16 +21,20 @@ export const families: Family[] = [
     category: "Mechanical",
     tag: "Smooth, connected load paths",
     origin:
-      "The gyroid is a mathematical surface described by Alan Schoen. Similar gyroid-like patterns later became known in some biological nanostructures, including butterfly scales, but those natural examples did not create the mathematical design.",
+      "Purpose: pair a flexible polymer with a smooth, connected cell for light cushioning and airflow. The gyroid is an engineered mathematical surface, not a copy of a natural object.",
     mechanism:
-      "A gyroid replaces straight beams with one continuous curved wall or network. Loads can spread through smooth connected paths, while the open passages can allow air, fluid, or heat to move through the structure.",
+      "Structure: one continuous curved wall winds through the part. It has no sharp beam junctions, so force can travel along connected paths while open spaces remain between the walls.",
+    behavior:
+      "Behavior: the walls flex and spread a load through the connected network. The open passages can also let air, fluid, or heat move through.",
     application: "Cushioning shoe midsole",
     applicationLesson:
-      "Begin with a flexible base polymer such as TPU. Shape it into a gyroid midsole, then watch the curved walls compress during foot strike. The midsole may provide cushioning; the outsole supplies ground contact, and the upper holds the foot. Real shoe performance still requires fatigue, comfort, traction, and athlete testing.",
+      "A gyroid can form the springy core of a running-shoe midsole. Its connected walls compress under a foot strike and recover between steps, while the upper and outsole handle fit and grip.",
+    applicationWhy:
+      "It is useful because it can cushion repeated impacts while using less material than a solid block.",
     variantLessons: [
-      "Sheet gyroid: the mathematical surface becomes a continuous thin wall. Increase wall thickness to add material and usually make the cell harder to compress.",
-      "Skeletal gyroid: solid branches follow one of the gyroid’s connected labyrinths. The changed solid paths and voids produce a different load path from the sheet version.",
-      "Graded gyroid: wall thickness changes from one region to another. This can create softer and firmer zones without changing the shoe’s outer shape; the animation is a design concept, not measured cushioning data.",
+      "Sheet gyroid: a thin continuous wall follows the gyroid surface. Thicker walls usually make it harder to compress.",
+      "Skeletal gyroid: solid ribs trace the gyroid’s connected pathways. The load path differs from the thin-wall version.",
+      "Graded gyroid: wall thickness changes across the part. This can create softer and firmer zones in one piece.",
     ],
     variants: ["Sheet gyroid", "Skeletal gyroid", "Graded gyroid"],
     color: "#c2ef72",
@@ -40,16 +46,20 @@ export const families: Family[] = [
     category: "Mechanical",
     tag: "Triangular paths for high stiffness",
     origin:
-      "The octet truss is an engineered framework built from repeating tetrahedra and octahedra. It is a geometric design, not a direct copy of an organism.",
+      "Purpose: combine a stiff material with a light triangular framework for high stiffness at low mass. The octet truss is an engineered pattern built from tetrahedra and octahedra.",
     mechanism:
-      "Its connected triangles guide many loads along the struts as tension or compression instead of bending. That can create high stiffness for low mass when the geometry, joints, material, and load direction are suitable.",
+      "Structure: repeating triangles connect the struts in three dimensions. Many struts carry pulling or pushing forces directly instead of bending.",
+    behavior:
+      "Behavior: the triangular network carries force through tension and compression. This can make it stiff without making it solid or heavy.",
     application: "Lightweight aircraft wing core",
     applicationLesson:
-      "Begin with a stiff base material such as aluminium, titanium, or a composite. Arrange it as an octet core between wing skins. The skins preserve the airfoil shape, while the triangulated core separates and supports them. A real wing also needs spars, joints, control surfaces, fatigue analysis, and certification.",
+      "An octet truss can sit between the skins of a lightweight aircraft wing. The skins keep the airfoil shape, while the triangular core holds them apart with little material.",
+    applicationWhy:
+      "It is useful because a light core can support separated wing skins and reduce overall mass.",
     variantLessons: [
-      "Uniform octet: cell size and strut thickness stay constant, producing the same triangular pattern throughout the inspected region.",
-      "Graded octet: struts become thicker in selected regions. This places more material where greater support may be needed, but the visible zones are not calculated stress results.",
-      "Anisotropic octet: cells are stretched so their struts point differently by direction. The structure may become stiffer along one axis than another; rotate it to identify that preferred direction.",
+      "Uniform octet: every cell and strut has the same size. The pattern behaves consistently across the part.",
+      "Graded octet: selected struts become thicker. More material is placed where extra support may be useful.",
+      "Anisotropic octet: cells are stretched in one direction. The part can become stiffer along that direction.",
     ],
     variants: ["Uniform octet", "Graded octet", "Anisotropic octet"],
     color: "#87ccf8",
@@ -61,16 +71,20 @@ export const families: Family[] = [
     category: "Mechanical",
     tag: "Widens when stretched",
     origin:
-      "A re-entrant lattice is made by folding the ribs of a honeycomb-like cell inward. It is an engineered geometric transformation; an ordinary natural honeycomb is not generally auxetic.",
+      "Purpose: combine a flexible material with an inward-folded cell that can wrap around curved surfaces. It is an engineered honeycomb transformation, not ordinary bee comb.",
     mechanism:
-      "When the lattice is pulled, its inward-pointing ribs can rotate outward. That motion can make it wider as it becomes longer. Engineers call this auxetic behavior, or a negative Poisson ratio.",
+      "Structure: the ribs point inward. When pulled, they rotate outward, so the lattice can become wider as it becomes longer. This is called auxetic behavior.",
+    behavior:
+      "Behavior: pulling the lattice makes it widen instead of narrow. Bending it lets the ribs rotate and follow a curved surface.",
     application: "Conforming knee-protection insert",
     applicationLesson:
-      "Begin with a flexible polymer or textile-supported insert. Fold its cells inward, then bend the brace around the knee. Rib rotation may help the insert conform and redistribute local pressure, while the sleeve and stays keep it positioned. Protection and fit must be verified on real anatomy and with impact tests.",
+      "A re-entrant lattice can form a flexible knee-protection insert. Its ribs rotate as the knee bends, helping the insert conform while the sleeve and straps keep it in place.",
+    applicationWhy:
+      "It is useful because the insert can follow knee movement while spreading contact over a larger area.",
     variantLessons: [
-      "Re-entrant cell: identify the ribs that angle toward the center. Their outward rotation is the source of the idealized auxetic widening.",
-      "Deep re-entrant: increase the inward angle. This changes the space and rotation available before ribs contact or lock; it does not automatically mean better protection.",
-      "Graded re-entrant: change rib thickness across the insert. Thicker zones generally resist bending more strongly, while thinner zones may flex more easily.",
+      "Re-entrant cell: ribs angle toward the center. Their outward rotation creates the widening motion.",
+      "Deep re-entrant: ribs point farther inward. This gives them more room to rotate before they touch.",
+      "Graded re-entrant: rib thickness changes across the insert. Thick zones resist bending more, while thin zones flex more easily.",
     ],
     variants: ["Re-entrant cell", "Deep re-entrant", "Graded re-entrant"],
     color: "#f4ad85",
@@ -82,16 +96,20 @@ export const families: Family[] = [
     category: "Mechanical",
     tag: "Bending cells for energy management",
     origin:
-      "The Kelvin cell comes from Lord Kelvin’s mathematical search for a space-filling foam made from equal-volume cells. Its ideal cell is based on a 14-faced truncated octahedron.",
+      "Purpose: combine a crushable polymer with a space-filling cell for lightweight impact absorption. The Kelvin cell was proposed by Lord Kelvin as a model for foam.",
     mechanism:
-      "A Kelvin lattice connects the edges of these space-filling cells. Its struts can bend and buckle as the structure compresses, allowing a lightweight region to absorb and dissipate some energy.",
+      "Structure: struts connect a repeating 14-faced cell. Under compression, they bend and buckle, using motion inside the empty space to absorb energy.",
+    behavior:
+      "Behavior: compression makes the cells deform progressively. Their movement can absorb part of an impact before the load reaches the protected object.",
     application: "Cellular cycling-helmet liner",
     applicationLesson:
-      "Begin with a crushable polymer liner and form it into curved Kelvin cells below a hard shell. During impact, the shell spreads contact while the liner deforms to lengthen the stopping time. This scene explains the idea only: a complete helmet must pass standardized impact, retention, fit, and durability tests.",
+      "A Kelvin lattice can form the crushable liner inside a cycling helmet. The shell spreads the impact, while the cells deform and slow the head more gradually.",
+    applicationWhy:
+      "It is useful because controlled crushing can increase stopping time and reduce a sudden peak load.",
     variantLessons: [
-      "Uniform Kelvin: cells and struts stay constant across the curved liner, providing a baseline geometry for comparison.",
-      "Thick Kelvin: thicker struts add material and usually resist compression more strongly. Too much stiffness can also reduce useful crush distance, so “thicker” is not automatically “safer.”",
-      "Graded Kelvin: strut thickness changes across the liner. This suggests different crush zones, but only helmet-specific simulation and testing can determine protection.",
+      "Uniform Kelvin: cells and struts stay the same size across the liner. This gives a simple baseline.",
+      "Thick Kelvin: thicker struts add material and usually resist compression more strongly.",
+      "Graded Kelvin: strut thickness changes across the liner. This creates zones that can crush differently.",
     ],
     variants: ["Uniform Kelvin", "Thick Kelvin", "Graded Kelvin"],
     color: "#cab0f4",
@@ -103,16 +121,20 @@ export const families: Family[] = [
     category: "Mechanical",
     tag: "Lightweight support with direction",
     origin:
-      "Engineered honeycomb uses repeating cells similar to natural bee comb. The familiar hexagon is the natural analogue; manufactured cores may use paper, polymers, aluminium, or composites.",
+      "Purpose: combine thin cell walls with strong outer skins to make a light, stiff panel. The design is inspired by the efficient hexagons in bee comb and can be made from paper, polymer, aluminium, or composite.",
     mechanism:
-      "Thin cell walls keep two outer skins apart. This can greatly increase bending stiffness without filling the whole object with solid material, but strength differs along and across the cell direction.",
+      "Structure: thin walls form repeating cells between two skins. The depth between the skins increases bending stiffness, but strength depends on direction.",
+    behavior:
+      "Behavior: the skins carry much of the bending load while the cells keep them separated. The response is stronger in some directions than others.",
     application: "Lightweight skateboard deck core",
     applicationLesson:
-      "Begin with a paper, polymer, or aluminium honeycomb and bond it between strong deck skins. The core keeps the skins apart while the skins carry much of the bending load. Truck mounting areas need extra reinforcement, and a rideable deck requires fatigue, impact, moisture, and bonding tests.",
+      "A honeycomb can form the light core of a skateboard deck. It keeps the top and bottom skins apart so they resist bending without filling the deck with solid material.",
+    applicationWhy:
+      "It is useful because a deep, light core can make a panel stiffer without adding a lot of weight.",
     variantLessons: [
-      "Hexagonal: regular six-sided cells repeat through the core. View from above to see the pattern and from the side to see the depth that separates the skins.",
-      "Elongated hexagonal: stretch the cells along one axis. The core’s response becomes more directional because the long and short wall arrangements deform differently.",
-      "Graded hexagonal: change wall thickness or cell size along the deck. This places material selectively, but a structural analysis is needed to locate the right zones.",
+      "Hexagonal: regular six-sided cells repeat through the core. Their depth separates and supports the skins.",
+      "Elongated hexagonal: cells stretch along one axis. The core becomes more directional because its walls are no longer equal.",
+      "Graded hexagonal: wall thickness or cell size changes along the deck. Material is concentrated where support may be needed.",
     ],
     variants: ["Hexagonal", "Elongated hexagonal", "Graded hexagonal"],
     color: "#f2d77e",
@@ -124,16 +146,20 @@ export const families: Family[] = [
     category: "Acoustic",
     tag: "Targets selected vibrations",
     origin:
-      "A local-resonator metamaterial is designed from masses connected to flexible supports. It follows the physics of mass–spring oscillators rather than copying a particular natural organism.",
+      "Purpose: combine a host structure with small tuned masses to reduce a chosen vibration. The design uses the familiar physics of a mass connected to a spring.",
     mechanism:
-      "Near a resonator’s tuned frequency, the internal mass moves relative to the outer frame. Its motion can interact with waves in the host structure and inhibit transmission across a limited frequency band.",
+      "Structure: each small mass hangs from a flexible support. Near its tuned frequency, the mass moves against the frame and can reduce vibration passing through it.",
+    behavior:
+      "Behavior: the internal mass oscillates out of step with the host structure. Near its tuning, this can weaken vibration in a narrow frequency range.",
     application: "Frequency-tuned motor mount",
     applicationLesson:
-      "Begin with a motor that produces vibration. Add small internal masses on flexible links and tune them near a troublesome frequency. Their relative motion may reduce transmission in that range; broad, changing motor vibration still needs damping, multiple tunings, and measured validation.",
+      "A local resonator can be built into a motor mount. Its tuned masses move at a troublesome frequency and may reduce the vibration reaching the frame.",
+    applicationWhy:
+      "It is useful because it can target one annoying vibration without making the entire mount much heavier.",
     variantLessons: [
-      "Single mass: one resonator introduces one dominant tuning scale. Its effective frequency depends on mass, connection stiffness, damping, and attachment.",
-      "Dual mass: two internal masses introduce two tuning scales that may target more than one response. Geometry alone does not reveal the final band gaps.",
-      "Graded mass: resonator mass changes across the support. This suggests a spread of local tuning frequencies, but a dynamic model is required to calculate them.",
+      "Single mass: one internal mass targets one main vibration frequency.",
+      "Dual mass: two internal masses target two frequency ranges.",
+      "Graded mass: mass changes across the support, creating a spread of tuning frequencies.",
     ],
     variants: ["Single mass", "Dual mass", "Graded mass"],
     color: "#8ee0cf",

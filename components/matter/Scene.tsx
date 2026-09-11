@@ -134,7 +134,7 @@ export default function Scene(p: SceneProps) {
     overlay.appendChild(svg);
     const calloutNodes = (application?.callouts ?? []).map((c) => {
       const label = document.createElement("div");
-      label.className = "scene-callout";
+      label.className = `scene-callout scene-callout--${c.side}`;
       label.textContent = c.label;
       label.tabIndex = 0;
       label.setAttribute("role", "button");
@@ -188,20 +188,38 @@ export default function Scene(p: SceneProps) {
         const px = ((v.x + 1) * w) / 2,
           py = ((1 - v.y) * h) / 2;
         const compact = w < 560;
-        const lw = compact ? 112 : 168;
-        const lx =
-            c.side === "left"
-              ? compact
-                ? 8
-                : 18
-              : w - lw - (compact ? 8 : 30),
-          ly = h * 0.28 + c.slot * h * 0.18;
-        label.style.left = lx + "px";
-        label.style.top = ly + "px";
-        const edge = c.side === "left" ? lx + lw : lx;
+        const leftInset = compact ? 8 : 18;
+        // Leave a dedicated lane for the scene controls. The labels must stay
+        // readable while the controls remain directly reachable in every view.
+        const rightInset = compact ? 72 : 104;
+        const labelWidth = compact
+          ? Math.min(
+              112,
+              Math.max(76, Math.floor((w - leftInset - rightInset - 12) / 2)),
+            )
+          : 168;
+        const labelX =
+          c.side === "left"
+            ? leftInset
+            : Math.max(leftInset, w - labelWidth - rightInset);
+        // The metadata chip occupies the upper-left corner. Start desktop
+        // labels below that protected header band rather than letting a callout
+        // compete with the selected-material summary.
+        const labelTop = compact
+          ? Math.max(160, h * 0.34)
+          : Math.max(180, h * 0.32);
+        const labelStep = h * (compact ? 0.17 : 0.18);
+        const labelY = Math.min(
+          h - (compact ? 92 : 108),
+          labelTop + c.slot * labelStep,
+        );
+        label.style.left = labelX + "px";
+        label.style.top = labelY + "px";
+        label.style.width = labelWidth + "px";
+        const edge = c.side === "left" ? labelX + labelWidth : labelX;
         line.setAttribute(
           "points",
-          `${edge},${ly + 13} ${edge + (c.side === "left" ? 16 : -16)},${ly + 13} ${px},${py}`,
+          `${edge},${labelY + 18} ${edge + (c.side === "left" ? 16 : -16)},${labelY + 18} ${px},${py}`,
         );
         dot.setAttribute("cx", String(px));
         dot.setAttribute("cy", String(py));
