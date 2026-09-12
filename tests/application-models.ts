@@ -71,9 +71,11 @@ for (const kind of [
     if (kind === "labyrinth")
       assert.ok(a.group.getObjectsByProperty("name", "labyrinth-pressure-band").length >= 12, "labyrinth scene shows a sequence of sound-pressure wavefronts");
     if (kind === "radiative-cooler") {
-      assert.equal(a.group.getObjectsByProperty("name", "reflected-sunlight").length, 4, "cooling scene has four clean sunlight paths");
+      assert.equal(a.group.getObjectsByProperty("name", "reflected-sunlight").length, 8, "cooling scene has four clean incident-and-reflected sunlight paths");
       assert.equal(a.group.getObjectsByProperty("name", "emitted-infrared").length, 4, "cooling scene has four clean infrared paths");
     }
+    if (kind === "labyrinth")
+      assert.equal(a.group.getObjectsByProperty("name", "labyrinth-direct-reference").length, 0, "labyrinth scene has no off-panel comparison beam");
     if (kind === "seismic")
       assert.ok(a.group.getObjectsByProperty("name", "seismic-wavefront").length >= 8, "seismic scene shows a moving ground-wave train");
     if (kind === "water-wave") {
@@ -156,6 +158,14 @@ for (const kind of [
         const filmBounds = new T.Box3().setFromObject(root.getObjectByName("radiative-polymer-film")!);
         const spheres = new T.Box3().setFromObject(root.getObjectByName("radiative-silica-microsphere")!);
         assert.ok(spheres.min.y >= filmBounds.min.y - 1e-6 && spheres.max.y <= filmBounds.max.y + 1e-6, "microspheres stay inside the polymer film");
+        const application = createApplication(kind, variant, root, "#d4e0eb", count, thickness);
+        application.update(0.7, 0);
+        application.group.updateMatrixWorld(true);
+        const appliedFilm = new T.Box3().setFromObject(application.group.getObjectByName("radiative-polymer-film")!);
+        const sunlight = new T.Box3().setFromObject(application.group.getObjectByName("reflected-sunlight")!);
+        const infrared = new T.Box3().setFromObject(application.group.getObjectByName("emitted-infrared")!);
+        assert.ok(Math.abs(sunlight.min.y - appliedFilm.max.y) < 0.025, `sunlight path touches the polymer-film surface (${sunlight.min.y}, ${appliedFilm.max.y})`);
+        assert.ok(Math.abs(infrared.min.y - appliedFilm.max.y) < 0.025, `infrared path starts at the polymer-film surface (${infrared.min.y}, ${appliedFilm.max.y})`);
       }
       if (kind === "seismic") {
         const groundBounds = new T.Box3().setFromObject(root.getObjectByName("seismic-ground-plate")!);

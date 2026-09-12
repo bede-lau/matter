@@ -642,7 +642,6 @@ export function createApplication(
     if (folds) path.push([1.72, -0.62, folds % 2 === 0 ? 0.82 : -0.82]);
     path.push([2.14, -0.62, 0]);
     const route = fieldTube(group, field, path, 0.018, "labyrinth-sound-route");
-    const direct = fieldTube(group, fieldMaterial("#aac5d2", 0.28), [[-1.72, -0.28, 1.16], [2.14, -0.28, 1.16]], 0.012, "labyrinth-direct-reference");
     const routeCurve = new T.CatmullRomCurve3(path.map((point) => new T.Vector3(...(point as [number, number, number]))), false, "centripetal");
     const pressureBands = Array.from({ length: 12 }, (_, index) => {
       const band = mesh(
@@ -656,19 +655,8 @@ export function createApplication(
       band.userData.offset = index / 12;
       return band;
     });
-    const referenceBands = Array.from({ length: 5 }, (_, index) => {
-      const band = mesh(
-        new T.TorusGeometry(0.09, 0.007, 6, 18),
-        fieldMaterial("#b7cdd7", 0.24),
-        group,
-        "labyrinth-reference-band",
-      );
-      band.rotation.y = Math.PI / 2;
-      band.userData.offset = index / 5;
-      return band;
-    });
     label("Inlet: sound enters the panel", speaker, [0, 0, 0], "left", 0);
-    label("Divider walls: make the air route longer", lattice, [0, 0.4, 0], "left", 1);
+    label(folds ? "Divider walls: make the air route longer" : "Side walls: contain the short air route", lattice, [0, 0.4, 0], "left", 1);
     label(folds ? "Folded air path: delays the sound" : "Straight air path: gives sound a short route", route, [0.62, 0, 0], "right", 0);
     label("Receiver: compares the delayed output", receiver, [0, 0, 0], "right", 1);
     camera = [6.8, 5.6, 9.4];
@@ -684,30 +672,43 @@ export function createApplication(
         band.scale.setScalar(pulse);
         (band.material as T.MeshBasicMaterial).opacity = 0.16 + 0.42 * Math.sin(progress * Math.PI);
       });
-      referenceBands.forEach((band) => {
-        const progress = (t * 0.44 + (band.userData.offset as number)) % 1;
-        band.position.set(-1.68 + progress * 3.78, -0.28, 1.16);
-        (band.material as T.MeshBasicMaterial).opacity = 0.09 + 0.2 * Math.sin(progress * Math.PI);
-      });
-      direct.position.y = Math.sin(t * 3) * 0.006;
-      return e > 0.15 ? "Panel opened · continuous folded passage" : "Sound pulse · folded route arrives later";
+      return e > 0.15
+        ? "Panel opened · continuous folded passage"
+        : folds
+          ? "Sound pulse · folded route arrives later"
+          : "Sound pulse · short reference route";
     };
   } else if (kind === "radiative-cooler") {
     group.add(lattice);
     const roof = box(group, p.dark, [5.8, 0.16, 3.2], [0, -1.15, 0], "cooler-roof-coupon");
     lattice.position.y = roof.position.y + 0.08;
+    const control = Math.max(0, Math.min(1, (thickness - 0.3) / 1.3));
+    const filmHeight = 0.12 + control * 0.26 + (variant === 2 ? 0.08 : 0);
+    // Keep every explanatory ray tangent to the polymer's outer surface at
+    // each control setting. The ray thickness starts just above the film.
+    const filmSurface = lattice.position.y + 0.07 + filmHeight;
     const sun = fieldMaterial("#ffe289", 0.42);
     const infrared = fieldMaterial("#ff9f72", 0.48);
     const solarLines: T.Mesh[] = [];
     const infraredLines: T.Mesh[] = [];
-    const solarCurves: T.CatmullRomCurve3[] = [];
+    const solarCurves: T.LineCurve3[] = [];
     const infraredCurves: T.CatmullRomCurve3[] = [];
     for (const x of [-0.9, -0.3, 0.3, 0.9]) {
-      const solarPoints = [[x - 0.72, 1.48, -0.34], [x, -0.59, -0.34], [x + 0.62, 0.82, -0.34]];
-      const infraredPoints = [[x, -0.58, 0.3], [x + 0.12, 0.12, 0.3], [x + 0.22, 1.18, 0.3]];
-      solarLines.push(fieldTube(group, sun, solarPoints, 0.011, "reflected-sunlight"));
+      const solarStart = [x - 0.72, 1.48, -0.34];
+      const solarContact = [x, filmSurface + 0.011, -0.34];
+      const solarExit = [x + 0.62, 0.82, -0.34];
+      const infraredPoints = [[x, filmSurface + 0.012, 0.3], [x + 0.12, 0.12, 0.3], [x + 0.22, 1.18, 0.3]];
+      solarLines.push(
+        fieldTube(group, sun, [solarStart, solarContact], 0.011, "reflected-sunlight"),
+        fieldTube(group, sun, [solarContact, solarExit], 0.011, "reflected-sunlight"),
+      );
       infraredLines.push(fieldTube(group, infrared, infraredPoints, 0.012, "emitted-infrared"));
-      solarCurves.push(new T.CatmullRomCurve3(solarPoints.map((point) => new T.Vector3(...(point as [number, number, number])))));
+      solarCurves.push(
+        new T.LineCurve3(
+          new T.Vector3(...(solarStart as [number, number, number])),
+          new T.Vector3(...(solarContact as [number, number, number])),
+        ),
+      );
       infraredCurves.push(new T.CatmullRomCurve3(infraredPoints.map((point) => new T.Vector3(...(point as [number, number, number])))));
     }
     const solarDots = solarCurves.map((curve, index) => ({ dot: ellipsoid(group, sun, curve.getPointAt(0).toArray(), [0.024, 0.024, 0.024], "sunlight-marker"), curve, offset: index / solarCurves.length }));
