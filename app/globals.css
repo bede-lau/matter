@@ -3074,11 +3074,10 @@ h1 {
 }
 .parameters.design-dock {
   display: flex;
-  height: 620px;
-  min-height: 0;
+  min-height: 620px;
   flex-direction: column;
   gap: 14px;
-  overflow: hidden;
+  overflow: visible;
   border-left: 1px solid #30404c;
   padding: 17px;
 }
@@ -4341,10 +4340,11 @@ h1 {
   height: 570px;
 }
 .studio-workbench .parameters.design-dock {
-  height: 570px;
-  justify-content: space-between;
-  gap: 0;
-  overflow: clip;
+  height: auto;
+  min-height: 570px;
+  justify-content: flex-start;
+  gap: 24px;
+  overflow: visible;
   padding: 20px;
 }
 .design-dock .panel-heading {
@@ -4386,6 +4386,9 @@ h1 {
 }
 .geometry-grid .compact-range:nth-child(3) {
   grid-column: 1 / -1;
+}
+.geometry-grid--specialised .compact-range:nth-child(3) {
+  grid-column: auto;
 }
 .compact-range > label {
   margin-bottom: 7px;
@@ -4649,7 +4652,8 @@ h1 {
     grid-template-columns: minmax(0, 1fr) 334px;
   }
   .studio-workbench .parameters.design-dock {
-    height: 570px;
+    height: auto;
+    min-height: 570px;
   }
 }
 @media (max-width: 920px) {
@@ -4700,10 +4704,12 @@ h1 {
     height: 500px;
   }
   .studio-workbench .parameters.design-dock {
-    height: 670px;
+    height: auto;
+    min-height: 670px;
     justify-content: flex-start;
     gap: 24px;
     padding: 21px 23px;
+    overflow: visible;
   }
   .design-dock .panel-heading {
     min-height: 34px;

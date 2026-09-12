@@ -53,6 +53,23 @@ type RecordRow = {
 const withoutTeachingLabel = (copy: string) =>
   copy.replace(/^(Purpose|Structure|Behavior):\s*/i, "");
 
+// These field-based devices use different units and design levers from the
+// mechanical lattices. Only expose controls that alter the model on screen.
+const specialisedParameterLabels: Record<
+  string,
+  { thickness: string; count: string }
+> = {
+  metalens: { thickness: "Post height", count: "Post density" },
+  cloak: { thickness: "Trace width", count: "Ring count" },
+  "membrane-absorber": {
+    thickness: "Membrane thickness",
+    count: "Membrane cells",
+  },
+  "thermal-cloak": { thickness: "Layer spacing", count: "Layer count" },
+  topological: { thickness: "Post diameter", count: "Post density" },
+  flux: { thickness: "Funnel opening", count: "Funnel layers" },
+};
+
 export default function Studio() {
   const [family, setFamily] = useState(0),
     [variant, setVariant] = useState(0),
@@ -86,6 +103,7 @@ export default function Studio() {
   const file = useRef<HTMLInputElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const f = families[family];
+  const specialisedParameters = specialisedParameterLabels[f.id];
   const allowedBase = f.allowedBase ?? bases.map((_, index) => index);
   const allowedSecondary = f.allowedSecondary ?? bases.map((_, index) => index);
   const hasSecondary = allowedSecondary.length > 0;
@@ -102,7 +120,7 @@ export default function Studio() {
     familyFactor *
       variantFactor *
       Math.pow(thick / 0.8, 1.6) *
-      Math.pow(10 / size, 1.4),
+      Math.pow(specialisedParameters ? 1 : 10 / size, 1.4),
   );
   const fraction = blend / 100;
   const upper = (1 - fraction) * bases[base].e + fraction * bases[second].e;
@@ -515,7 +533,11 @@ export default function Studio() {
                   kind={f.id}
                   variant={variant}
                   count={sceneParameters.count}
-                  thickness={(sceneParameters.thick * 10) / sceneParameters.size}
+                  thickness={
+                    specialisedParameters
+                      ? sceneParameters.thick
+                      : (sceneParameters.thick * 10) / sceneParameters.size
+                  }
                   color={baseMaterial.color}
                   secondaryColor={secondaryMaterial.color}
                   blend={sceneParameters.blend / 100}
@@ -644,19 +666,21 @@ export default function Studio() {
               </div>
               {mode === "application" && (
                 <div className="application-controls">
-                  <div>
-                    <label>
-                      Explode components <output>{explode}%</output>
-                    </label>
-                    <Slider
-                      aria-label="Explode components"
-                      min={0}
-                      max={100}
-                      step={5}
-                      value={[explode]}
-                      onValueChange={(v) => setExplode(v[0])}
-                    />
-                  </div>
+                  {!specialisedParameters && (
+                    <div>
+                      <label>
+                        Explode components <output>{explode}%</output>
+                      </label>
+                      <Slider
+                        aria-label="Explode components"
+                        min={0}
+                        max={100}
+                        step={5}
+                        value={[explode]}
+                        onValueChange={(v) => setExplode(v[0])}
+                      />
+                    </div>
+                  )}
                   <div>
                     <label>
                       Motion speed <output>{speed.toFixed(1)}×</output>
@@ -868,37 +892,39 @@ export default function Studio() {
                   <p className="material-compatibility-note">{f.materialNote}</p>
                 )}
               </div>
-              <div className="geometry-grid">
-                <div className="control-block compact-range">
-                  <label>
-                    <GlossaryText>Cell size</GlossaryText>
-                    <output>{size.toFixed(1)} mm</output>
-                  </label>
-                  <Slider
-                    aria-label="Cell size"
-                    min={5}
-                    max={20}
-                    step={0.5}
-                    value={[size]}
-                    onValueChange={(v) => setSize(v[0])}
-                    onValueCommit={(v) =>
-                      setSceneParameters((current) => ({
-                        ...current,
-                        size: v[0],
-                      }))
-                    }
-                  />
-                </div>
+              <div className={`geometry-grid${specialisedParameters ? " geometry-grid--specialised" : ""}`}>
+                {!specialisedParameters && (
+                  <div className="control-block compact-range">
+                    <label>
+                      <GlossaryText>Cell size</GlossaryText>
+                      <output>{size.toFixed(1)} mm</output>
+                    </label>
+                    <Slider
+                      aria-label="Cell size"
+                      min={5}
+                      max={20}
+                      step={0.5}
+                      value={[size]}
+                      onValueChange={(v) => setSize(v[0])}
+                      onValueCommit={(v) =>
+                        setSceneParameters((current) => ({
+                          ...current,
+                          size: v[0],
+                        }))
+                      }
+                    />
+                  </div>
+                )}
                 <div className="control-block compact-range">
                   <label>
                     <GlossaryText>
-                      {isMechanical
+                      {specialisedParameters?.thickness ?? (isMechanical
                         ? f.id === "gyroid"
                           ? "Wall thickness"
                           : "Strut diameter"
                         : f.category === "Thermal"
                           ? "Layer thickness"
-                          : "Element thickness"}
+                          : "Element thickness")}
                     </GlossaryText>
                     <output>{thick.toFixed(2)} mm</output>
                   </label>
@@ -919,8 +945,10 @@ export default function Studio() {
                 </div>
                 <div className="control-block compact-range">
                   <label>
-                    Repetition
-                    <output>{count} × {count} × {count}</output>
+                    {specialisedParameters?.count ?? "Repetition"}
+                    <output>
+                      {specialisedParameters ? count : `${count} × ${count} × ${count}`}
+                    </output>
                   </label>
                   <Slider
                     aria-label="Repetition"
@@ -963,13 +991,6 @@ export default function Studio() {
                       : `${Math.min(5, 1.2 + density * 4.2 + variant * 0.35).toFixed(1)}`}
                     <small>{metricUnit}</small>
                   </strong>
-                </div>
-                <div className="estimate-note">
-                  <p>
-                    {isMechanical
-                      ? "Compare this rough stiffness range inside the model, not the performance of a finished part."
-                      : "This is a qualitative teaching cue, not a measured material property or device prediction."}
-                  </p>
                 </div>
               </div>
             </aside>

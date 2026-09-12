@@ -105,6 +105,9 @@ export function createLattice(p: LatticeOptions, software = false) {
   const n = p.count,
     step = 3.5 / n,
     r = (step * p.thickness) / 20;
+  // Field-device controls are intentionally bounded so their detail stays
+  // readable while still changing a real geometric feature of each model.
+  const detail = Math.max(0.58, Math.min(1.42, p.thickness));
   const edgeKeys = new Set<string>();
   const edge = (a: number[], b: number[]) => {
     const key = [
@@ -304,10 +307,10 @@ export function createLattice(p: LatticeOptions, software = false) {
           p.variant === 0
             ? 0.45
             : 0.28 + 0.56 * (1 - Math.min(1, radius ** 1.7));
-        postSites.push({ x, z, height });
+        postSites.push({ x, z, height: height * detail });
       }
     const post = new T.InstancedMesh(
-      new T.CylinderGeometry(0.055, 0.075, 1, software ? 6 : 10),
+      new T.CylinderGeometry(0.055 * Math.sqrt(detail), 0.075 * Math.sqrt(detail), 1, software ? 6 : 10),
       material,
       postSites.length,
     );
@@ -354,7 +357,7 @@ export function createLattice(p: LatticeOptions, software = false) {
         const arc = addMesh(
           new T.TorusGeometry(
             radius,
-            0.032 + (p.variant === 1 ? i * 0.005 : 0),
+            (0.032 + (p.variant === 1 ? i * 0.005 : 0)) * detail,
             software ? 6 : 10,
             software ? 20 : 38,
             Math.PI * 1.52,
@@ -385,7 +388,7 @@ export function createLattice(p: LatticeOptions, software = false) {
         const px = (x - (cells - 1) / 2) * step * 0.82;
         const pz = (z - (cells - 1) / 2) * step * 0.82;
         const diaphragm = addMesh(
-          new T.CylinderGeometry(step * 0.27, step * 0.27, 0.028, software ? 12 : 24),
+        new T.CylinderGeometry(step * 0.27, step * 0.27, 0.028 * detail, software ? 12 : 24),
         );
         diaphragm.position.set(px, 0, pz);
         diaphragm.name = "membrane-diaphragm";
@@ -395,15 +398,15 @@ export function createLattice(p: LatticeOptions, software = false) {
           new T.TorusGeometry(step * 0.27, r * 0.55, software ? 6 : 10, software ? 18 : 30),
         );
         frame.rotation.x = Math.PI / 2;
-        frame.position.set(px, 0.03, pz);
+        frame.position.set(px, 0.016 + 0.014 * detail, pz);
         if (p.variant !== 0) {
           const platelet = addMesh(
-            new T.CylinderGeometry(step * 0.105, step * 0.105, 0.025, software ? 12 : 20),
+            new T.CylinderGeometry(step * 0.105, step * 0.105, 0.025 * detail, software ? 12 : 20),
             plateletMat,
           );
           platelet.name = "bonded-platelet";
           platelet.userData.cell = `${x}:${z}`;
-          platelet.position.set(px + step * 0.055, 0.027, pz);
+          platelet.position.set(px + step * 0.055, 0.014 * detail + 0.0125 * detail, pz);
           platelet.rotation.y = (p.variant === 2 ? x - z : 0) * 0.18;
         }
       }
@@ -438,7 +441,7 @@ export function createLattice(p: LatticeOptions, software = false) {
         i % 2 === 0 ? copper : insulator,
       );
       ring.rotation.x = -Math.PI / 2;
-      ring.position.y = 0.012 + (i % 2) * 0.012;
+      ring.position.y = 0.012 + (i % 2) * 0.012 * detail;
     }
     const protectedCore = addMesh(
       new T.CylinderGeometry(0.27, 0.27, 0.075, software ? 16 : 28),
@@ -470,10 +473,10 @@ export function createLattice(p: LatticeOptions, software = false) {
           (Math.abs(x - 0.8) < pitch * 0.34 && z > -1.18);
         if (route) continue;
         const post = addMesh(
-          new T.CylinderGeometry(0.095, 0.095, 0.26, software ? 8 : 16),
+          new T.CylinderGeometry(0.095 * detail, 0.095 * detail, 0.26 * detail, software ? 8 : 16),
           x < 0.8 || z < -1.18 ? postMat : domainMat,
         );
-        post.position.set(x + (p.variant === 1 ? (iz % 2) * 0.055 : 0), 0.13, z);
+        post.position.set(x + (p.variant === 1 ? (iz % 2) * 0.055 : 0), 0.13 * detail, z);
       }
   } else if (p.kind === "flux") {
     // Five nested soft-magnetic funnels on each side of a small sensing gap.
@@ -484,13 +487,13 @@ export function createLattice(p: LatticeOptions, software = false) {
       clearcoat: 0.16,
       side: T.DoubleSide,
     });
-    const layers = Math.min(5, Math.max(3, n + 2));
+    const layers = Math.max(1, n);
     const gap = 0.28;
     for (let side of [-1, 1])
       for (let i = 0; i < layers; i++) {
         const length = 0.62 + i * 0.11;
-        const narrow = 0.13 + i * 0.045;
-        const outer = 0.56 + i * 0.11;
+        const narrow = (0.13 + i * 0.045) * detail;
+        const outer = (0.56 + i * 0.11) * detail;
         const funnel = addMesh(
           new T.CylinderGeometry(narrow, outer, length, software ? 16 : 40, 1, true),
           funnelMat,
@@ -498,7 +501,7 @@ export function createLattice(p: LatticeOptions, software = false) {
         funnel.rotation.z = side < 0 ? -Math.PI / 2 : Math.PI / 2;
         funnel.position.x = side * (gap / 2 + length / 2);
         const mouth = addMesh(
-          new T.TorusGeometry(outer, 0.024, software ? 6 : 9, software ? 18 : 32),
+          new T.TorusGeometry(outer, 0.024 * detail, software ? 6 : 9, software ? 18 : 32),
           funnelMat,
         );
         mouth.rotation.y = Math.PI / 2;
