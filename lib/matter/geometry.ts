@@ -289,31 +289,38 @@ export function createLattice(p: LatticeOptions, software = false) {
   } else if (p.kind === "metalens") {
     // A metalens is a flat field of subwavelength posts. The height gradient
     // is exaggerated here so the phase idea remains visible at screen scale.
+    // Only posts inside the circular wafer are instantiated, and every post
+    // starts on the wafer surface rather than in free space.
     const side = Math.max(4, n * 4);
-    const total = side * side;
-    const post = new T.InstancedMesh(
-      new T.CylinderGeometry(0.055, 0.075, 1, software ? 6 : 10),
-      material,
-      total,
-    );
-    const dummy = new T.Object3D();
+    const postSites: { x: number; z: number; height: number }[] = [];
     for (let ix = 0; ix < side; ix++)
       for (let iz = 0; iz < side; iz++) {
         const x = (ix / (side - 1) - 0.5) * 3.15;
         const z = (iz / (side - 1) - 0.5) * 3.15;
+        // Leave a clean margin inside the mounting ring.
+        if (Math.hypot(x, z) > 1.46) continue;
         const radius = Math.hypot(x, z) / 2.23;
-        const focusHeight =
+        const height =
           p.variant === 0
             ? 0.45
             : 0.28 + 0.56 * (1 - Math.min(1, radius ** 1.7));
-        dummy.position.set(x, focusHeight / 2 - 0.35, z);
+        postSites.push({ x, z, height });
+      }
+    const post = new T.InstancedMesh(
+      new T.CylinderGeometry(0.055, 0.075, 1, software ? 6 : 10),
+      material,
+      postSites.length,
+    );
+    const dummy = new T.Object3D();
+    postSites.forEach(({ x, z, height }, index) => {
+        // The wafer top is at y = 0.035 (it is 0.07 units thick).
+        dummy.position.set(x, 0.035 + height / 2, z);
         dummy.scale.setScalar(1 + (p.variant === 2 ? 0.12 * Math.sin(x * 4) : 0));
-        dummy.scale.y = focusHeight;
+        dummy.scale.y = height;
         dummy.updateMatrix();
-        const index = ix * side + iz;
         post.setMatrixAt(index, dummy.matrix);
         if (showSecondPhase) post.setColorAt(index, phaseColor(dummy.position));
-      }
+      });
     if (showSecondPhase && post.instanceColor) post.instanceColor.needsUpdate = true;
     post.castShadow = true;
     post.receiveShadow = true;

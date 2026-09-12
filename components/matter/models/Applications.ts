@@ -388,12 +388,14 @@ export function createApplication(
       return e > 0.15 ? "Panel opened · membrane motion" : "Resonant absorption · selected low tone";
     };
   } else if (kind === "thermal-cloak") {
-    const shield = fitLattice(lattice, [3.3, 0.34, 3.3], [0, -0.15, 0], group);
+    // Seat the annular composite directly on the plate. All thermal guides
+    // share this surface height so the model reads as one manufactured part.
+    const shield = fitLattice(lattice, [3.3, 0.34, 3.3], [0, -0.45, 0], group);
     box(group, p.dark, [5.9, 0.13, 3.2], [0, -0.72, 0], "thermal-plate");
-    const heatSource = box(group, p.accent, [0.28, 0.23, 1.42], [-2.28, -0.35, 0], "heat-source");
-    const coolSink = box(group, p.metal, [0.28, 0.23, 1.42], [2.28, -0.35, 0], "cool-boundary");
+    const heatSource = box(group, p.accent, [0.28, 0.23, 1.42], [-2.28, -0.54, 0], "heat-source");
+    const coolSink = box(group, p.metal, [0.28, 0.23, 1.42], [2.28, -0.54, 0], "cool-boundary");
     const core = mesh(new T.CylinderGeometry(0.27, 0.27, 0.1, 28), p.ivory, group, "protected-core");
-    core.position.set(0, -0.06, 0);
+    core.position.set(0, -0.35, 0);
     const heat = fieldMaterial("#ffb266", 0.6);
     const heatDots: { dot: T.Mesh; base: T.Vector3 }[] = [];
     for (let z of [-0.82, -0.42, 0.42, 0.82])
@@ -401,18 +403,18 @@ export function createApplication(
         group,
         heat,
         [
-          [-2.05, -0.02, z],
-          [-0.95, -0.02, z],
-          [-0.42, -0.02, z * 1.12],
-          [0.42, -0.02, z * 1.12],
-          [0.95, -0.02, z],
-          [2.05, -0.02, z],
+          [-2.05, -0.30, z],
+          [-0.95, -0.30, z],
+          [-0.42, -0.30, z * 1.12],
+          [0.42, -0.30, z * 1.12],
+          [0.95, -0.30, z],
+          [2.05, -0.30, z],
         ],
         0.014,
         "thermal-flow-path",
       );
     for (let i = 0; i < 9; i++) {
-      const dot = ellipsoid(group, heat, [-1.7 + i * 0.4, -0.02, 0.72 * Math.sin(i * 1.4)], [0.045, 0.045, 0.045], "heat-flow-dot");
+      const dot = ellipsoid(group, heat, [-1.7 + i * 0.4, -0.30, 0.72 * Math.sin(i * 1.4)], [0.045, 0.045, 0.045], "heat-flow-dot");
       dot.castShadow = false;
       heatDots.push({ dot, base: dot.scale.clone() });
     }
@@ -427,47 +429,49 @@ export function createApplication(
       heatDots.forEach(({ dot, base }, i) => {
         const phase = (travel + i / heatDots.length) % 1;
         dot.position.x = -1.8 + phase * 3.6;
+        dot.position.y = -0.30;
         dot.position.z = 0.78 * Math.sin(phase * Math.PI * 2);
         dot.scale.copy(base).multiplyScalar(0.7 + 0.35 * Math.sin(phase * Math.PI));
       });
       return e > 0.15 ? "Layered plate · transient heat path" : "Heat diverted · core warms over time";
     };
   } else if (kind === "topological") {
-    const latticeHolder = fitLattice(lattice, [3.55, 0.65, 3.2], [0, 0.08, 0], group);
+    // The post bases meet the chip's top face at y = -0.75.
+    const latticeHolder = fitLattice(lattice, [3.55, 0.65, 3.2], [0, -0.75, 0], group);
     box(group, p.dark, [5.8, 0.14, 3.4], [0, -0.82, 0], "photonic-chip");
-    const inputPort = box(group, p.metal, [0.34, 0.16, 0.22], [-1.92, 0.18, -1.18], "waveguide-input");
+    const inputPort = box(group, p.metal, [0.34, 0.16, 0.22], [-1.92, -0.67, -1.18], "waveguide-input");
     const signal = fieldMaterial("#66dbff", 0.75);
     const edgeRoute = fieldTube(
       group,
       signal,
       [
-        [-1.75, 0.31, -1.18],
-        [0.8, 0.31, -1.18],
-        [0.8, 0.31, 1.18],
+        [-1.75, -0.06, -1.18],
+        [0.8, -0.06, -1.18],
+        [0.8, -0.06, 1.18],
       ],
       0.028,
       "topological-edge-route",
     );
-    const corner = anchor(group, [0.8, 0.31, -1.18], "edge-route-corner");
+    const corner = anchor(group, [0.8, -0.06, -1.18], "edge-route-corner");
     const waveDots: { dot: T.Mesh; base: T.Vector3 }[] = [];
     for (let i = 0; i < 10; i++) {
-      const dot = ellipsoid(group, signal, [-1.65 + i * 0.36, 0.31, -1.18], [0.052, 0.052, 0.052], "edge-mode-packet");
+      const dot = ellipsoid(group, signal, [-1.65 + i * 0.36, -0.06, -1.18], [0.052, 0.052, 0.052], "edge-mode-packet");
       dot.castShadow = false;
       waveDots.push({ dot, base: dot.scale.clone() });
     }
-    label("Patterned bulk: blocks selected paths", latticeHolder, [-0.6, 0, 0.6], "left", 0);
+    label("Patterned bulk: blocks selected paths", latticeHolder, [-0.6, 0.26, 0.6], "left", 0);
     label("Input port: launches the signal", inputPort, [0, 0, 0], "left", 1);
-    label("Edge route: carries the guided signal", edgeRoute, [0.8, 0.31, 0.15], "right", 0);
+    label("Edge route: carries the guided signal", edgeRoute, [0.8, -0.06, 0.15], "right", 0);
     label("Corner: the signal follows the boundary", corner, [0, 0, 0], "right", 1);
     camera = [7.6, 4.8, 9.6];
-    target = [0, -0.2, 0];
+    target = [0, -0.4, 0];
     update = (t, e) => {
       waveDots.forEach(({ dot, base }, i) => {
         const phase = (t * 0.42 + i / waveDots.length) % 1;
         if (phase < 0.52) {
-          dot.position.set(-1.75 + (phase / 0.52) * 2.55, 0.31, -1.18);
+          dot.position.set(-1.75 + (phase / 0.52) * 2.55, -0.06, -1.18);
         } else {
-          dot.position.set(0.8, 0.31, -1.18 + ((phase - 0.52) / 0.48) * 2.36);
+          dot.position.set(0.8, -0.06, -1.18 + ((phase - 0.52) / 0.48) * 2.36);
         }
         dot.scale.copy(base).multiplyScalar(0.75 + 0.25 * Math.sin(phase * Math.PI * 2));
       });
