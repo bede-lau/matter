@@ -83,3 +83,22 @@ test("renders sidebar skeletons deterministically", async () => {
   assert.equal(first, second);
   assert.match(first, /--skeleton-width:70%/);
 });
+
+test("renders Field Guide sources as labelled, safe external links", async () => {
+  const { default: FieldGuide } = await vite.ssrLoadModule(
+    "/components/matter/FieldGuide.tsx",
+  );
+  const html = renderToStaticMarkup(
+    React.createElement(FieldGuide, { onOpenStudio() {} }),
+  );
+
+  assert.doesNotMatch(
+    html,
+    /These real examples anchor the choices in the Material Studio\./,
+  );
+  assert.match(html, /View source:/);
+  assert.match(html, /Open original source/);
+  assert.match(html, /target="_blank"/);
+  assert.match(html, /rel="noopener noreferrer"/);
+  assert.match(html, /aria-label="Open [^"]+ \(opens in a new tab\)"/);
+});

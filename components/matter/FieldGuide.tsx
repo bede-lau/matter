@@ -20,6 +20,27 @@ type FieldGuideProps = {
   onOpenStudio: (familyIndex: number, variantIndex: number, mode: GuideMode) => void;
 };
 
+type SourceLinkProps = {
+  href: string;
+  children: React.ReactNode;
+  label: string;
+};
+
+function SourceLink({ href, children, label }: SourceLinkProps) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${label} (opens in a new tab)`}
+      title={`${label} (opens in a new tab)`}
+    >
+      {children}
+      <ArrowUpRight size={14} aria-hidden="true" />
+    </a>
+  );
+}
+
 const beginnerSummaries: Record<string, string> = {
   gyroid:
     "A smooth, continuous network that guides force through curved paths instead of sharp beam joints.",
@@ -93,10 +114,6 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
             <span className="eyebrow">01 / START WITH THE SUBSTANCE</span>
             <h2 id="starting-materials">The material gives the first behavior.</h2>
           </div>
-          <p>
-            These real examples anchor the choices in the Material Studio.
-            Manufacturing method and grade can change what each one does.
-          </p>
         </div>
         <div className="field-guide-v2__material-grid">
           {materialCards.map((card) => (
@@ -106,9 +123,12 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
                 <span>{card.eyebrow.replace("BASE MATERIAL · ", "")}</span>
                 <h3>{card.title}</h3>
                 <p>{card.note}</p>
-                <a href={card.sourceUrl} target="_blank" rel="noreferrer">
-                  View reference <ArrowUpRight size={14} aria-hidden="true" />
-                </a>
+                <SourceLink
+                  href={card.sourceUrl}
+                  label={`Open ${card.sourceLabel}`}
+                >
+                  View source: {card.sourceLabel}
+                </SourceLink>
               </div>
             </article>
           ))}
@@ -238,9 +258,12 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
                     </button>
                   ))}
                 </div>
-                <a href={family.source} target="_blank" rel="noreferrer">
-                  Read the source <ArrowUpRight size={14} aria-hidden="true" />
-                </a>
+                <SourceLink
+                  href={family.source}
+                  label={`Open the original source for ${family.name}`}
+                >
+                  Open original source
+                </SourceLink>
               </div>
             </details>
 

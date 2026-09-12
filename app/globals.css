@@ -3784,16 +3784,24 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  width: fit-content;
   margin-top: auto;
   padding-top: 12px;
   color: #c9f18b;
   font-size: .75rem;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
 }
 .field-guide-v2__material-card a:hover,
 .field-guide-v2__details a:hover {
   color: #e2ffac;
+}
+.field-guide-v2__material-card a:focus-visible,
+.field-guide-v2__details a:focus-visible {
+  outline: 2px solid #c9f18b;
+  outline-offset: 4px;
+  border-radius: 3px;
 }
 
 .field-guide-v2__lesson-layout {

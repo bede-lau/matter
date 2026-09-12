@@ -6,7 +6,7 @@ import { warpLattice } from "../components/matter/models/primitives";
 import { createLattice } from "../lib/matter/geometry";
 import { createBehavior } from "../components/matter/models/Behaviors";
 import { bases, families } from "../lib/matter/catalog";
-import { structureCards } from "../lib/matter/learning";
+import { materialCards, structureCards } from "../lib/matter/learning";
 import glossary from "../lib/matter/glossary.json";
 for (const kind of [
   "gyroid",
@@ -102,6 +102,17 @@ families.forEach((family) => {
     assert.ok(family.allowedSecondary.includes(family.defaultSecondary ?? -1), family.id + " default secondary is permitted");
     assert.ok(Boolean(family.secondaryRole), family.id + " declares the secondary role");
   }
+});
+for (const card of [...materialCards, ...structureCards]) {
+  const source = new URL(card.sourceUrl);
+  assert.equal(source.protocol, "https:", card.id + " field-guide source uses HTTPS");
+  assert.ok(source.hostname.length > 0, card.id + " field-guide source has a hostname");
+  assert.ok(card.sourceLabel.trim().length > 0, card.id + " field-guide source has an accessible label");
+}
+families.forEach((family) => {
+  const source = new URL(family.source);
+  assert.equal(source.protocol, "https:", family.id + " lesson source uses HTTPS");
+  assert.ok(source.hostname.length > 0, family.id + " lesson source has a hostname");
 });
 for (const requiredTerm of [
   "Hyperbolic multilayer",
