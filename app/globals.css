@@ -3808,6 +3808,15 @@ h1 {
   border-radius: 16px;
   background: #101a22;
 }
+@media (min-width: 1061px) {
+  .field-guide-v2__cell-chooser {
+    position: sticky;
+    top: 18px;
+    max-height: min(720px, calc(100vh - 116px));
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
 .field-guide-v2__chooser-heading {
   display: flex;
   align-items: center;

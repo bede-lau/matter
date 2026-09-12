@@ -530,6 +530,187 @@ export function createApplication(
       });
       return e > 0.15 ? "Funnels opened · sensing gap" : "Static field lines · flux concentrated at the gap";
     };
+  } else if (kind === "hyperbolic") {
+    // Keep the deposited-film stack at its native proportions so the layer
+    // count and metal share remain visible when the control changes.
+    group.add(lattice);
+    const bench = box(group, p.dark, [5.9, 0.14, 3.25], [0, -1.15, 0], "hyperlens-optics-bench");
+    lattice.position.set(0, bench.position.y + 0.07, 0);
+    const emitter = box(group, p.dark, [0.38, 0.46, 0.74], [-2.45, -0.28, 0], "hyperlens-near-field-emitter");
+    const aperture = mesh(new T.CylinderGeometry(0.12, 0.12, 0.04, 18), p.ivory, group, "hyperlens-object-aperture");
+    aperture.rotation.z = Math.PI / 2;
+    aperture.position.set(-2.23, -0.28, 0);
+    const plane = box(group, p.dark, [0.08, 0.82, 1.48], [2.1, -0.28, 0], "hyperlens-observation-plane");
+    const pathMaterial = fieldMaterial("#79ddff", 0.7);
+    const pathDots: T.Mesh[] = [];
+    for (let i = -2; i <= 2; i++) {
+      const z = i * 0.3;
+      fieldTube(
+        group,
+        pathMaterial,
+        [[-2.18, -0.28, z], [-0.85, -0.28, z], [0.72, -0.28, z * 0.74], [2.02, -0.28, z * 0.6]],
+        0.015,
+        "hyperlens-energy-path",
+      );
+      const dot = ellipsoid(group, pathMaterial, [-2.12, -0.28, z], [0.04, 0.04, 0.04], "hyperlens-field-marker");
+      dot.userData.offset = (i + 2) / 5;
+      pathDots.push(dot);
+    }
+    label("Metal films: carry the optical response", lattice, [-0.38, 0.78, 0.35], "left", 0);
+    label("Nearby source: launches fine optical detail", emitter, [0, 0, 0], "left", 1);
+    label("Dielectric films: separate the metal layers", lattice, [0.42, 0.78, -0.3], "right", 0);
+    label("Observation plane: receives the transported pattern", plane, [0, 0, 0], "right", 1);
+    camera = [7.4, 4.6, 9.2];
+    target = [0, -0.2, 0];
+    update = (t, e) => {
+      pathDots.forEach((dot) => {
+        const progress = (t * 0.24 + (dot.userData.offset as number)) % 1;
+        dot.position.x = -2.16 + progress * 4.08;
+        dot.position.z = (dot.userData.offset - 0.4) * 0.5 * (1 - progress * 0.28);
+        dot.scale.setScalar(0.7 + 0.35 * Math.sin(progress * Math.PI));
+      });
+      return e > 0.15 ? "Layer stack opened · deposited film order" : "Fine optical pattern · illustrative near-field transport";
+    };
+  } else if (kind === "chiral") {
+    // The whole helix wafer rotates into an upright optical holder. Its lower
+    // edge is aligned to the bench top rather than hovering above it.
+    group.add(lattice);
+    lattice.rotation.z = -Math.PI / 2;
+    const bench = box(group, p.dark, [5.9, 0.14, 3.25], [0, -1.15, 0], "chiral-optics-bench");
+    lattice.position.set(0, 0.61, 0);
+    const holder = box(group, p.dark, [0.18, 0.18, 2.22], [0.02, -0.98, 0], "chiral-wafer-holder");
+    const source = box(group, p.dark, [0.42, 0.48, 0.74], [-2.5, 0.61, 0], "chiral-light-source");
+    const detector = box(group, p.dark, [0.28, 0.72, 0.82], [2.46, 0.61, 0], "chiral-polarization-detector");
+    const rightHanded = fieldMaterial("#8be5ff", 0.76);
+    const leftHanded = fieldMaterial("#c99bff", 0.76);
+    const selected = variant === 1 ? leftHanded : rightHanded;
+    const reduced = variant === 1 ? rightHanded : leftHanded;
+    const selectedLine = fieldTube(group, selected, [[-2.27, 0.61, -0.16], [-0.25, 0.61, -0.16], [1.52, 0.61, -0.16], [2.3, 0.61, -0.16]], 0.02, "preferred-polarization");
+    const reducedLine = fieldTube(group, reduced, [[-2.27, 0.61, 0.22], [-0.25, 0.61, 0.22], [1.15, 0.61, 0.22], [2.3, 0.61, 0.22]], 0.02, "reduced-polarization");
+    const selectedDot = ellipsoid(group, selected, [-2.1, 0.61, -0.16], [0.05, 0.05, 0.05], "preferred-polarization-marker");
+    const reducedDot = ellipsoid(group, reduced, [-2.1, 0.61, 0.22], [0.05, 0.05, 0.05], "reduced-polarization-marker");
+    label("Polarized source: sends two light twists", source, [0, 0, 0], "left", 0);
+    label("Gold helices: select a handedness", lattice, [0.46, 0, 0], "left", 1);
+    label("Preferred polarization: stays stronger", selectedLine, [1.65, 0, 0], "right", 0);
+    label("Detector: compares the outgoing light", detector, [0, 0, 0], "right", 1);
+    camera = [7.6, 4.7, 9.3];
+    target = [0, -0.05, 0];
+    update = (t, e) => {
+      const progress = (t * 0.34) % 1;
+      selectedDot.position.x = -2.2 + progress * 4.35;
+      reducedDot.position.x = -2.2 + progress * 3.35;
+      (reducedLine.material as T.MeshBasicMaterial).opacity = 0.22 + 0.12 * Math.sin(t * 3);
+      selectedDot.scale.setScalar(0.8 + 0.25 * Math.sin(t * 5));
+      return e > 0.15 ? "Helix array opened · handedness comparison" : "Circular polarizations · one is reduced more strongly";
+    };
+  } else if (kind === "labyrinth") {
+    group.add(lattice);
+    const ductFloor = box(group, p.dark, [5.8, 0.14, 3.2], [0, -1.15, 0], "labyrinth-duct-floor");
+    lattice.position.y = ductFloor.position.y + 0.07;
+    const speaker = mesh(new T.CylinderGeometry(0.42, 0.42, 0.38, 24), p.dark, group, "labyrinth-speaker");
+    speaker.rotation.z = Math.PI / 2;
+    speaker.position.set(-2.36, -0.63, 0);
+    const receiver = box(group, p.dark, [0.22, 0.52, 0.62], [2.26, -0.63, 0], "labyrinth-receiver");
+    const field = fieldMaterial("#7edfff", 0.72);
+    const folds = variant === 0 ? 0 : count + 1 + (variant === 2 ? 2 : 0);
+    const path: number[][] = [[-1.72, -0.62, 0]];
+    for (let i = 0; i < folds; i++)
+      path.push([-1.35 + ((i + 1) / (folds + 1)) * 2.7, -0.62, i % 2 === 0 ? -0.82 : 0.82]);
+    path.push([1.72, -0.62, folds % 2 === 0 ? 0.82 : -0.82], [2.14, -0.62, 0]);
+    const route = fieldTube(group, field, path, 0.018, "labyrinth-sound-route");
+    const direct = fieldTube(group, fieldMaterial("#aac5d2", 0.28), [[-1.72, -0.28, 1.16], [2.14, -0.28, 1.16]], 0.012, "labyrinth-direct-reference");
+    const pulse = ellipsoid(group, field, [-1.7, -0.62, 0], [0.05, 0.05, 0.05], "labyrinth-pressure-marker");
+    label("Inlet: sound enters the folded passage", speaker, [0, 0, 0], "left", 0);
+    label("Divider walls: make the air route longer", lattice, [0, 0.4, 0], "left", 1);
+    label("Folded air path: delays the sound", route, [0.62, 0, 0], "right", 0);
+    label("Receiver: compares the delayed output", receiver, [0, 0, 0], "right", 1);
+    camera = [6.8, 5.6, 9.4];
+    target = [0, -0.5, 0];
+    update = (t, e) => {
+      const points = path.map(
+        (v) => new T.Vector3(...(v as [number, number, number])),
+      );
+      const curve = new T.CatmullRomCurve3(points, false, "centripetal");
+      pulse.position.copy(curve.getPointAt((t * 0.18) % 1));
+      direct.position.y = Math.sin(t * 3) * 0.01;
+      return e > 0.15 ? "Panel opened · continuous folded passage" : "Sound pulse · folded route arrives later";
+    };
+  } else if (kind === "radiative-cooler") {
+    group.add(lattice);
+    const roof = box(group, p.dark, [5.8, 0.16, 3.2], [0, -1.15, 0], "cooler-roof-coupon");
+    lattice.position.y = roof.position.y + 0.08;
+    const sun = fieldMaterial("#ffe289", 0.62);
+    const infrared = fieldMaterial("#ff9f72", 0.58);
+    const solarLines: T.Mesh[] = [];
+    const infraredLines: T.Mesh[] = [];
+    for (let i = -2; i <= 2; i++) {
+      const x = i * 0.48;
+      solarLines.push(fieldTube(group, sun, [[x - 0.3, 1.75, -0.38], [x, -0.57, 0], [x + 0.36, 0.84, 0.48]], 0.018, "reflected-sunlight"));
+      infraredLines.push(fieldTube(group, infrared, [[x, -0.58, 0], [x * 1.14, 0.16, 0.08], [x * 1.26, 1.35, 0.16]], 0.014, "emitted-infrared"));
+    }
+    const film = lattice.getObjectByName("radiative-polymer-film") ?? lattice;
+    const backing = lattice.getObjectByName("radiative-silver-backing") ?? lattice;
+    label("Polymer film: holds embedded microspheres", film, [0, 0, 0], "left", 0);
+    label("Sunlight: mostly reflects away", solarLines[0], [0, 0, 0], "left", 1);
+    label("Infrared emission: carries heat toward the sky", infraredLines[4], [0, 0, 0], "right", 0);
+    label("Silver backing: reflects light below the film", backing, [0, 0, 0], "right", 1);
+    camera = [7.4, 4.9, 9.2];
+    target = [0, -0.1, 0];
+    update = (t, e) => {
+      solarLines.forEach((line, i) => (line.position.x = Math.sin(t * 1.2 + i) * 0.02));
+      infraredLines.forEach((line, i) => (line.position.y = Math.sin(t * 1.8 + i) * 0.018));
+      return e > 0.15 ? "Film layers opened · fixed backing and microspheres" : "Sunlight reflected · thermal infrared emitted";
+    };
+  } else if (kind === "seismic") {
+    group.add(lattice);
+    lattice.position.y = -1.08;
+    const building = box(group, p.dark, [0.72, 1.35, 1.06], [2.22, -0.31, 0], "seismic-test-building");
+    const window = box(group, p.ivory, [0.03, 0.26, 0.48], [1.85, -0.1, 0], "seismic-building-window");
+    const field = fieldMaterial("#80dcff", 0.5);
+    const waveBands: T.Mesh[] = [];
+    for (let i = 0; i < 4; i++) {
+      const band = fieldTube(group, field, [[-3.0 + i * 0.12, -0.77, -1.3], [-2.3 + i * 0.12, -0.65, -0.5], [-1.4 + i * 0.12, -0.77, 0.4], [-0.5 + i * 0.12, -0.65, 1.3]], 0.018, "seismic-wavefront");
+      waveBands.push(band);
+    }
+    const pivots = lattice.getObjectsByProperty("name", "seismic-resonator-pivot") as T.Group[];
+    label("Incoming ground wave: travels across the surface", waveBands[1], [0, 0, 0], "left", 0);
+    label("Anchored rods: respond at selected frequencies", lattice, [-0.8, 0.35, 0], "left", 1);
+    label("Graded array: changes height along the route", lattice, [0.82, 0.55, 0.3], "right", 0);
+    label("Test region: shows the downstream comparison", building, [0, 0, 0], "right", 1);
+    camera = [7.8, 5.4, 9.7];
+    target = [0, -0.55, 0];
+    update = (t, e) => {
+      pivots.forEach((pivot) => {
+        pivot.rotation.z = Math.sin(t * 4.1 + (pivot.userData.phase ?? 0)) * 0.075;
+      });
+      waveBands.forEach((band, index) => (band.position.x = ((t * 0.7 + index * 0.13) % 1) * 0.34));
+      return e > 0.15 ? "Ground array opened · rods stay anchored" : "Selected surface wave · graded rods couple to motion";
+    };
+  } else if (kind === "water-wave") {
+    group.add(lattice);
+    lattice.position.y = -1.08;
+    const source = box(group, p.dark, [0.24, 0.4, 1.85], [-2.36, -0.66, 0], "water-wave-paddle");
+    const field = fieldMaterial("#78e0f4", 0.64);
+    const fronts: T.Mesh[] = [];
+    for (let i = 0; i < 5; i++) {
+      const x = -1.95 + i * 0.68;
+      const zBend = variant === 1 ? 0.36 : 0.12;
+      fronts.push(fieldTube(group, field, [[x, -0.5, -1.12], [x + 0.1, -0.5, -zBend], [x + 0.1, -0.5, zBend], [x, -0.5, 1.12]], 0.013, "water-wave-front"));
+    }
+    const plates = lattice.getObjectsByProperty("name", "water-wave-plate") as T.Mesh[];
+    label("Wave paddle: makes small test ripples", source, [0, 0, 0], "left", 0);
+    label("Submerged plates: stay fixed to the tank floor", plates[0] ?? lattice, [0, 0, 0], "left", 1);
+    label("Water channels: guide the visible wavefronts", lattice, [0, 0.35, 0], "right", 0);
+    label("Emerging wavefront: shows the changed route", fronts[4], [0, 0, 0], "right", 1);
+    camera = [7.2, 6.1, 9.2];
+    target = [0, -0.55, 0];
+    update = (t, e) => {
+      fronts.forEach((front, i) => {
+        front.position.x = ((t * 0.42 + i * 0.2) % 1) * 0.45;
+        front.position.y = Math.sin(t * 3 + i) * 0.015;
+      });
+      return e > 0.15 ? "Tank opened · plates attached to the floor" : "Surface ripples · patterned channels guide the route";
+    };
   } else if (kind === "auxetic") {
     return buildKneeBrace(lattice, color, variant);
   } else if (kind === "kelvin") {

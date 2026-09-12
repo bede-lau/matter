@@ -56,7 +56,12 @@ const withoutTeachingLabel = (copy: string) =>
 // mechanical lattices. Only expose controls that alter the model on screen.
 const specialisedParameterLabels: Record<
   string,
-  { thickness: string; count: string }
+  {
+    thickness: string;
+    count: string;
+    thicknessValue?: (value: number) => string;
+    countValue?: (value: number) => string;
+  }
 > = {
   metalens: { thickness: "Post height", count: "Post density" },
   cloak: { thickness: "Trace width", count: "Ring count" },
@@ -67,6 +72,42 @@ const specialisedParameterLabels: Record<
   "thermal-cloak": { thickness: "Layer spacing", count: "Layer count" },
   topological: { thickness: "Post diameter", count: "Post density" },
   flux: { thickness: "Funnel opening", count: "Funnel layers" },
+  hyperbolic: {
+    thickness: "Metal-layer share",
+    count: "Layer pairs",
+    thicknessValue: (value) => `${value.toFixed(2)}×`,
+    countValue: (value) => String(value + 2),
+  },
+  chiral: {
+    thickness: "Helix pitch",
+    count: "Helix array",
+    thicknessValue: (value) => `${value.toFixed(2)}×`,
+    countValue: (value) => `${value + 2} × ${value + 2}`,
+  },
+  labyrinth: {
+    thickness: "Channel width",
+    count: "Fold count",
+    thicknessValue: (value) => `${value.toFixed(2)}×`,
+    countValue: (value) => String(value + 1),
+  },
+  "radiative-cooler": {
+    thickness: "Film thickness",
+    count: "Microsphere density",
+    thicknessValue: (value) => `${value.toFixed(2)}×`,
+    countValue: (value) => ["Very sparse", "Sparse", "Medium", "Dense", "Very dense"][value - 1] ?? "Dense",
+  },
+  seismic: {
+    thickness: "Rod-height scale",
+    count: "Resonator rows",
+    thicknessValue: (value) => `${value.toFixed(2)}×`,
+    countValue: (value) => String(value + 2),
+  },
+  "water-wave": {
+    thickness: "Plate-height scale",
+    count: "Plate rows",
+    thicknessValue: (value) => `${value.toFixed(2)}×`,
+    countValue: (value) => String(value + 2),
+  },
 };
 
 export default function Studio() {
@@ -106,8 +147,12 @@ export default function Studio() {
   const allowedBase = f.allowedBase ?? bases.map((_, index) => index);
   const allowedSecondary = f.allowedSecondary ?? bases.map((_, index) => index);
   const hasSecondary = allowedSecondary.length > 0;
+  const fixedSecondary = hasSecondary && Boolean(f.secondaryFixed);
   const activeReference = structureCards.find((card) => card.id === f.id);
-  const familyFactor = [0.13, 0.16, 0.08, 0.1, 0.12, 0.14][family] ?? 0.12;
+  const familyFactor =
+    f.category === "Mechanical"
+      ? ({ gyroid: 0.13, octet: 0.16, auxetic: 0.08, kelvin: 0.1, honeycomb: 0.12 }[f.id] ?? 0.11)
+      : 0.12;
   const isMechanical = f.category === "Mechanical";
   const metricLabel = isMechanical
     ? "Illustrative lattice stiffness"
@@ -145,7 +190,7 @@ export default function Studio() {
     const nextFamily = families[i];
     const nextBase = nextFamily.defaultBase ?? 0;
     const nextSecond = nextFamily.defaultSecondary ?? 1;
-    const nextBlend = nextFamily.secondaryRequired ? 35 : 0;
+    const nextBlend = nextFamily.secondaryRequired && !nextFamily.secondaryFixed ? 35 : 0;
     setBase(nextBase);
     setSecond(nextSecond);
     setBlend(nextBlend);
@@ -163,12 +208,15 @@ export default function Studio() {
     setThick(next.thick);
     setCount(next.count);
     setBase(f.defaultBase ?? 0);
-    setBlend(f.secondaryRequired ? 35 : next.blend);
+    setBlend(f.secondaryRequired && !f.secondaryFixed ? 35 : next.blend);
     setSecond(f.defaultSecondary ?? 1);
     setVariant(0);
     setWire(false);
     setSection(false);
-    setSceneParameters({ ...next, blend: f.secondaryRequired ? 35 : 0 });
+    setSceneParameters({
+      ...next,
+      blend: f.secondaryRequired && !f.secondaryFixed ? 35 : 0,
+    });
     setReset((value) => value + 1);
   };
   const catalog = useMemo(
@@ -557,7 +605,7 @@ export default function Studio() {
                   <div className="material-phase-key" aria-live="polite">
                     <span className="phase-key-item">
                       <i style={{ backgroundColor: baseMaterial.color }} />
-                      Base · {baseMaterial.name} <strong>{100 - blend}%</strong>
+                      Base · {baseMaterial.name} {!fixedSecondary && <strong>{100 - blend}%</strong>}
                     </span>
                     {blend > 0 && (
                       <>
@@ -566,6 +614,15 @@ export default function Studio() {
                           <i style={{ backgroundColor: secondaryMaterial.color }} />
                           Secondary · {secondaryMaterial.name}{" "}
                           <strong>{blend}%</strong>
+                        </span>
+                      </>
+                    )}
+                    {fixedSecondary && (
+                      <>
+                        <ArrowRight size={14} aria-hidden="true" />
+                        <span className="phase-key-item">
+                          <i style={{ backgroundColor: secondaryMaterial.color }} />
+                          {f.secondaryRole ?? "Secondary layer"} · {secondaryMaterial.name}
                         </span>
                       </>
                     )}
@@ -823,7 +880,7 @@ export default function Studio() {
                     <div className="compact-material-choice">
                       <label htmlFor="secondary">
                         <GlossaryText>{f.secondaryRole ?? "Secondary material"}</GlossaryText>
-                        <output>{blend}%</output>
+                        {!fixedSecondary && <output>{blend}%</output>}
                       </label>
                       <Choice
                         id="secondary"
@@ -835,50 +892,52 @@ export default function Studio() {
                           .map((i) => ({ value: String(i), label: bases[i].name }))}
                       />
                     </div>
-                    <div className="phase-meter">
-                      <div>
-                        <span>
-                          <i style={{ backgroundColor: baseMaterial.color }} />
-                          {baseMaterial.name}
-                        </span>
-                        <strong>{100 - blend}%</strong>
-                      </div>
-                      <div>
-                        <span>
-                          <i style={{ backgroundColor: secondaryMaterial.color }} />
-                          {secondaryMaterial.name}
-                        </span>
-                        <strong>{blend}%</strong>
-                      </div>
-                      <div className="blend-bar" aria-hidden="true">
-                        <span
-                          style={{
-                            width: `${100 - blend}%`,
-                            backgroundColor: baseMaterial.color,
-                          }}
+                    {!fixedSecondary && (
+                      <div className="phase-meter">
+                        <div>
+                          <span>
+                            <i style={{ backgroundColor: baseMaterial.color }} />
+                            {baseMaterial.name}
+                          </span>
+                          <strong>{100 - blend}%</strong>
+                        </div>
+                        <div>
+                          <span>
+                            <i style={{ backgroundColor: secondaryMaterial.color }} />
+                            {secondaryMaterial.name}
+                          </span>
+                          <strong>{blend}%</strong>
+                        </div>
+                        <div className="blend-bar" aria-hidden="true">
+                          <span
+                            style={{
+                              width: `${100 - blend}%`,
+                              backgroundColor: baseMaterial.color,
+                            }}
+                          />
+                          <span
+                            style={{
+                              width: `${blend}%`,
+                              backgroundColor: secondaryMaterial.color,
+                            }}
+                          />
+                        </div>
+                        <Slider
+                          aria-label={`${f.secondaryRole ?? "Secondary material"} share`}
+                          min={0}
+                          max={100}
+                          step={5}
+                          value={[blend]}
+                          onValueChange={(v) => setBlend(v[0])}
+                          onValueCommit={(v) =>
+                            setSceneParameters((current) => ({
+                              ...current,
+                              blend: v[0],
+                            }))
+                          }
                         />
-                        <span
-                          style={{
-                            width: `${blend}%`,
-                            backgroundColor: secondaryMaterial.color,
-                          }}
-                        />
                       </div>
-                      <Slider
-                        aria-label={`${f.secondaryRole ?? "Secondary material"} share`}
-                        min={0}
-                        max={100}
-                        step={5}
-                        value={[blend]}
-                        onValueChange={(v) => setBlend(v[0])}
-                        onValueCommit={(v) =>
-                          setSceneParameters((current) => ({
-                            ...current,
-                            blend: v[0],
-                          }))
-                        }
-                      />
-                    </div>
+                    )}
                   </>
                 ) : (
                   <p className="material-compatibility-note">{f.materialNote}</p>
@@ -921,7 +980,11 @@ export default function Studio() {
                           ? "Layer thickness"
                           : "Element thickness")}
                     </GlossaryText>
-                    <output>{thick.toFixed(2)} mm</output>
+                    <output>
+                      {specialisedParameters?.thicknessValue
+                        ? specialisedParameters.thicknessValue(thick)
+                        : `${thick.toFixed(2)} mm`}
+                    </output>
                   </label>
                   <Slider
                     aria-label="Thickness"
@@ -942,7 +1005,11 @@ export default function Studio() {
                   <label>
                     {specialisedParameters?.count ?? "Repetition"}
                     <output>
-                      {specialisedParameters ? count : `${count} × ${count} × ${count}`}
+                      {specialisedParameters?.countValue
+                        ? specialisedParameters.countValue(count)
+                        : specialisedParameters
+                          ? count
+                          : `${count} × ${count} × ${count}`}
                     </output>
                   </label>
                   <Slider
@@ -963,15 +1030,22 @@ export default function Studio() {
               </div>
               <div className="property-card compact-properties">
                 <div className="eyebrow">ILLUSTRATIVE TEACHING ESTIMATES</div>
-                <div>
-                  <span>
-                    <GlossaryText>Relative density</GlossaryText>
-                  </span>
-                  <strong>
-                    {(density * 100).toFixed(1)}
-                    <small>%</small>
-                  </strong>
-                </div>
+                {specialisedParameters ? (
+                  <div className="property-card__qualitative">
+                    <span>Teaching model</span>
+                    <strong>Qualitative</strong>
+                  </div>
+                ) : (
+                  <div>
+                    <span>
+                      <GlossaryText>Relative density</GlossaryText>
+                    </span>
+                    <strong>
+                      {(density * 100).toFixed(1)}
+                      <small>%</small>
+                    </strong>
+                  </div>
+                )}
                 <div>
                   <span>
                     <GlossaryText>{metricLabel}</GlossaryText>

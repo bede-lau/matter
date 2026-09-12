@@ -281,6 +281,198 @@ const behaviorField = (kind: string, lattice: T.Group, variant: number): Behavio
       },
     };
   }
+
+  if (kind === "hyperbolic") {
+    const paths: T.CatmullRomCurve3[] = [];
+    for (let z = -2; z <= 2; z++) {
+      const { curve } = fieldTube(
+        group,
+        cyan,
+        [
+          new T.Vector3(-1.65, 0.7, z * 0.23),
+          new T.Vector3(-0.45, 0.7, z * 0.23),
+          new T.Vector3(0.48, 0.7, z * 0.18),
+          new T.Vector3(1.65, 0.7, z * 0.14),
+        ],
+        0.014,
+        "hyperbolic-near-field-path",
+      );
+      paths.push(curve);
+    }
+    const updateDots = curveMarkers(group, paths, cyan, 11, 0.22);
+    return {
+      group,
+      camera: [7.2, 4.7, 9.1],
+      target: [0, 0.6, 0],
+      update: (time) => {
+        updateDots(time);
+        return "Layered response · selected fine optical detail is carried through the stack";
+      },
+    };
+  }
+
+  if (kind === "chiral") {
+    const preferred = fieldMaterial("#8be5ff", 0.78);
+    const reduced = fieldMaterial("#c99bff", 0.27);
+    const preferredPaths: T.CatmullRomCurve3[] = [];
+    for (let x = -1; x <= 1; x++) {
+      const { curve } = fieldTube(
+        group,
+        preferred,
+        [
+          new T.Vector3(x * 0.55, -0.4, 0),
+          new T.Vector3(x * 0.55, 0.2, 0.08),
+          new T.Vector3(x * 0.4, 1.15, 0.12),
+          new T.Vector3(x * 0.28, 1.8, 0),
+        ],
+        0.017,
+        "chiral-preferred-field",
+      );
+      preferredPaths.push(curve);
+      fieldTube(
+        group,
+        reduced,
+        [
+          new T.Vector3(x * 0.55 + 0.17, -0.4, 0.18),
+          new T.Vector3(x * 0.55 + 0.17, 0.25, 0.22),
+          new T.Vector3(x * 0.45 + 0.17, 0.92, 0.18),
+        ],
+        0.014,
+        "chiral-reduced-field",
+      );
+    }
+    const updateDots = curveMarkers(group, preferredPaths, preferred, 8, 0.24);
+    return {
+      group,
+      camera: [7.1, 4.8, 8.9],
+      target: [0, 0.55, 0],
+      update: (time) => {
+        updateDots(time);
+        return variant === 1
+          ? "Right-handed helices · opposite light twist passes more readily"
+          : "Left-handed helices · one circular polarization is reduced more strongly";
+      },
+    };
+  }
+
+  if (kind === "labyrinth") {
+    const field = fieldMaterial("#80e1ff", 0.74);
+    const folds = variant === 0 ? 0 : 4 + (variant === 2 ? 2 : 0);
+    const points = [new T.Vector3(-1.7, 0.43, 0)];
+    for (let i = 0; i < folds; i++)
+      points.push(new T.Vector3(-1.35 + ((i + 1) / (folds + 1)) * 2.7, 0.43, i % 2 ? 0.8 : -0.8));
+    points.push(new T.Vector3(1.7, 0.43, folds % 2 ? 0.8 : -0.8));
+    const { curve } = fieldTube(group, field, points, 0.019, "labyrinth-pressure-route");
+    const markerUpdate = curveMarkers(group, [curve], field, 7, 0.16);
+    const reference = marker(group, fieldMaterial("#b7cdd7", 0.38), 0.04);
+    return {
+      group,
+      camera: [6.7, 5.4, 9.1],
+      target: [0, 0.35, 0],
+      update: (time) => {
+        markerUpdate(time);
+        reference.position.set(-1.7 + cycle(time * 0.42) * 3.4, 0.7, 1.15);
+        return folds
+          ? "Folded air passage · the same pulse takes a longer route"
+          : "Straight reference · sound crosses the short air path";
+      },
+    };
+  }
+
+  if (kind === "radiative-cooler") {
+    const sunlight = fieldMaterial("#ffe187", 0.64);
+    const infrared = fieldMaterial("#ff9f72", 0.6);
+    const incoming: T.CatmullRomCurve3[] = [];
+    const outgoing: T.CatmullRomCurve3[] = [];
+    for (let x = -2; x <= 2; x++) {
+      const { curve: inCurve } = fieldTube(
+        group,
+        sunlight,
+        [new T.Vector3(x * 0.42 - 0.22, 2.1, 0), new T.Vector3(x * 0.42, 0.48, 0), new T.Vector3(x * 0.42 + 0.35, 1.38, 0)],
+        0.017,
+        "radiative-sunlight-path",
+      );
+      incoming.push(inCurve);
+      const { curve: outCurve } = fieldTube(
+        group,
+        infrared,
+        [new T.Vector3(x * 0.42, 0.48, 0.16), new T.Vector3(x * 0.46, 1.18, 0.12), new T.Vector3(x * 0.5, 2.18, 0.08)],
+        0.014,
+        "radiative-infrared-path",
+      );
+      outgoing.push(outCurve);
+    }
+    const sunDots = curveMarkers(group, incoming, sunlight, 7, 0.18);
+    const heatDots = curveMarkers(group, outgoing, infrared, 7, 0.14);
+    return {
+      group,
+      camera: [7.2, 4.9, 8.8],
+      target: [0, 0.35, 0],
+      update: (time) => {
+        sunDots(time);
+        heatDots(time);
+        return "Energy balance · sunlight reflects while thermal infrared leaves the film";
+      },
+    };
+  }
+
+  if (kind === "seismic") {
+    const wave = fieldMaterial("#82dcff", 0.5);
+    const fronts = Array.from({ length: 5 }, (_, index) => {
+      const { line } = fieldTube(
+        group,
+        wave,
+        [new T.Vector3(-2.35 + index * 0.14, 0.27, -1.28), new T.Vector3(-1.55 + index * 0.14, 0.36, 0), new T.Vector3(-0.7 + index * 0.14, 0.27, 1.28)],
+        0.018,
+        "seismic-surface-wavefront",
+      );
+      return line;
+    });
+    const pivots = lattice.getObjectsByProperty("name", "seismic-resonator-pivot") as T.Group[];
+    return {
+      group,
+      camera: [7.8, 5.4, 9.5],
+      target: [0, 0.38, 0],
+      update: (time) => {
+        fronts.forEach((front, index) => (front.position.x = cycle(time * 0.38 + index * 0.14) * 0.54));
+        pivots.forEach((pivot) => {
+          pivot.rotation.z = Math.sin(time * 4.2 + (pivot.userData.phase ?? 0)) * 0.075;
+        });
+        return "Ground-wave coupling · the anchored rods oscillate near a selected band";
+      },
+    };
+  }
+
+  if (kind === "water-wave") {
+    const water = fieldMaterial("#7de2f4", 0.62);
+    const fronts: T.Mesh[] = [];
+    for (let i = 0; i < 5; i++) {
+      const x = -1.65 + i * 0.62;
+      const bend = variant === 1 ? 0.46 : 0.14;
+      const { line } = fieldTube(
+        group,
+        water,
+        [new T.Vector3(x, 0.57, -1.12), new T.Vector3(x + 0.09, 0.57, -bend), new T.Vector3(x + 0.09, 0.57, bend), new T.Vector3(x, 0.57, 1.12)],
+        0.014,
+        "water-wavefront",
+      );
+      fronts.push(line);
+    }
+    return {
+      group,
+      camera: [7.1, 6.0, 9.0],
+      target: [0, 0.35, 0],
+      update: (time) => {
+        fronts.forEach((front, index) => {
+          front.position.x = cycle(time * 0.35 + index * 0.2) * 0.42;
+          front.position.y = Math.sin(time * 3 + index) * 0.014;
+        });
+        return variant === 1
+          ? "Rotated plates · ripples leave on a changed route"
+          : "Submerged plate rows · ripples pass through the water channels";
+      },
+    };
+  }
   return undefined;
 };
 

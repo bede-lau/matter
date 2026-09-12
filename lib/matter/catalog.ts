@@ -21,6 +21,8 @@ export type Family = {
   allowedSecondary?: number[];
   secondaryRole?: string;
   secondaryRequired?: boolean;
+  /** Two materials are shown as fixed layers or inclusions, not a volume blend. */
+  secondaryFixed?: boolean;
   materialNote?: string;
 };
 export const families: Family[] = [
@@ -394,6 +396,192 @@ export const families: Family[] = [
     allowedSecondary: [],
     materialNote: "A soft magnetic alloy guides an externally supplied field. Copper is not a second phase in this shell.",
   },
+  {
+    id: "hyperbolic",
+    name: "Hyperbolic multilayer",
+    category: "Optical",
+    tag: "Carries fine light detail through layers",
+    origin:
+      "Purpose: use alternating metal and insulating films to carry some fine light patterns that normally fade very close to an object.",
+    mechanism:
+      "Structure: many very thin silver and alumina layers are deposited one after another. The stack responds differently along the layers than across them.",
+    behavior:
+      "Behavior: near a tiny illuminated feature, the layered stack can carry selected fine optical patterns farther than a plain material. Losses and the operating wavelength limit the effect.",
+    application: "Near-field optical transport demonstrator",
+    applicationLesson:
+      "Researchers use a layered hyperlens to study how very fine optical detail can move from a nearby source to an observation plane.",
+    applicationWhy:
+      "It is useful because the layers can preserve selected subwavelength detail long enough to study it. It is not unlimited magnification or a general camera lens.",
+    variantLessons: [
+      "Flat stack: parallel layers provide a simple comparison for how the two materials alternate.",
+      "Curved stack: the layers widen outward to show a hyperlens-style geometry that can spread a near-field pattern.",
+      "Dense stack: more layer pairs make the layered direction easier to compare, while real optical performance still depends on wavelength and fabrication.",
+    ],
+    variants: ["Flat multilayer", "Curved hyperlens", "Dense multilayer"],
+    color: "#d4e0eb",
+    source: "https://xlab.hku.hk/pdf/10.1364_oe.15.015886.pdf",
+    defaultBase: 11,
+    defaultSecondary: 12,
+    allowedBase: [11],
+    allowedSecondary: [12],
+    secondaryRole: "Dielectric layer",
+    secondaryRequired: true,
+    secondaryFixed: true,
+    materialNote: "Silver and alumina are separate deposited films. This model keeps their layer roles fixed instead of treating them as a bulk alloy.",
+  },
+  {
+    id: "chiral",
+    name: "Chiral helix polarizer",
+    category: "Optical",
+    tag: "Filters one twist of light",
+    origin:
+      "Purpose: use a field of tiny metal corkscrews to distinguish left- and right-handed circularly polarized light.",
+    mechanism:
+      "Structure: identical gold helices stand on a transparent support. Their handed twist, pitch, and height set how they couple to light along the helix axis.",
+    behavior:
+      "Behavior: at a chosen wavelength and viewing direction, one circular polarization couples more strongly to the helices and is reduced more than the opposite handedness.",
+    application: "Polarization-sensitive optical filter",
+    applicationLesson:
+      "A chiral helix array can sit between a light source and detector to help an optical instrument distinguish the handedness of circularly polarized light.",
+    applicationWhy:
+      "It is useful because the same thin patterned layer can select a polarization state without using a bulky stack of conventional optics.",
+    variantLessons: [
+      "Left-handed array: the corkscrews all twist left, so the comparison field favors one circular polarization.",
+      "Right-handed array: mirroring the helices swaps which circular polarization is more strongly reduced.",
+      "Tall helix array: extra turns make the helical path longer, which changes the visible geometry that interacts with the light.",
+    ],
+    variants: ["Left-handed helices", "Right-handed helices", "Tall helix array"],
+    color: "#f1c96c",
+    source: "https://pubmed.ncbi.nlm.nih.gov/19696310/",
+    defaultBase: 13,
+    defaultSecondary: 13,
+    allowedBase: [13],
+    allowedSecondary: [],
+    materialNote: "Gold helices are shown on a fixed transparent support. The support holds the array and is not presented as a mixed phase.",
+  },
+  {
+    id: "labyrinth",
+    name: "Space-coiling labyrinth",
+    category: "Acoustic",
+    tag: "Folds a long sound path into a thin panel",
+    origin:
+      "Purpose: use a folded air path to delay sound inside a panel that is much thinner than the path itself.",
+    mechanism:
+      "Structure: rigid walls form one continuous serpentine channel. More folds make the internal air route longer while the outside panel stays compact.",
+    behavior:
+      "Behavior: sound takes longer to travel through the folded channel than through a straight opening. A patterned set of delays can reshape or steer a wavefront.",
+    application: "Compact acoustic wave-shaping panel",
+    applicationLesson:
+      "A space-coiling panel can sit in an acoustic test duct, where its folded passages delay parts of a sound wave before they leave the other side.",
+    applicationWhy:
+      "It is useful because it can create a long acoustic path without needing a deep enclosure. Channel losses and frequency still matter.",
+    variantLessons: [
+      "Straight reference: the direct channel gives sound the shortest route through the panel.",
+      "Serpentine channel: alternating walls force the air through a folded path before it reaches the outlet.",
+      "Long serpentine: extra folds increase the route length in the same panel footprint.",
+    ],
+    variants: ["Straight reference", "Serpentine channel", "Long serpentine"],
+    color: "#75d9cf",
+    source: "https://www.nature.com/articles/ncomms6553",
+    defaultBase: 1,
+    defaultSecondary: 1,
+    allowedBase: [1],
+    allowedSecondary: [],
+    materialNote: "The rigid nylon walls define the channel. Air is the working medium, so it is not offered as a second solid material.",
+  },
+  {
+    id: "radiative-cooler",
+    name: "Radiative-cooling film",
+    category: "Thermal",
+    tag: "Reflects sun while emitting heat to the sky",
+    origin:
+      "Purpose: let a surface shed heat as infrared light while reflecting much of the incoming sunlight.",
+    mechanism:
+      "Structure: silica microspheres sit inside a polymer film above a reflective silver backing. These are separate layers and inclusions, not one alloy.",
+    behavior:
+      "Behavior: the backing reflects sunlight while the film emits thermal infrared radiation. Whether the surface cools depends on weather, airflow, and the surrounding surfaces.",
+    application: "Passive-cooling roof-film demonstrator",
+    applicationLesson:
+      "A radiative-cooling film can cover a small roof coupon or outdoor device surface. It reflects light from the sun and sends part of its thermal radiation toward the sky.",
+    applicationWhy:
+      "It is useful because it can lower absorbed heat without a fan or electricity in suitable outdoor conditions. It is not a guaranteed temperature drop in every climate.",
+    variantLessons: [
+      "Sparse microspheres: widely spaced particles make the polymer matrix easy to inspect.",
+      "Dense microspheres: more embedded particles change the visible composite pattern without claiming a calculated cooling gain.",
+      "Thick film: a deeper polymer layer gives the microspheres more surrounding material while the silver backing stays below.",
+    ],
+    variants: ["Sparse microspheres", "Dense microspheres", "Thick film"],
+    color: "#eef4f7",
+    source: "https://www.science.org/doi/10.1126/science.aai7899",
+    defaultBase: 14,
+    defaultSecondary: 15,
+    allowedBase: [14],
+    allowedSecondary: [15],
+    secondaryRole: "Silica microspheres",
+    secondaryRequired: true,
+    secondaryFixed: true,
+    materialNote: "The polymer is a continuous matrix around silica microspheres. A separate silver backing reflects sunlight below the film.",
+  },
+  {
+    id: "seismic",
+    name: "Seismic resonant metawedge",
+    category: "Seismic",
+    tag: "Redirects selected ground-wave motion",
+    origin:
+      "Purpose: use a graded row of upright resonators to change how a selected ground-surface wave travels through a laboratory-scale model.",
+    mechanism:
+      "Structure: rods are anchored to a solid ground plate and gradually change height. Different rod heights respond most strongly at different frequencies.",
+    behavior:
+      "Behavior: a surface wave can couple to the rods. In a graded array, some conditions can slow, reflect, or redirect part of that motion into the ground instead of simply destroying it.",
+    application: "Ground-wave management research model",
+    applicationLesson:
+      "Researchers use metawedges to study how a selected band of ground vibration could be redirected before it reaches a protected test region.",
+    applicationWhy:
+      "It is useful as a research tool for wave control at infrastructure scale. Real soil, foundations, frequency, and damping must be modeled for each site.",
+    variantLessons: [
+      "Uniform rods: equal heights make a clear reference array for the same type of anchored resonator.",
+      "Short-to-tall wedge: rod height rises along the wave path, showing a gradual change in the array.",
+      "Tall-to-short wedge: reversing the height gradient reverses the illustrated direction of the graded response.",
+    ],
+    variants: ["Uniform rod array", "Short-to-tall wedge", "Tall-to-short wedge"],
+    color: "#bdc9d5",
+    source: "https://www.nature.com/articles/srep27717",
+    defaultBase: 16,
+    defaultSecondary: 16,
+    allowedBase: [16],
+    allowedSecondary: [],
+    materialNote: "This is a laboratory analogue with steel-like rods fixed to a solid base. It does not claim an earthquake-proof building.",
+  },
+  {
+    id: "water-wave",
+    name: "Water-wave plate array",
+    category: "Hydrodynamic",
+    tag: "Guides ripples through submerged channels",
+    origin:
+      "Purpose: use a patterned tank bottom to make small surface waves travel differently across and along a set of submerged plates.",
+    mechanism:
+      "Structure: rigid plates rise from the tank floor with clear water channels between them. Their spacing, height, and orientation form an engineered bathymetry.",
+    behavior:
+      "Behavior: in the appropriate shallow-water regime, the plate pattern changes the wave direction and spacing. The water moves while the plates remain fixed to the tank floor.",
+    application: "Wave-tank guiding experiment",
+    applicationLesson:
+      "A plate array in a shallow tank lets researchers observe how repeated bottom features guide small waves through channels or a rotated pattern.",
+    applicationWhy:
+      "It is useful because the controlled tank makes a fluid-wave metamaterial easy to observe. It is not a ready-made ocean-wave shield.",
+    variantLessons: [
+      "Parallel channels: equal plate rows create a direct reference for guided water paths.",
+      "Rotated rows: rotating the plates changes the preferred route through the patterned bathymetry.",
+      "Tall plates: less clearance above each plate makes the submerged structure more prominent in the tank.",
+    ],
+    variants: ["Parallel channels", "Rotated rows", "Tall plate array"],
+    color: "#83c6e8",
+    source: "https://journals.aps.org/prb/abstract/10.1103/PhysRevB.96.134310",
+    defaultBase: 17,
+    defaultSecondary: 17,
+    allowedBase: [17],
+    allowedSecondary: [],
+    materialNote: "Rigid acrylic plates sit in a fixed water tank. Water is the wave medium, not a secondary solid phase.",
+  },
 ];
 export const bases = [
   {
@@ -472,5 +660,54 @@ export const bases = [
     rho: 7870,
     color: "#aeb7bd",
     intro: "A small dense metal mass bonded to a membrane to shift its resonant motion.",
+  },
+  {
+    name: "Silver",
+    e: 83000,
+    rho: 10490,
+    color: "#d4e0eb",
+    intro: "A highly conductive metal used in thin optical films and reflective backings.",
+  },
+  {
+    name: "Alumina",
+    e: 300000,
+    rho: 3950,
+    color: "#dbe8ee",
+    intro: "A hard ceramic electrical insulator that can separate thin optical metal layers.",
+  },
+  {
+    name: "Gold",
+    e: 78000,
+    rho: 19300,
+    color: "#f1c96c",
+    intro: "A stable conductive metal used in small optical and electronic structures.",
+  },
+  {
+    name: "Polymethylpentene",
+    e: 1500,
+    rho: 830,
+    color: "#eef4f7",
+    intro: "A transparent polymer that can act as the continuous film around optical microspheres.",
+  },
+  {
+    name: "Silica microspheres",
+    e: 70000,
+    rho: 2200,
+    color: "#f8fbfd",
+    intro: "Tiny glass-like spheres used as optical inclusions inside a polymer film.",
+  },
+  {
+    name: "Stainless steel",
+    e: 200000,
+    rho: 8000,
+    color: "#bdc9d5",
+    intro: "A strong metal suitable for a rigid laboratory resonator or support rod.",
+  },
+  {
+    name: "Acrylic",
+    e: 3200,
+    rho: 1180,
+    color: "#83c6e8",
+    intro: "A clear rigid plastic often used for laboratory tank walls, channels, and model plates.",
   },
 ];

@@ -4,6 +4,10 @@ import { createApplication } from "../components/matter/models/Applications";
 import { kneeFor, buildAthlete } from "../components/matter/models/Athlete";
 import { warpLattice } from "../components/matter/models/primitives";
 import { createLattice } from "../lib/matter/geometry";
+import { createBehavior } from "../components/matter/models/Behaviors";
+import { bases, families } from "../lib/matter/catalog";
+import { structureCards } from "../lib/matter/learning";
+import glossary from "../lib/matter/glossary.json";
 for (const kind of [
   "gyroid",
   "octet",
@@ -17,6 +21,12 @@ for (const kind of [
   "thermal-cloak",
   "topological",
   "flux",
+  "hyperbolic",
+  "chiral",
+  "labyrinth",
+  "radiative-cooler",
+  "seismic",
+  "water-wave",
 ])
   for (let variant = 0; variant < 3; variant++) {
     const root = new T.Group();
@@ -56,6 +66,90 @@ for (const kind of [
       a.callouts.length + " component anchors",
     );
   }
+
+assert.equal(families.length, 18, "the atlas contains 18 material families");
+assert.equal(new Set(families.map((family) => family.id)).size, families.length, "family IDs stay unique");
+families.forEach((family) => {
+  assert.equal(family.variants.length, 3, family.id + " has three variants");
+  assert.equal(family.variantLessons.length, family.variants.length, family.id + " variants have matching lessons");
+  assert.ok(structureCards.some((card) => card.id === family.id), family.id + " has a field-guide reference");
+  assert.ok(family.allowedBase?.includes(family.defaultBase ?? -1), family.id + " default base is permitted");
+  assert.ok((family.defaultBase ?? -1) >= 0 && (family.defaultBase ?? -1) < bases.length, family.id + " base exists");
+  if (family.allowedSecondary?.length) {
+    assert.ok(family.allowedSecondary.includes(family.defaultSecondary ?? -1), family.id + " default secondary is permitted");
+    assert.ok(Boolean(family.secondaryRole), family.id + " declares the secondary role");
+  }
+});
+for (const requiredTerm of [
+  "Hyperbolic multilayer",
+  "Chirality",
+  "Space coiling",
+  "Radiative cooling",
+  "Seismic metawedge",
+  "Bathymetry",
+])
+  assert.ok(glossary.some((entry) => entry.term === requiredTerm), requiredTerm + " has a quick glossary definition");
+
+for (const kind of [
+  "hyperbolic",
+  "chiral",
+  "labyrinth",
+  "radiative-cooler",
+  "seismic",
+  "water-wave",
+])
+  for (let variant = 0; variant < 3; variant++)
+    for (const [count, thickness] of [
+      [1, 0.3],
+      [3, 0.8],
+      [5, 1.6],
+    ] as const) {
+      const root = createLattice({
+        kind,
+        variant,
+        count,
+        thickness,
+        color: "#d4e0eb",
+        secondaryColor: "#f8fbfd",
+      });
+      root.updateMatrixWorld(true);
+      const bounds = new T.Box3().setFromObject(root);
+      assert.ok(bounds.getSize(new T.Vector3()).length() > 0.2, kind + " builds visible geometry");
+      assert.ok(bounds.getSize(new T.Vector3()).length() < 12, kind + " stays within the scene budget");
+      const behavior = createBehavior({ kind, variant, count, thickness, color: "#d4e0eb" }, root);
+      assert.ok(behavior, kind + " has a dedicated behavior animation");
+      behavior?.update(0.2);
+      behavior?.update(1.1);
+      root.traverse((object) =>
+        assert.ok(object.matrix.elements.every(Number.isFinite), kind + " behavior keeps transforms finite"),
+      );
+      if (kind === "labyrinth") {
+        const base = root.getObjectByName("labyrinth-base")!;
+        for (const divider of root.getObjectsByProperty("name", "labyrinth-divider") as T.Mesh[]) {
+          const baseBounds = new T.Box3().setFromObject(base);
+          const dividerBounds = new T.Box3().setFromObject(divider);
+          assert.ok(Math.abs(dividerBounds.min.y - baseBounds.max.y) < 1e-6, "labyrinth divider sits on the base");
+        }
+      }
+      if (kind === "radiative-cooler") {
+        const filmBounds = new T.Box3().setFromObject(root.getObjectByName("radiative-polymer-film")!);
+        const spheres = new T.Box3().setFromObject(root.getObjectByName("radiative-silica-microsphere")!);
+        assert.ok(spheres.min.y >= filmBounds.min.y - 1e-6 && spheres.max.y <= filmBounds.max.y + 1e-6, "microspheres stay inside the polymer film");
+      }
+      if (kind === "seismic") {
+        const groundBounds = new T.Box3().setFromObject(root.getObjectByName("seismic-ground-plate")!);
+        for (const pivot of root.getObjectsByProperty("name", "seismic-resonator-pivot") as T.Group[])
+          assert.ok(Math.abs(pivot.position.y - groundBounds.max.y) < 1e-6, "seismic rod pivots are anchored at the ground surface");
+      }
+      if (kind === "water-wave") {
+        const floorBounds = new T.Box3().setFromObject(root.getObjectByName("water-tank-floor")!);
+        for (const plate of root.getObjectsByProperty("name", "water-wave-plate") as T.Mesh[]) {
+          const plateBounds = new T.Box3().setFromObject(plate);
+          assert.ok(Math.abs(plateBounds.min.y - floorBounds.max.y) < 1e-6, "water-wave plates meet the tank floor");
+        }
+      }
+    }
+console.log("PASS: advanced-family materials, glossary coverage, field-specific motion and support-surface contacts");
 for (let i = 0; i <= 100; i++) {
   const hip = new T.Vector3(0, 1.5, 0.17),
     ankle = new T.Vector3(-0.5 + i / 100, 0.135, 0.17),

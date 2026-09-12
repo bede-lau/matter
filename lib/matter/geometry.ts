@@ -108,6 +108,9 @@ export function createLattice(p: LatticeOptions, software = false) {
   // Field-device controls are intentionally bounded so their detail stays
   // readable while still changing a real geometric feature of each model.
   const detail = Math.max(0.58, Math.min(1.42, p.thickness));
+  // New field-based families use the complete committed slider range. Their
+  // labels intentionally use an illustrative scale rather than universal mm.
+  const control = Math.max(0, Math.min(1, (p.thickness - 0.3) / 1.3));
   const edgeKeys = new Set<string>();
   const edge = (a: number[], b: number[]) => {
     const key = [
@@ -507,6 +510,260 @@ export function createLattice(p: LatticeOptions, software = false) {
         mouth.rotation.y = Math.PI / 2;
         mouth.position.x = side * (gap / 2 + length);
       }
+  } else if (p.kind === "hyperbolic") {
+    // Alternating deposited films. Their thicknesses add to one continuous
+    // stack, so no fake air gaps imply a bulk material mixture.
+    const metal = new T.MeshPhysicalMaterial({
+      color: p.color,
+      metalness: 0.86,
+      roughness: 0.22,
+      clearcoat: 0.14,
+    });
+    const dielectric = new T.MeshPhysicalMaterial({
+      color: p.secondaryColor ?? "#dbe8ee",
+      metalness: 0.04,
+      roughness: 0.38,
+      transmission: software ? 0 : 0.12,
+      transparent: true,
+      opacity: 0.92,
+    });
+    const pairs = Math.max(3, n + 2 + (p.variant === 2 ? 2 : 0));
+    const totalDepth = 1.52;
+    const metalShare = 0.24 + control * 0.48;
+    let cursor = -totalDepth / 2;
+    for (let i = 0; i < pairs * 2; i++) {
+      const isMetal = i % 2 === 0;
+      const layerDepth =
+        (isMetal ? metalShare : 1 - metalShare) * (totalDepth / pairs);
+      const outward = Math.abs(i - (pairs * 2 - 1) / 2) / pairs;
+      const span = p.variant === 1 ? 1.48 + outward * 0.48 : 1.68;
+      const height = 1.42 + outward * (p.variant === 1 ? 0.3 : 0);
+      const layer = addMesh(
+        new T.BoxGeometry(layerDepth, height, span),
+        isMetal ? metal : dielectric,
+      );
+      layer.name = isMetal ? "hyperbolic-metal-layer" : "hyperbolic-dielectric-layer";
+      // The first deposited film begins exactly at the substrate surface.
+      // That keeps the stack continuous without hiding a fake overlap below it.
+      layer.position.set(cursor + layerDepth / 2, 0.07 + height / 2, 0);
+      cursor += layerDepth;
+    }
+    const base = addMesh(
+      new T.BoxGeometry(1.74, 0.07, 1.94),
+      new T.MeshStandardMaterial({ color: 0x263845, roughness: 0.72, metalness: 0.16 }),
+    );
+    base.name = "hyperbolic-substrate";
+    base.position.y = 0.035;
+  } else if (p.kind === "chiral") {
+    // Every tube starts one radius above the support, so its lower surface is
+    // seated on the transparent substrate rather than floating through it.
+    const helixMaterial = new T.MeshPhysicalMaterial({
+      color: p.color,
+      roughness: 0.22,
+      metalness: 0.84,
+      clearcoat: 0.16,
+    });
+    const substrate = addMesh(
+      new T.BoxGeometry(3.35, 0.08, 3.35),
+      new T.MeshPhysicalMaterial({
+        color: 0x6d8594,
+        roughness: 0.24,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.5,
+      }),
+    );
+    substrate.name = "chiral-transparent-substrate";
+    substrate.position.y = -0.04;
+    const side = Math.max(3, n + 2);
+    const spacing = 2.45 / Math.max(1, side - 1);
+    const handedness = p.variant === 1 ? -1 : 1;
+    const turns = p.variant === 2 ? 2.35 : 1.55;
+    const helixHeight = 0.48 + control * 0.82;
+    const helixRadius = 0.1 + control * 0.12;
+    const tubeRadius = 0.035;
+    for (let ix = 0; ix < side; ix++)
+      for (let iz = 0; iz < side; iz++) {
+        const cx = (ix - (side - 1) / 2) * spacing;
+        const cz = (iz - (side - 1) / 2) * spacing;
+        const points = Array.from({ length: 38 }, (_, index) => {
+          const t = index / 37;
+          const a = handedness * t * Math.PI * 2 * turns;
+          return new T.Vector3(
+            cx + Math.cos(a) * helixRadius,
+            tubeRadius + t * helixHeight,
+            cz + Math.sin(a) * helixRadius,
+          );
+        });
+        const helix = addMesh(
+          new T.TubeGeometry(
+            new T.CatmullRomCurve3(points),
+            software ? 28 : 48,
+            tubeRadius,
+            software ? 4 : 7,
+            false,
+          ),
+          helixMaterial,
+        );
+        helix.name = "chiral-gold-helix";
+        helix.userData.handedness = handedness;
+      }
+  } else if (p.kind === "labyrinth") {
+    // The dividers all meet the base and alternate sides, creating a true
+    // serpentine air route rather than disconnected decorative walls.
+    const wallMaterial = new T.MeshStandardMaterial({
+      color: p.color,
+      roughness: 0.46,
+      metalness: 0.08,
+    });
+    const base = addMesh(new T.BoxGeometry(3.55, 0.09, 2.35), wallMaterial);
+    base.name = "labyrinth-base";
+    base.position.y = 0.045;
+    const wallHeight = 0.52;
+    const wallThickness = 0.08;
+    const addWall = (sx: number, sz: number, x: number, z: number, name: string) => {
+      const wall = addMesh(new T.BoxGeometry(sx, wallHeight, sz), wallMaterial);
+      wall.name = name;
+      wall.position.set(x, 0.09 + wallHeight / 2, z);
+      return wall;
+    };
+    addWall(3.55, wallThickness, 0, -1.135, "labyrinth-side-wall");
+    addWall(3.55, wallThickness, 0, 1.135, "labyrinth-side-wall");
+    addWall(wallThickness, wallHeight, -1.735, 0, "labyrinth-inlet-wall");
+    addWall(wallThickness, wallHeight, 1.735, 0, "labyrinth-outlet-wall");
+    const folds = p.variant === 0 ? 0 : n + 1 + (p.variant === 2 ? 2 : 0);
+    const clearance = 0.2 + control * 0.22;
+    for (let i = 0; i < folds; i++) {
+      const x = -1.38 + ((i + 1) / (folds + 1)) * 2.76;
+      const fromBottom = i % 2 === 0;
+      const length = 2.27 - clearance;
+      addWall(
+        wallThickness,
+        length,
+        x,
+        fromBottom ? -clearance / 2 : clearance / 2,
+        "labyrinth-divider",
+      );
+    }
+  } else if (p.kind === "radiative-cooler") {
+    // The film is a continuous polymer slab. Each microsphere centre is kept
+    // between its two faces, which prevents the floating-particle artifact.
+    const backingHeight = 0.07;
+    const filmHeight = 0.12 + control * 0.26 + (p.variant === 2 ? 0.08 : 0);
+    const backing = addMesh(
+      new T.BoxGeometry(3.5, backingHeight, 2.7),
+      new T.MeshPhysicalMaterial({ color: 0xc6d1d7, metalness: 0.92, roughness: 0.18 }),
+    );
+    backing.name = "radiative-silver-backing";
+    backing.position.y = backingHeight / 2;
+    const film = addMesh(
+      new T.BoxGeometry(3.42, filmHeight, 2.62),
+      new T.MeshPhysicalMaterial({
+        color: p.color,
+        roughness: 0.34,
+        metalness: 0.03,
+        transparent: true,
+        opacity: 0.74,
+      }),
+    );
+    film.name = "radiative-polymer-film";
+    film.position.y = backingHeight + filmHeight / 2;
+    const density = Math.max(3, n + 2 + (p.variant === 1 ? 2 : 0));
+    const sphereRadius = Math.min(0.07, filmHeight * 0.32);
+    const spheres = new T.InstancedMesh(
+      new T.SphereGeometry(sphereRadius, software ? 6 : 10, software ? 5 : 8),
+      new T.MeshPhysicalMaterial({
+        color: p.secondaryColor ?? "#f8fbfd",
+        roughness: 0.2,
+        metalness: 0.08,
+        clearcoat: 0.14,
+      }),
+      density * density,
+    );
+    spheres.name = "radiative-silica-microsphere";
+    const dummy = new T.Object3D();
+    for (let ix = 0; ix < density; ix++)
+      for (let iz = 0; iz < density; iz++) {
+        const index = ix * density + iz;
+        const x = -1.34 + (ix / Math.max(1, density - 1)) * 2.68;
+        const z = -0.98 + (iz / Math.max(1, density - 1)) * 1.96;
+        const y =
+          backingHeight +
+          sphereRadius +
+          ((ix * 7 + iz * 11) % 5) / 4 * Math.max(0, filmHeight - sphereRadius * 2);
+        dummy.position.set(x, y, z);
+        dummy.updateMatrix();
+        spheres.setMatrixAt(index, dummy.matrix);
+      }
+    spheres.instanceMatrix.needsUpdate = true;
+    root.add(spheres);
+  } else if (p.kind === "seismic") {
+    // Pivot each rod at the ground surface. The motion builder can then bend
+    // the upright resonator without lifting its lower end off the support.
+    const groundHeight = 0.18;
+    const ground = addMesh(
+      new T.BoxGeometry(3.95, groundHeight, 2.9),
+      new T.MeshStandardMaterial({ color: 0x384955, roughness: 0.86, metalness: 0.04 }),
+    );
+    ground.name = "seismic-ground-plate";
+    ground.position.y = groundHeight / 2;
+    const rods = Math.max(3, n + 2);
+    const spacing = 2.9 / Math.max(1, rods - 1);
+    const postMaterial = new T.MeshPhysicalMaterial({ color: p.color, metalness: 0.68, roughness: 0.3 });
+    for (let ix = 0; ix < rods; ix++)
+      for (let iz = -1; iz <= 1; iz++) {
+        const fraction = ix / Math.max(1, rods - 1);
+        const gradient =
+          p.variant === 1 ? 0.58 + fraction * 0.72 : p.variant === 2 ? 1.3 - fraction * 0.72 : 1;
+        const height = (0.45 + control * 0.9) * gradient;
+        const pivot = new T.Group();
+        pivot.name = "seismic-resonator-pivot";
+        pivot.position.set(-1.45 + ix * spacing, groundHeight, iz * 0.62);
+        pivot.userData.phase = ix * 0.42 + iz * 0.35;
+        const post = new T.Mesh(
+          new T.CylinderGeometry(0.065, 0.08, height, software ? 7 : 12),
+          postMaterial,
+        );
+        post.name = "seismic-resonator-rod";
+        post.position.y = height / 2;
+        post.castShadow = true;
+        post.receiveShadow = true;
+        pivot.add(post);
+        root.add(pivot);
+      }
+  } else if (p.kind === "water-wave") {
+    // A transparent water volume sits above a floor. Plate bottoms align with
+    // that floor top at every height setting.
+    const floorHeight = 0.1;
+    const floor = addMesh(
+      new T.BoxGeometry(3.9, floorHeight, 3.0),
+      new T.MeshStandardMaterial({ color: 0x304452, roughness: 0.78, metalness: 0.14 }),
+    );
+    floor.name = "water-tank-floor";
+    floor.position.y = floorHeight / 2;
+    const water = addMesh(
+      new T.BoxGeometry(3.82, 0.46, 2.92),
+      new T.MeshPhysicalMaterial({
+        color: 0x6ad3ed,
+        roughness: 0.16,
+        metalness: 0.04,
+        transparent: true,
+        opacity: 0.2,
+        depthWrite: false,
+      }),
+    );
+    water.name = "water-volume";
+    water.position.y = floorHeight + 0.23;
+    const rows = Math.max(3, n + 2);
+    const spacing = 2.75 / Math.max(1, rows - 1);
+    const plateHeight = 0.2 + control * 0.3 + (p.variant === 2 ? 0.14 : 0);
+    const plateMaterial = new T.MeshPhysicalMaterial({ color: p.color, roughness: 0.34, metalness: 0.12 });
+    for (let i = 0; i < rows; i++) {
+      const plate = addMesh(new T.BoxGeometry(0.09, plateHeight, 1.64), plateMaterial);
+      plate.name = "water-wave-plate";
+      plate.position.set(-1.35 + i * spacing, floorHeight + plateHeight / 2, 0);
+      plate.rotation.y = p.variant === 1 ? (i - (rows - 1) / 2) * 0.11 : 0;
+    }
   } else {
     for (let x = 0; x < n; x++)
       for (let y = 0; y < n; y++)

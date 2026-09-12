@@ -45,6 +45,18 @@ const beginnerSummaries: Record<string, string> = {
     "A patterned wave lattice with an edge route that can bend around some defects.",
   flux:
     "A nested magnetic shell that gathers an existing field into a small sensor gap.",
+  hyperbolic:
+    "A layered optical stack that can carry selected fine light patterns near its surface.",
+  chiral:
+    "A field of tiny corkscrews that distinguishes the two handed twists of light.",
+  labyrinth:
+    "A folded air channel that makes sound travel farther inside a thin panel.",
+  "radiative-cooler":
+    "A reflective film with microspheres that can release heat as infrared light.",
+  seismic:
+    "A graded array of anchored rods that changes how selected ground waves travel.",
+  "water-wave":
+    "Submerged plates that guide small tank ripples through patterned water channels.",
 };
 
 const tryPrompts: Record<string, string> = {
@@ -60,6 +72,12 @@ const tryPrompts: Record<string, string> = {
   "thermal-cloak": "Trace the heat dots around the protected centre. The core warms later, but it does not stay cold forever.",
   topological: "Follow the bright packet along the boundary, then inspect the corner where the edge route bends.",
   flux: "Follow the field lines into the narrow centre. The shell gathers an existing field instead of creating one.",
+  hyperbolic: "Inspect the alternating films. The stack is layered, not a mixed metal and ceramic block.",
+  chiral: "Compare the left- and right-handed helix variants. The favored light twist swaps when the geometry is mirrored.",
+  labyrinth: "Start at the inlet and trace the only continuous air route through the folded channel.",
+  "radiative-cooler": "Find the microspheres inside the film, then follow the separate sunlight and infrared arrows.",
+  seismic: "Compare the two wedge directions. The rods stay anchored while their height changes along the route.",
+  "water-wave": "Look down through the tank. The plates stay on the floor while ripples pass through the clear channels.",
 };
 
 export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
