@@ -59,6 +59,27 @@ for (const kind of [
       extent.x < 15 && extent.y < 15 && extent.z < 15,
       kind + " bounded scene",
     );
+    if (kind === "hyperbolic")
+      for (const marker of a.group.getObjectsByProperty("name", "hyperlens-field-marker") as T.Mesh[])
+        assert.ok(marker.scale.length() < 0.09, "hyperbolic optical markers stay fine, not disc-sized");
+    if (kind === "chiral")
+      for (const marker of [
+        a.group.getObjectByName("preferred-polarization-marker"),
+        a.group.getObjectByName("reduced-polarization-marker"),
+      ].filter(Boolean) as T.Mesh[])
+        assert.ok(marker.scale.length() < 0.09, "polarization markers stay small relative to the helix array");
+    if (kind === "labyrinth")
+      assert.ok(a.group.getObjectsByProperty("name", "labyrinth-pressure-band").length >= 12, "labyrinth scene shows a sequence of sound-pressure wavefronts");
+    if (kind === "radiative-cooler") {
+      assert.equal(a.group.getObjectsByProperty("name", "reflected-sunlight").length, 4, "cooling scene has four clean sunlight paths");
+      assert.equal(a.group.getObjectsByProperty("name", "emitted-infrared").length, 4, "cooling scene has four clean infrared paths");
+    }
+    if (kind === "seismic")
+      assert.ok(a.group.getObjectsByProperty("name", "seismic-wavefront").length >= 8, "seismic scene shows a moving ground-wave train");
+    if (kind === "water-wave") {
+      assert.ok(a.group.getObjectsByProperty("name", "water-wave-front").length >= 11, "water-wave scene shows a dense set of surface ripples");
+      assert.equal(a.group.getObjectsByProperty("name", "water-tank-wall").length, 4, "water-wave scene includes a clear tank boundary");
+    }
     console.log(
       "PASS",
       kind,
@@ -138,8 +159,15 @@ for (const kind of [
       }
       if (kind === "seismic") {
         const groundBounds = new T.Box3().setFromObject(root.getObjectByName("seismic-ground-plate")!);
-        for (const pivot of root.getObjectsByProperty("name", "seismic-resonator-pivot") as T.Group[])
-          assert.ok(Math.abs(pivot.position.y - groundBounds.max.y) < 1e-6, "seismic rod pivots are anchored at the ground surface");
+        const feet = root.getObjectsByProperty("name", "seismic-anchor-foot") as T.Mesh[];
+        const pivots = root.getObjectsByProperty("name", "seismic-resonator-pivot") as T.Group[];
+        assert.equal(feet.length, pivots.length, "every seismic rod has an anchor foot");
+        for (const foot of feet) {
+          const footBounds = new T.Box3().setFromObject(foot);
+          assert.ok(Math.abs(footBounds.min.y - groundBounds.max.y) < 1e-6, "seismic anchor foot meets the ground surface");
+        }
+        for (const pivot of pivots)
+          assert.ok(pivot.position.y > groundBounds.max.y, "seismic rod pivots sit on their visible anchor foot");
       }
       if (kind === "water-wave") {
         const floorBounds = new T.Box3().setFromObject(root.getObjectByName("water-tank-floor")!);

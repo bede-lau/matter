@@ -570,7 +570,7 @@ export function createLattice(p: LatticeOptions, software = false) {
         roughness: 0.24,
         metalness: 0.1,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.18,
       }),
     );
     substrate.name = "chiral-transparent-substrate";
@@ -718,7 +718,17 @@ export function createLattice(p: LatticeOptions, software = false) {
         const height = (0.45 + control * 0.9) * gradient;
         const pivot = new T.Group();
         pivot.name = "seismic-resonator-pivot";
-        pivot.position.set(-1.45 + ix * spacing, groundHeight, iz * 0.62);
+        const footHeight = 0.045;
+        const foot = new T.Mesh(
+          new T.CylinderGeometry(0.13, 0.15, footHeight, software ? 8 : 14),
+          postMaterial,
+        );
+        foot.name = "seismic-anchor-foot";
+        foot.position.set(-1.45 + ix * spacing, groundHeight + footHeight / 2, iz * 0.62);
+        foot.castShadow = true;
+        foot.receiveShadow = true;
+        root.add(foot);
+        pivot.position.set(-1.45 + ix * spacing, groundHeight + footHeight, iz * 0.62);
         pivot.userData.phase = ix * 0.42 + iz * 0.35;
         const post = new T.Mesh(
           new T.CylinderGeometry(0.065, 0.08, height, software ? 7 : 12),

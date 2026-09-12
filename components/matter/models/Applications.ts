@@ -541,20 +541,25 @@ export function createApplication(
     aperture.rotation.z = Math.PI / 2;
     aperture.position.set(-2.23, -0.28, 0);
     const plane = box(group, p.dark, [0.08, 0.82, 1.48], [2.1, -0.28, 0], "hyperlens-observation-plane");
-    const pathMaterial = fieldMaterial("#79ddff", 0.7);
-    const pathDots: T.Mesh[] = [];
-    for (let i = -2; i <= 2; i++) {
-      const z = i * 0.3;
+    const pathMaterial = fieldMaterial("#79ddff", 0.48);
+    const pathDots: { dot: T.Mesh; curve: T.CatmullRomCurve3; offset: number }[] = [];
+    for (let i = -3; i <= 3; i++) {
+      const z = i * 0.21;
+      const points: T.Vector3[] = [
+        new T.Vector3(-2.18, -0.28, z),
+        new T.Vector3(-0.85, -0.28, z),
+        new T.Vector3(0.72, -0.28, z * 0.74),
+        new T.Vector3(2.02, -0.28, z * 0.6),
+      ];
       fieldTube(
         group,
         pathMaterial,
-        [[-2.18, -0.28, z], [-0.85, -0.28, z], [0.72, -0.28, z * 0.74], [2.02, -0.28, z * 0.6]],
-        0.015,
+        points.map((point) => point.toArray()),
+        0.011,
         "hyperlens-energy-path",
       );
-      const dot = ellipsoid(group, pathMaterial, [-2.12, -0.28, z], [0.04, 0.04, 0.04], "hyperlens-field-marker");
-      dot.userData.offset = (i + 2) / 5;
-      pathDots.push(dot);
+      const dot = ellipsoid(group, pathMaterial, [-2.12, -0.28, z], [0.026, 0.026, 0.026], "hyperlens-field-marker");
+      pathDots.push({ dot, curve: new T.CatmullRomCurve3(points), offset: (i + 3) / 7 });
     }
     label("Metal films: carry the optical response", lattice, [-0.38, 0.78, 0.35], "left", 0);
     label("Nearby source: launches fine optical detail", emitter, [0, 0, 0], "left", 1);
@@ -563,11 +568,10 @@ export function createApplication(
     camera = [7.4, 4.6, 9.2];
     target = [0, -0.2, 0];
     update = (t, e) => {
-      pathDots.forEach((dot) => {
-        const progress = (t * 0.24 + (dot.userData.offset as number)) % 1;
-        dot.position.x = -2.16 + progress * 4.08;
-        dot.position.z = (dot.userData.offset - 0.4) * 0.5 * (1 - progress * 0.28);
-        dot.scale.setScalar(0.7 + 0.35 * Math.sin(progress * Math.PI));
+      pathDots.forEach(({ dot, curve, offset }) => {
+        const progress = (t * 0.24 + offset) % 1;
+        dot.position.copy(curve.getPointAt(progress));
+        dot.scale.setScalar(0.018 + 0.014 * Math.sin(progress * Math.PI));
       });
       return e > 0.15 ? "Layer stack opened · deposited film order" : "Fine optical pattern · illustrative near-field transport";
     };
@@ -579,28 +583,47 @@ export function createApplication(
     const bench = box(group, p.dark, [5.9, 0.14, 3.25], [0, -1.15, 0], "chiral-optics-bench");
     lattice.position.set(0, 0.61, 0);
     const holder = box(group, p.dark, [0.18, 0.18, 2.22], [0.02, -0.98, 0], "chiral-wafer-holder");
+    const waferRing = mesh(new T.TorusGeometry(1.63, 0.045, 8, 48), p.metal, group, "chiral-wafer-ring");
+    waferRing.rotation.y = Math.PI / 2;
+    waferRing.position.set(0, 0.61, 0);
     const source = box(group, p.dark, [0.42, 0.48, 0.74], [-2.5, 0.61, 0], "chiral-light-source");
     const detector = box(group, p.dark, [0.28, 0.72, 0.82], [2.46, 0.61, 0], "chiral-polarization-detector");
     const rightHanded = fieldMaterial("#8be5ff", 0.76);
     const leftHanded = fieldMaterial("#c99bff", 0.76);
     const selected = variant === 1 ? leftHanded : rightHanded;
     const reduced = variant === 1 ? rightHanded : leftHanded;
-    const selectedLine = fieldTube(group, selected, [[-2.27, 0.61, -0.16], [-0.25, 0.61, -0.16], [1.52, 0.61, -0.16], [2.3, 0.61, -0.16]], 0.02, "preferred-polarization");
-    const reducedLine = fieldTube(group, reduced, [[-2.27, 0.61, 0.22], [-0.25, 0.61, 0.22], [1.15, 0.61, 0.22], [2.3, 0.61, 0.22]], 0.02, "reduced-polarization");
-    const selectedDot = ellipsoid(group, selected, [-2.1, 0.61, -0.16], [0.05, 0.05, 0.05], "preferred-polarization-marker");
-    const reducedDot = ellipsoid(group, reduced, [-2.1, 0.61, 0.22], [0.05, 0.05, 0.05], "reduced-polarization-marker");
+    const polarizationPath = (handedness: number, zOffset: number, travel = 1) =>
+      Array.from({ length: 34 }, (_, index) => {
+        const progress = index / 33;
+        const angle = handedness * progress * Math.PI * 7;
+        const radius = progress > 0.34 && progress < 0.67 ? 0.105 : 0.075;
+        return [
+          -2.27 + progress * 4.57 * travel,
+          0.61 + Math.cos(angle) * radius,
+          zOffset + Math.sin(angle) * radius,
+        ];
+      });
+    const selectedPoints = polarizationPath(variant === 1 ? -1 : 1, -0.16);
+    const reducedPoints = polarizationPath(variant === 1 ? 1 : -1, 0.22, 0.78);
+    const selectedLine = fieldTube(group, selected, selectedPoints, 0.016, "preferred-polarization");
+    const reducedLine = fieldTube(group, reduced, reducedPoints, 0.013, "reduced-polarization");
+    const selectedCurve = new T.CatmullRomCurve3(selectedPoints.map((point) => new T.Vector3(...(point as [number, number, number]))));
+    const reducedCurve = new T.CatmullRomCurve3(reducedPoints.map((point) => new T.Vector3(...(point as [number, number, number]))));
+    const selectedDot = ellipsoid(group, selected, [-2.1, 0.61, -0.16], [0.038, 0.038, 0.038], "preferred-polarization-marker");
+    const reducedDot = ellipsoid(group, reduced, [-2.1, 0.61, 0.22], [0.03, 0.03, 0.03], "reduced-polarization-marker");
     label("Polarized source: sends two light twists", source, [0, 0, 0], "left", 0);
-    label("Gold helices: select a handedness", lattice, [0.46, 0, 0], "left", 1);
+    label("Gold helices: select a handedness", waferRing, [0, 0, 0], "left", 1);
     label("Preferred polarization: stays stronger", selectedLine, [1.65, 0, 0], "right", 0);
     label("Detector: compares the outgoing light", detector, [0, 0, 0], "right", 1);
     camera = [7.6, 4.7, 9.3];
     target = [0, -0.05, 0];
     update = (t, e) => {
       const progress = (t * 0.34) % 1;
-      selectedDot.position.x = -2.2 + progress * 4.35;
-      reducedDot.position.x = -2.2 + progress * 3.35;
-      (reducedLine.material as T.MeshBasicMaterial).opacity = 0.22 + 0.12 * Math.sin(t * 3);
-      selectedDot.scale.setScalar(0.8 + 0.25 * Math.sin(t * 5));
+      selectedDot.position.copy(selectedCurve.getPointAt(progress));
+      reducedDot.position.copy(reducedCurve.getPointAt(progress));
+      (reducedLine.material as T.MeshBasicMaterial).opacity = 0.18 + 0.1 * Math.sin(t * 3);
+      selectedDot.scale.setScalar(0.027 + 0.014 * Math.sin(progress * Math.PI));
+      reducedDot.scale.setScalar(0.018 + 0.009 * Math.sin(progress * Math.PI));
       return e > 0.15 ? "Helix array opened · handedness comparison" : "Circular polarizations · one is reduced more strongly";
     };
   } else if (kind === "labyrinth") {
@@ -616,60 +639,110 @@ export function createApplication(
     const path: number[][] = [[-1.72, -0.62, 0]];
     for (let i = 0; i < folds; i++)
       path.push([-1.35 + ((i + 1) / (folds + 1)) * 2.7, -0.62, i % 2 === 0 ? -0.82 : 0.82]);
-    path.push([1.72, -0.62, folds % 2 === 0 ? 0.82 : -0.82], [2.14, -0.62, 0]);
+    if (folds) path.push([1.72, -0.62, folds % 2 === 0 ? 0.82 : -0.82]);
+    path.push([2.14, -0.62, 0]);
     const route = fieldTube(group, field, path, 0.018, "labyrinth-sound-route");
     const direct = fieldTube(group, fieldMaterial("#aac5d2", 0.28), [[-1.72, -0.28, 1.16], [2.14, -0.28, 1.16]], 0.012, "labyrinth-direct-reference");
-    const pulse = ellipsoid(group, field, [-1.7, -0.62, 0], [0.05, 0.05, 0.05], "labyrinth-pressure-marker");
-    label("Inlet: sound enters the folded passage", speaker, [0, 0, 0], "left", 0);
+    const routeCurve = new T.CatmullRomCurve3(path.map((point) => new T.Vector3(...(point as [number, number, number]))), false, "centripetal");
+    const pressureBands = Array.from({ length: 12 }, (_, index) => {
+      const band = mesh(
+        new T.TorusGeometry(0.115, 0.009, 6, 20),
+        fieldMaterial("#80e1ff", 0.58),
+        group,
+        "labyrinth-pressure-band",
+      );
+      band.castShadow = false;
+      band.receiveShadow = false;
+      band.userData.offset = index / 12;
+      return band;
+    });
+    const referenceBands = Array.from({ length: 5 }, (_, index) => {
+      const band = mesh(
+        new T.TorusGeometry(0.09, 0.007, 6, 18),
+        fieldMaterial("#b7cdd7", 0.24),
+        group,
+        "labyrinth-reference-band",
+      );
+      band.rotation.y = Math.PI / 2;
+      band.userData.offset = index / 5;
+      return band;
+    });
+    label("Inlet: sound enters the panel", speaker, [0, 0, 0], "left", 0);
     label("Divider walls: make the air route longer", lattice, [0, 0.4, 0], "left", 1);
-    label("Folded air path: delays the sound", route, [0.62, 0, 0], "right", 0);
+    label(folds ? "Folded air path: delays the sound" : "Straight air path: gives sound a short route", route, [0.62, 0, 0], "right", 0);
     label("Receiver: compares the delayed output", receiver, [0, 0, 0], "right", 1);
     camera = [6.8, 5.6, 9.4];
     target = [0, -0.5, 0];
     update = (t, e) => {
-      const points = path.map(
-        (v) => new T.Vector3(...(v as [number, number, number])),
-      );
-      const curve = new T.CatmullRomCurve3(points, false, "centripetal");
-      pulse.position.copy(curve.getPointAt((t * 0.18) % 1));
-      direct.position.y = Math.sin(t * 3) * 0.01;
+      pressureBands.forEach((band) => {
+        const progress = (t * 0.13 + (band.userData.offset as number)) % 1;
+        const point = routeCurve.getPointAt(progress);
+        const tangent = routeCurve.getTangentAt(progress).normalize();
+        band.position.copy(point);
+        band.quaternion.setFromUnitVectors(new T.Vector3(0, 0, 1), tangent);
+        const pulse = 0.74 + 0.3 * Math.sin(progress * Math.PI);
+        band.scale.setScalar(pulse);
+        (band.material as T.MeshBasicMaterial).opacity = 0.16 + 0.42 * Math.sin(progress * Math.PI);
+      });
+      referenceBands.forEach((band) => {
+        const progress = (t * 0.44 + (band.userData.offset as number)) % 1;
+        band.position.set(-1.68 + progress * 3.78, -0.28, 1.16);
+        (band.material as T.MeshBasicMaterial).opacity = 0.09 + 0.2 * Math.sin(progress * Math.PI);
+      });
+      direct.position.y = Math.sin(t * 3) * 0.006;
       return e > 0.15 ? "Panel opened · continuous folded passage" : "Sound pulse · folded route arrives later";
     };
   } else if (kind === "radiative-cooler") {
     group.add(lattice);
     const roof = box(group, p.dark, [5.8, 0.16, 3.2], [0, -1.15, 0], "cooler-roof-coupon");
     lattice.position.y = roof.position.y + 0.08;
-    const sun = fieldMaterial("#ffe289", 0.62);
-    const infrared = fieldMaterial("#ff9f72", 0.58);
+    const sun = fieldMaterial("#ffe289", 0.42);
+    const infrared = fieldMaterial("#ff9f72", 0.48);
     const solarLines: T.Mesh[] = [];
     const infraredLines: T.Mesh[] = [];
-    for (let i = -2; i <= 2; i++) {
-      const x = i * 0.48;
-      solarLines.push(fieldTube(group, sun, [[x - 0.3, 1.75, -0.38], [x, -0.57, 0], [x + 0.36, 0.84, 0.48]], 0.018, "reflected-sunlight"));
-      infraredLines.push(fieldTube(group, infrared, [[x, -0.58, 0], [x * 1.14, 0.16, 0.08], [x * 1.26, 1.35, 0.16]], 0.014, "emitted-infrared"));
+    const solarCurves: T.CatmullRomCurve3[] = [];
+    const infraredCurves: T.CatmullRomCurve3[] = [];
+    for (const x of [-0.9, -0.3, 0.3, 0.9]) {
+      const solarPoints = [[x - 0.72, 1.48, -0.34], [x, -0.59, -0.34], [x + 0.62, 0.82, -0.34]];
+      const infraredPoints = [[x, -0.58, 0.3], [x + 0.12, 0.12, 0.3], [x + 0.22, 1.18, 0.3]];
+      solarLines.push(fieldTube(group, sun, solarPoints, 0.011, "reflected-sunlight"));
+      infraredLines.push(fieldTube(group, infrared, infraredPoints, 0.012, "emitted-infrared"));
+      solarCurves.push(new T.CatmullRomCurve3(solarPoints.map((point) => new T.Vector3(...(point as [number, number, number])))));
+      infraredCurves.push(new T.CatmullRomCurve3(infraredPoints.map((point) => new T.Vector3(...(point as [number, number, number])))));
     }
+    const solarDots = solarCurves.map((curve, index) => ({ dot: ellipsoid(group, sun, curve.getPointAt(0).toArray(), [0.024, 0.024, 0.024], "sunlight-marker"), curve, offset: index / solarCurves.length }));
+    const infraredDots = infraredCurves.map((curve, index) => ({ dot: ellipsoid(group, infrared, curve.getPointAt(0).toArray(), [0.022, 0.022, 0.022], "infrared-marker"), curve, offset: index / infraredCurves.length }));
     const film = lattice.getObjectByName("radiative-polymer-film") ?? lattice;
     const backing = lattice.getObjectByName("radiative-silver-backing") ?? lattice;
     label("Polymer film: holds embedded microspheres", film, [0, 0, 0], "left", 0);
     label("Sunlight: mostly reflects away", solarLines[0], [0, 0, 0], "left", 1);
-    label("Infrared emission: carries heat toward the sky", infraredLines[4], [0, 0, 0], "right", 0);
+    label("Infrared emission: carries heat toward the sky", infraredLines[3], [0, 0, 0], "right", 0);
     label("Silver backing: reflects light below the film", backing, [0, 0, 0], "right", 1);
     camera = [7.4, 4.9, 9.2];
     target = [0, -0.1, 0];
     update = (t, e) => {
-      solarLines.forEach((line, i) => (line.position.x = Math.sin(t * 1.2 + i) * 0.02));
-      infraredLines.forEach((line, i) => (line.position.y = Math.sin(t * 1.8 + i) * 0.018));
+      solarDots.forEach(({ dot, curve, offset }) => {
+        const progress = (t * 0.25 + offset) % 1;
+        dot.position.copy(curve.getPointAt(progress));
+        dot.scale.setScalar(0.016 + 0.012 * Math.sin(progress * Math.PI));
+      });
+      infraredDots.forEach(({ dot, curve, offset }) => {
+        const progress = (t * 0.18 + offset) % 1;
+        dot.position.copy(curve.getPointAt(progress));
+        dot.scale.setScalar(0.015 + 0.011 * Math.sin(progress * Math.PI));
+      });
       return e > 0.15 ? "Film layers opened · fixed backing and microspheres" : "Sunlight reflected · thermal infrared emitted";
     };
   } else if (kind === "seismic") {
     group.add(lattice);
     lattice.position.y = -1.08;
-    const building = box(group, p.dark, [0.72, 1.35, 1.06], [2.22, -0.31, 0], "seismic-test-building");
-    const window = box(group, p.ivory, [0.03, 0.26, 0.48], [1.85, -0.1, 0], "seismic-building-window");
-    const field = fieldMaterial("#80dcff", 0.5);
+    const building = box(group, p.dark, [0.72, 1.35, 1.06], [2.22, -0.225, 0], "seismic-test-building");
+    const window = box(group, p.ivory, [0.03, 0.26, 0.48], [1.85, -0.015, 0], "seismic-building-window");
+    const field = fieldMaterial("#80dcff", 0.44);
     const waveBands: T.Mesh[] = [];
-    for (let i = 0; i < 4; i++) {
-      const band = fieldTube(group, field, [[-3.0 + i * 0.12, -0.77, -1.3], [-2.3 + i * 0.12, -0.65, -0.5], [-1.4 + i * 0.12, -0.77, 0.4], [-0.5 + i * 0.12, -0.65, 1.3]], 0.018, "seismic-wavefront");
+    for (let i = 0; i < 8; i++) {
+      const x = -2.48 + i * 0.45;
+      const band = fieldTube(group, field, [[x, -0.868, -1.36], [x + 0.09, -0.83, -0.68], [x, -0.868, 0], [x + 0.09, -0.83, 0.68], [x, -0.868, 1.36]], 0.014, "seismic-wavefront");
       waveBands.push(band);
     }
     const pivots = lattice.getObjectsByProperty("name", "seismic-resonator-pivot") as T.Group[];
@@ -677,37 +750,50 @@ export function createApplication(
     label("Anchored rods: respond at selected frequencies", lattice, [-0.8, 0.35, 0], "left", 1);
     label("Graded array: changes height along the route", lattice, [0.82, 0.55, 0.3], "right", 0);
     label("Test region: shows the downstream comparison", building, [0, 0, 0], "right", 1);
-    camera = [7.8, 5.4, 9.7];
-    target = [0, -0.55, 0];
+    camera = [7.6, 4.95, 9.5];
+    target = [0.1, -0.5, 0];
     update = (t, e) => {
       pivots.forEach((pivot) => {
         pivot.rotation.z = Math.sin(t * 4.1 + (pivot.userData.phase ?? 0)) * 0.075;
       });
-      waveBands.forEach((band, index) => (band.position.x = ((t * 0.7 + index * 0.13) % 1) * 0.34));
+      waveBands.forEach((band, index) => {
+        band.position.x = ((t * 0.34 + index * 0.12) % 1) * 0.48;
+        (band.material as T.MeshBasicMaterial).opacity = 0.14 + 0.3 * (0.5 + 0.5 * Math.sin(t * 3 + index));
+      });
       return e > 0.15 ? "Ground array opened · rods stay anchored" : "Selected surface wave · graded rods couple to motion";
     };
   } else if (kind === "water-wave") {
     group.add(lattice);
     lattice.position.y = -1.08;
-    const source = box(group, p.dark, [0.24, 0.4, 1.85], [-2.36, -0.66, 0], "water-wave-paddle");
-    const field = fieldMaterial("#78e0f4", 0.64);
+    const glass = new T.MeshPhysicalMaterial({ color: "#75d7ee", transparent: true, opacity: 0.16, roughness: 0.14, metalness: 0.04, depthWrite: false });
+    box(group, glass, [3.94, 0.58, 0.04], [0, -0.79, -1.48], "water-tank-wall");
+    box(group, glass, [3.94, 0.58, 0.04], [0, -0.79, 1.48], "water-tank-wall");
+    box(group, glass, [0.04, 0.58, 3.0], [-1.95, -0.79, 0], "water-tank-wall");
+    box(group, glass, [0.04, 0.58, 3.0], [1.95, -0.79, 0], "water-tank-wall");
+    const source = box(group, p.dark, [0.24, 0.56, 1.85], [-2.18, -0.7, 0], "water-wave-paddle");
+    const field = fieldMaterial("#78e0f4", 0.54);
     const fronts: T.Mesh[] = [];
-    for (let i = 0; i < 5; i++) {
-      const x = -1.95 + i * 0.68;
-      const zBend = variant === 1 ? 0.36 : 0.12;
-      fronts.push(fieldTube(group, field, [[x, -0.5, -1.12], [x + 0.1, -0.5, -zBend], [x + 0.1, -0.5, zBend], [x, -0.5, 1.12]], 0.013, "water-wave-front"));
+    for (let i = 0; i < 11; i++) {
+      const x = -1.78 + i * 0.31;
+      const points = Array.from({ length: 19 }, (_, index) => {
+        const z = -1.27 + (index / 18) * 2.54;
+        const turn = variant === 1 ? z * 0.22 : 0;
+        return [x + turn + Math.sin(index * 0.9) * 0.035, -0.505, z];
+      });
+      fronts.push(fieldTube(group, field, points, 0.011, "water-wave-front"));
     }
     const plates = lattice.getObjectsByProperty("name", "water-wave-plate") as T.Mesh[];
     label("Wave paddle: makes small test ripples", source, [0, 0, 0], "left", 0);
     label("Submerged plates: stay fixed to the tank floor", plates[0] ?? lattice, [0, 0, 0], "left", 1);
     label("Water channels: guide the visible wavefronts", lattice, [0, 0.35, 0], "right", 0);
-    label("Emerging wavefront: shows the changed route", fronts[4], [0, 0, 0], "right", 1);
-    camera = [7.2, 6.1, 9.2];
+    label("Emerging wavefront: shows the changed route", fronts[8], [0, 0, 0], "right", 1);
+    camera = [7.7, 6.45, 9.5];
     target = [0, -0.55, 0];
     update = (t, e) => {
       fronts.forEach((front, i) => {
-        front.position.x = ((t * 0.42 + i * 0.2) % 1) * 0.45;
-        front.position.y = Math.sin(t * 3 + i) * 0.015;
+        front.position.x = ((t * 0.21 + i * 0.09) % 1) * 0.36;
+        front.position.y = Math.sin(t * 3 + i * 0.72) * 0.012;
+        (front.material as T.MeshBasicMaterial).opacity = 0.16 + 0.38 * (0.5 + 0.5 * Math.sin(t * 2.5 + i * 0.42));
       });
       return e > 0.15 ? "Tank opened · plates attached to the floor" : "Surface ripples · patterned channels guide the route";
     };
