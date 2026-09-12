@@ -3206,6 +3206,17 @@ h1 {
   grid-column: 1/-1;
   margin-top: 1px;
 }
+.material-compatibility-note {
+  grid-column: 1 / -1;
+  margin: 1px 0 0;
+  padding: 8px 9px;
+  border-left: 2px solid #aeea72;
+  border-radius: 0 7px 7px 0;
+  color: #9fb7c7;
+  background: #14232b;
+  font-size: 11px;
+  line-height: 1.45;
+}
 .geometry-grid {
   display: grid;
   gap: 11px;

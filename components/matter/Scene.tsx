@@ -1,5 +1,6 @@
 "use client";
 import { createApplication, type Application } from "./models/Applications";
+import { createBehavior, type Behavior } from "./models/Behaviors";
 import { SoftwareRenderer } from "./SoftwareRenderer";
 import { useEffect, useRef } from "react";
 import * as T from "three";
@@ -113,6 +114,7 @@ export default function Scene(p: SceneProps) {
     scene.add(root);
     const step = 3.5 / p.count;
     let application: Application | undefined;
+    let behavior: Behavior | undefined;
     if (p.mode === "application") {
       application = createApplication(
         p.kind,
@@ -125,6 +127,16 @@ export default function Scene(p: SceneProps) {
       scene.add(application.group);
       camera.position.set(...(application.camera as [number, number, number]));
       controls.target.set(...(application.target as [number, number, number]));
+    }
+    if (p.mode === "deform") {
+      behavior = createBehavior(p, root);
+      if (behavior) {
+        scene.add(behavior.group);
+        if (behavior.camera)
+          camera.position.set(...(behavior.camera as [number, number, number]));
+        if (behavior.target)
+          controls.target.set(...(behavior.target as [number, number, number]));
+      }
     }
     // Project product annotations from component anchors; they follow orbit and exploded motion.
     const overlay = document.createElement("div");
@@ -177,7 +189,7 @@ export default function Scene(p: SceneProps) {
     });
     const motionLabel = document.createElement("div");
     motionLabel.className = "motion-phase";
-    if (application) container.appendChild(motionLabel);
+    if (application || behavior) container.appendChild(motionLabel);
     const updateCallouts = () => {
       overlay.style.display = latest.current.labels ? "block" : "none";
       const w = container.clientWidth,
@@ -296,11 +308,15 @@ export default function Scene(p: SceneProps) {
       controls.autoRotateSpeed = 0.35;
       const cameraChanged = controls.update();
       if (p.mode === "deform") {
-        const wave = reduced ? 0 : (1 - Math.cos(time * 2.6)) / 2;
-        root.scale.y = baseScale.y * (1 - wave * 0.22);
-        root.scale.x =
-          baseScale.x * (1 + (p.kind === "auxetic" ? -1 : 1) * wave * 0.1);
-        if (p.kind === "resonator") {
+        if (behavior) {
+          root.scale.copy(baseScale);
+        } else {
+          const wave = reduced ? 0 : (1 - Math.cos(time * 2.6)) / 2;
+          root.scale.y = baseScale.y * (1 - wave * 0.22);
+          root.scale.x =
+            baseScale.x * (1 + (p.kind === "auxetic" ? -1 : 1) * wave * 0.1);
+        }
+        if (p.kind === "resonator" && !behavior) {
           root.scale.copy(baseScale);
           root.traverse((o) => {
             if (o.userData.resonator) {
@@ -318,6 +334,7 @@ export default function Scene(p: SceneProps) {
           time,
           latest.current.explode / 100,
         );
+      if (behavior) motionLabel.textContent = behavior.update(time);
       if (
         (active || cameraChanged || firstRender) &&
         (!software || firstRender || now - lastDraw > 180)

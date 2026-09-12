@@ -266,21 +266,24 @@ export function createApplication(
   } else if (kind === "metalens") {
     // The post field is mounted upright, perpendicular to the optical axis.
     // Its enlarged posts remain physically attached to a thin wafer.
-    const optic = fitLattice(lattice, [2.45, 0.2, 2.45], [0, 0.2, 0], group);
+    // The wafer is positioned so its lower edge just meets the optics bench.
+    // This avoids both a floating panel and an impossible intersection.
+    const opticY = 0.25;
+    const optic = fitLattice(lattice, [2.45, 0.2, 2.45], [0, opticY, 0], group);
     optic.rotation.z = Math.PI / 2;
     const bench = box(group, p.dark, [5.9, 0.14, 3.2], [0, -1.05, 0], "optics-bench");
     const mount = mesh(new T.TorusGeometry(1.32, 0.055, 8, 42), p.metal, group, "wafer-mount");
     mount.rotation.y = Math.PI / 2;
-    mount.position.set(0, 0.2, 0);
-    const source = box(group, p.dark, [0.46, 0.52, 0.72], [-2.52, 0.2, 0], "collimated-light-source");
+    mount.position.set(0, opticY, 0);
+    const source = box(group, p.dark, [0.46, 0.52, 0.72], [-2.52, opticY, 0], "collimated-light-source");
     const aperture = mesh(new T.CylinderGeometry(0.12, 0.12, 0.035, 24), p.ivory, group, "source-aperture");
     aperture.rotation.z = Math.PI / 2;
-    aperture.position.set(-2.27, 0.2, 0);
-    const sensor = box(group, p.dark, [0.26, 0.72, 0.82], [2.15, 0.2, 0], "image-sensor");
+    aperture.position.set(-2.27, opticY, 0);
+    const sensor = box(group, p.dark, [0.26, 0.72, 0.82], [2.15, opticY, 0], "image-sensor");
     const sensorFace = mesh(new T.PlaneGeometry(0.56, 0.56), p.accent, group, "sensor-active-area");
     sensorFace.rotation.y = -Math.PI / 2;
-    sensorFace.position.set(2.005, 0.2, 0);
-    const focus = ellipsoid(group, fieldMaterial("#72dcff", 0.88), [1.84, 0.2, 0], [0.055, 0.055, 0.055], "focal-spot");
+    sensorFace.position.set(2.005, opticY, 0);
+    const focus = ellipsoid(group, fieldMaterial("#72dcff", 0.88), [1.84, opticY, 0], [0.055, 0.055, 0.055], "focal-spot");
     focus.castShadow = false;
     const light = fieldMaterial("#72dcff", 0.68);
     const rays: T.Mesh[] = [];
@@ -291,10 +294,10 @@ export function createApplication(
           group,
           light,
           [
-            [-2.23, 0.2, z],
-            [-0.16, 0.2, z],
-            [0.7, 0.2, z * 0.48],
-            [1.84, 0.2, 0],
+            [-2.23, opticY, z],
+            [-0.16, opticY, z],
+            [0.7, opticY, z * 0.48],
+            [1.84, opticY, 0],
           ],
           0.016,
           "focused-light-ray",
@@ -318,7 +321,8 @@ export function createApplication(
     const shell = fitLattice(lattice, [3.45, 0.55, 3.45], [0, 0.03, 0], group);
     const hidden = mesh(new T.CylinderGeometry(0.43, 0.43, 0.64, 32), p.dark, group, "hidden-test-cylinder");
     hidden.position.y = 0.27;
-    const floor = box(group, p.dark, [6.1, 0.13, 3.85], [0, -0.58, 0], "cloak-test-surface");
+    // Raise the test surface until it meets the shallow cloak substrate.
+    const floor = box(group, p.dark, [6.1, 0.13, 3.85], [0, -0.31, 0], "cloak-test-surface");
     const waves = fieldMaterial("#68d7ff", 0.68);
     const rays: T.Mesh[] = [];
     for (let i = -3; i <= 3; i++) {
@@ -436,42 +440,45 @@ export function createApplication(
       return e > 0.15 ? "Layered plate · transient heat path" : "Heat diverted · core warms over time";
     };
   } else if (kind === "topological") {
-    // The post bases meet the chip's top face at y = -0.75.
-    const latticeHolder = fitLattice(lattice, [3.55, 0.65, 3.2], [0, -0.75, 0], group);
-    box(group, p.dark, [5.8, 0.14, 3.4], [0, -0.82, 0], "photonic-chip");
-    const inputPort = box(group, p.metal, [0.34, 0.16, 0.22], [-1.92, -0.67, -1.18], "waveguide-input");
+    // Seat the chip panel on the shared scene floor and keep every post base
+    // precisely on its upper face.
+    const chipY = -2.38;
+    const chipTop = chipY + 0.07;
+    const latticeHolder = fitLattice(lattice, [3.55, 0.65, 3.2], [0, chipTop, 0], group);
+    box(group, p.dark, [5.8, 0.14, 3.4], [0, chipY, 0], "photonic-chip");
+    const inputPort = box(group, p.metal, [0.34, 0.16, 0.22], [-1.92, chipTop + 0.08, -1.18], "waveguide-input");
     const signal = fieldMaterial("#66dbff", 0.75);
     const edgeRoute = fieldTube(
       group,
       signal,
       [
-        [-1.75, -0.06, -1.18],
-        [0.8, -0.06, -1.18],
-        [0.8, -0.06, 1.18],
+        [-1.75, chipTop + 0.69, -1.18],
+        [0.8, chipTop + 0.69, -1.18],
+        [0.8, chipTop + 0.69, 1.18],
       ],
       0.028,
       "topological-edge-route",
     );
-    const corner = anchor(group, [0.8, -0.06, -1.18], "edge-route-corner");
+    const corner = anchor(group, [0.8, chipTop + 0.69, -1.18], "edge-route-corner");
     const waveDots: { dot: T.Mesh; base: T.Vector3 }[] = [];
     for (let i = 0; i < 10; i++) {
-      const dot = ellipsoid(group, signal, [-1.65 + i * 0.36, -0.06, -1.18], [0.052, 0.052, 0.052], "edge-mode-packet");
+      const dot = ellipsoid(group, signal, [-1.65 + i * 0.36, chipTop + 0.69, -1.18], [0.052, 0.052, 0.052], "edge-mode-packet");
       dot.castShadow = false;
       waveDots.push({ dot, base: dot.scale.clone() });
     }
     label("Patterned bulk: blocks selected paths", latticeHolder, [-0.6, 0.26, 0.6], "left", 0);
     label("Input port: launches the signal", inputPort, [0, 0, 0], "left", 1);
-    label("Edge route: carries the guided signal", edgeRoute, [0.8, -0.06, 0.15], "right", 0);
+    label("Edge route: carries the guided signal", edgeRoute, [0.8, chipTop + 0.69, 0.15], "right", 0);
     label("Corner: the signal follows the boundary", corner, [0, 0, 0], "right", 1);
     camera = [7.6, 4.8, 9.6];
-    target = [0, -0.4, 0];
+    target = [0, -1.88, 0];
     update = (t, e) => {
       waveDots.forEach(({ dot, base }, i) => {
         const phase = (t * 0.42 + i / waveDots.length) % 1;
         if (phase < 0.52) {
-          dot.position.set(-1.75 + (phase / 0.52) * 2.55, -0.06, -1.18);
+          dot.position.set(-1.75 + (phase / 0.52) * 2.55, chipTop + 0.69, -1.18);
         } else {
-          dot.position.set(0.8, -0.06, -1.18 + ((phase - 0.52) / 0.48) * 2.36);
+          dot.position.set(0.8, chipTop + 0.69, -1.18 + ((phase - 0.52) / 0.48) * 2.36);
         }
         dot.scale.copy(base).multiplyScalar(0.75 + 0.25 * Math.sin(phase * Math.PI * 2));
       });

@@ -86,17 +86,16 @@ export default function Studio() {
   const file = useRef<HTMLInputElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const f = families[family];
+  const allowedBase = f.allowedBase ?? bases.map((_, index) => index);
+  const allowedSecondary = f.allowedSecondary ?? bases.map((_, index) => index);
+  const hasSecondary = allowedSecondary.length > 0;
   const activeReference = structureCards.find((card) => card.id === f.id);
   const familyFactor = [0.13, 0.16, 0.08, 0.1, 0.12, 0.14][family] ?? 0.12;
   const isMechanical = f.category === "Mechanical";
   const metricLabel = isMechanical
     ? "Illustrative lattice stiffness"
-    : f.category === "Thermal"
-      ? "Heat-path contrast"
-      : f.category === "Magnetic"
-        ? "Flux concentration"
-        : "Wave response index";
-  const metricUnit = isMechanical ? "MPa" : "relative";
+    : "Qualitative response index";
+  const metricUnit = isMechanical ? "MPa" : "/ 5";
   const variantFactor = 1 + variant * 0.12;
   const density = Math.min(
     0.65,
@@ -115,19 +114,25 @@ export default function Studio() {
   const secondaryMaterial = bases[second];
   const chooseBase = (index: number) => {
     setBase(index);
-    if (index === second) setSecond((index + 1) % bases.length);
+    if (hasSecondary && index === second)
+      setSecond(allowedSecondary.find((candidate) => candidate !== index) ?? second);
   };
   const chooseSecondary = (index: number) => {
     setSecond(index);
-    if (index === base) setBase((index + 1) % bases.length);
+    if (index === base)
+      setBase(allowedBase.find((candidate) => candidate !== index) ?? base);
   };
   const choose = (i: number) => {
     setFamily(i);
     setVariant(0);
     const nextFamily = families[i];
-    if (nextFamily.defaultBase !== undefined) setBase(nextFamily.defaultBase);
-    if (nextFamily.defaultSecondary !== undefined)
-      setSecond(nextFamily.defaultSecondary);
+    const nextBase = nextFamily.defaultBase ?? 0;
+    const nextSecond = nextFamily.defaultSecondary ?? 1;
+    const nextBlend = nextFamily.secondaryRequired ? 35 : 0;
+    setBase(nextBase);
+    setSecond(nextSecond);
+    setBlend(nextBlend);
+    setSceneParameters((current) => ({ ...current, blend: nextBlend }));
     setStructurePickerOpen(false);
   };
   const startAnimation = () => {
@@ -140,13 +145,13 @@ export default function Studio() {
     setSize(next.size);
     setThick(next.thick);
     setCount(next.count);
-    setBase(0);
-    setBlend(next.blend);
-    setSecond(1);
+    setBase(f.defaultBase ?? 0);
+    setBlend(f.secondaryRequired ? 35 : next.blend);
+    setSecond(f.defaultSecondary ?? 1);
     setVariant(0);
     setWire(false);
     setSection(false);
-    setSceneParameters(next);
+    setSceneParameters({ ...next, blend: f.secondaryRequired ? 35 : 0 });
     setReset((value) => value + 1);
   };
   const catalog = useMemo(
@@ -529,7 +534,7 @@ export default function Studio() {
                     {mode === "application"
                       ? f.application + " · product anatomy"
                       : mode === "deform"
-                        ? "Illustrative compression"
+                        ? "Illustrative behavior"
                         : "Periodic unit-cell architecture"}
                   </div>
                   <div className="material-phase-key" aria-live="polite">
@@ -788,71 +793,80 @@ export default function Studio() {
                     label="Base material"
                     value={String(base)}
                     onChange={(v) => chooseBase(Number(v))}
-                    options={bases.map((b, i) => ({
+                    options={allowedBase.map((i) => ({
                       value: String(i),
-                      label: b.name,
+                      label: bases[i].name,
                     }))}
                   />
                 </div>
-                <div className="compact-material-choice">
-                  <label htmlFor="secondary">
-                    <GlossaryText>Secondary material</GlossaryText>
-                    <output>{blend}%</output>
-                  </label>
-                  <Choice
-                    id="secondary"
-                    label="Secondary material"
-                    value={String(second)}
-                    onChange={(v) => chooseSecondary(Number(v))}
-                    options={bases
-                      .map((b, i) => ({ value: String(i), label: b.name }))
-                      .filter((option) => option.value !== String(base))}
-                  />
-                </div>
-                <div className="phase-meter">
-                  <div>
-                    <span>
-                      <i style={{ backgroundColor: baseMaterial.color }} />
-                      {baseMaterial.name}
-                    </span>
-                    <strong>{100 - blend}%</strong>
-                  </div>
-                  <div>
-                    <span>
-                      <i style={{ backgroundColor: secondaryMaterial.color }} />
-                      {secondaryMaterial.name}
-                    </span>
-                    <strong>{blend}%</strong>
-                  </div>
-                  <div className="blend-bar" aria-hidden="true">
-                    <span
-                      style={{
-                        width: `${100 - blend}%`,
-                        backgroundColor: baseMaterial.color,
-                      }}
-                    />
-                    <span
-                      style={{
-                        width: `${blend}%`,
-                        backgroundColor: secondaryMaterial.color,
-                      }}
-                    />
-                  </div>
-                  <Slider
-                    aria-label="Secondary material volume percent"
-                    min={0}
-                    max={100}
-                    step={5}
-                    value={[blend]}
-                    onValueChange={(v) => setBlend(v[0])}
-                    onValueCommit={(v) =>
-                      setSceneParameters((current) => ({
-                        ...current,
-                        blend: v[0],
-                      }))
-                    }
-                  />
-                </div>
+                {hasSecondary ? (
+                  <>
+                    <div className="compact-material-choice">
+                      <label htmlFor="secondary">
+                        <GlossaryText>{f.secondaryRole ?? "Secondary material"}</GlossaryText>
+                        <output>{blend}%</output>
+                      </label>
+                      <Choice
+                        id="secondary"
+                        label={f.secondaryRole ?? "Secondary material"}
+                        value={String(second)}
+                        onChange={(v) => chooseSecondary(Number(v))}
+                        options={allowedSecondary
+                          .filter((index) => index !== base)
+                          .map((i) => ({ value: String(i), label: bases[i].name }))}
+                      />
+                    </div>
+                    <div className="phase-meter">
+                      <div>
+                        <span>
+                          <i style={{ backgroundColor: baseMaterial.color }} />
+                          {baseMaterial.name}
+                        </span>
+                        <strong>{100 - blend}%</strong>
+                      </div>
+                      <div>
+                        <span>
+                          <i style={{ backgroundColor: secondaryMaterial.color }} />
+                          {secondaryMaterial.name}
+                        </span>
+                        <strong>{blend}%</strong>
+                      </div>
+                      <div className="blend-bar" aria-hidden="true">
+                        <span
+                          style={{
+                            width: `${100 - blend}%`,
+                            backgroundColor: baseMaterial.color,
+                          }}
+                        />
+                        <span
+                          style={{
+                            width: `${blend}%`,
+                            backgroundColor: secondaryMaterial.color,
+                          }}
+                        />
+                      </div>
+                      <Slider
+                        aria-label={`${f.secondaryRole ?? "Secondary material"} share`}
+                        min={0}
+                        max={100}
+                        step={5}
+                        value={[blend]}
+                        onValueChange={(v) => setBlend(v[0])}
+                        onValueCommit={(v) =>
+                          setSceneParameters((current) => ({
+                            ...current,
+                            blend: v[0],
+                          }))
+                        }
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <p className="material-compatibility-note">{f.materialNote}</p>
+                )}
+                {hasSecondary && (
+                  <p className="material-compatibility-note">{f.materialNote}</p>
+                )}
               </div>
               <div className="geometry-grid">
                 <div className="control-block compact-range">
@@ -946,14 +960,15 @@ export default function Studio() {
                             ? estimated.toFixed(2)
                             : Math.round(estimated).toLocaleString()
                         }`
-                      : `${(0.8 + density * 2.4 + variant * 0.12).toFixed(2)}`}
+                      : `${Math.min(5, 1.2 + density * 4.2 + variant * 0.35).toFixed(1)}`}
                     <small>{metricUnit}</small>
                   </strong>
                 </div>
                 <div className="estimate-note">
                   <p>
-                    Compare settings in this model, not the performance of a
-                    finished part.
+                    {isMechanical
+                      ? "Compare this rough stiffness range inside the model, not the performance of a finished part."
+                      : "This is a qualitative teaching cue, not a measured material property or device prediction."}
                   </p>
                 </div>
               </div>

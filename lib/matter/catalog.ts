@@ -15,6 +15,13 @@ export type Family = {
   source: string;
   defaultBase?: number;
   defaultSecondary?: number;
+  /** Material indices that are physically meaningful for this teaching model. */
+  allowedBase?: number[];
+  /** Empty means this model is a one-material teaching model. */
+  allowedSecondary?: number[];
+  secondaryRole?: string;
+  secondaryRequired?: boolean;
+  materialNote?: string;
 };
 export const families: Family[] = [
   {
@@ -41,6 +48,11 @@ export const families: Family[] = [
     variants: ["Sheet gyroid", "Skeletal gyroid", "Graded gyroid"],
     color: "#c2ef72",
     source: "https://ntrs.nasa.gov/citations/19700020472",
+    defaultBase: 0,
+    defaultSecondary: 1,
+    allowedBase: [0, 1],
+    allowedSecondary: [],
+    materialNote: "A single polymer makes the visible gyroid. The material changes the feel, not the cell type.",
   },
   {
     id: "octet",
@@ -66,6 +78,11 @@ export const families: Family[] = [
     variants: ["Uniform octet", "Graded octet", "Anisotropic octet"],
     color: "#87ccf8",
     source: "https://doi.org/10.1016/S0022-5096(01)00010-2",
+    defaultBase: 2,
+    defaultSecondary: 3,
+    allowedBase: [2, 3],
+    allowedSecondary: [],
+    materialNote: "This structural truss is shown as one metal alloy, not a random material blend.",
   },
   {
     id: "auxetic",
@@ -91,6 +108,11 @@ export const families: Family[] = [
     variants: ["Re-entrant cell", "Deep re-entrant", "Graded re-entrant"],
     color: "#f4ad85",
     source: "https://doi.org/10.1126/science.235.4792.1038",
+    defaultBase: 0,
+    defaultSecondary: 1,
+    allowedBase: [0, 1],
+    allowedSecondary: [],
+    materialNote: "A flexible polymer lets the inward ribs rotate without behaving like a brittle metal frame.",
   },
   {
     id: "kelvin",
@@ -116,6 +138,11 @@ export const families: Family[] = [
     variants: ["Uniform Kelvin", "Thick Kelvin", "Graded Kelvin"],
     color: "#cab0f4",
     source: "https://doi.org/10.1080/14786448708628135",
+    defaultBase: 0,
+    defaultSecondary: 1,
+    allowedBase: [0, 1],
+    allowedSecondary: [],
+    materialNote: "This impact-absorption lesson uses a single polymer lattice. A real helmet needs system-level testing.",
   },
   {
     id: "honeycomb",
@@ -141,6 +168,11 @@ export const families: Family[] = [
     variants: ["Hexagonal", "Elongated hexagonal", "Graded hexagonal"],
     color: "#f2d77e",
     source: "https://doi.org/10.1017/CBO9781139878326",
+    defaultBase: 2,
+    defaultSecondary: 1,
+    allowedBase: [2, 1],
+    allowedSecondary: [],
+    materialNote: "The core is one material. The board skins are separate structural layers, not a mixed phase.",
   },
   {
     id: "resonator",
@@ -166,6 +198,13 @@ export const families: Family[] = [
     variants: ["Single mass", "Dual mass", "Graded mass"],
     color: "#8ee0cf",
     source: "https://doi.org/10.1126/science.289.5485.1734",
+    defaultBase: 0,
+    defaultSecondary: 5,
+    allowedBase: [0, 6],
+    allowedSecondary: [5],
+    secondaryRole: "Tuned mass",
+    secondaryRequired: true,
+    materialNote: "The soft base acts as the flexible support; the denser secondary component acts as the moving mass.",
   },
   {
     id: "metalens",
@@ -186,13 +225,16 @@ export const families: Family[] = [
     variantLessons: [
       "Uniform post field: posts share one height and show the starting surface before a focusing phase pattern is added.",
       "Phase-graded metalens: post height changes across the surface so the outgoing wavefront bends toward a focus.",
-      "Polarization-selective metalens: post orientation changes the response for one polarization of light.",
+      "Post-pattern comparison: a second patterned post field lets you compare how changing the tiny elements can change the optical response.",
     ],
-    variants: ["Uniform post field", "Phase-graded metalens", "Polarization-selective"],
+    variants: ["Uniform post field", "Phase-graded metalens", "Post-pattern comparison"],
     color: "#e7b5ff",
     source: "https://capasso.seas.harvard.edu/metasurfaces-and-flat-optics",
     defaultBase: 4,
-    defaultSecondary: 5,
+    defaultSecondary: 4,
+    allowedBase: [4],
+    allowedSecondary: [],
+    materialNote: "This near-infrared teaching model uses patterned silicon. A substrate is fixed in a real device, not mixed into the posts.",
   },
   {
     id: "cloak",
@@ -219,7 +261,12 @@ export const families: Family[] = [
     color: "#ffb66d",
     source: "https://www.science.org/doi/10.1126/science.1133628",
     defaultBase: 5,
-    defaultSecondary: 4,
+    defaultSecondary: 8,
+    allowedBase: [5],
+    allowedSecondary: [8],
+    secondaryRole: "Microwave substrate",
+    secondaryRequired: true,
+    materialNote: "Copper resonators are patterned onto a low-loss fiberglass/epoxy microwave board. They are separate layers, not a bulk alloy.",
   },
   {
     id: "membrane-absorber",
@@ -246,7 +293,12 @@ export const families: Family[] = [
     color: "#78d6f4",
     source: "https://www.nature.com/articles/ncomms1758",
     defaultBase: 6,
-    defaultSecondary: 1,
+    defaultSecondary: 10,
+    allowedBase: [6, 0],
+    allowedSecondary: [10],
+    secondaryRole: "Bonded platelet mass",
+    secondaryRequired: true,
+    materialNote: "A flexible silicone membrane carries a denser bonded platelet. They play different physical roles in the resonator.",
   },
   {
     id: "thermal-cloak",
@@ -266,7 +318,7 @@ export const families: Family[] = [
       "It is useful because it can delay a hot spot without refrigeration or an active pump.",
     variantLessons: [
       "Uniform rings: equal radial layers make the heat path easy to read but less carefully matched at the boundary.",
-      "Conductivity-graded cloak: ring values change smoothly so heat turns around the core with less reflection.",
+      "Conductivity-graded cloak: ring values change smoothly so the surrounding temperature field is less disturbed.",
       "Transient shield: the layer thickness is tuned for a short pulse rather than steady-state protection.",
     ],
     variants: ["Uniform rings", "Conductivity-graded", "Transient shield"],
@@ -274,6 +326,11 @@ export const families: Family[] = [
     source: "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.110.195901",
     defaultBase: 5,
     defaultSecondary: 6,
+    allowedBase: [5],
+    allowedSecondary: [6],
+    secondaryRole: "Low-conductivity layer",
+    secondaryRequired: true,
+    materialNote: "Copper and silicone form separate thermal paths. The colours show those paths, not a uniform material mixture.",
   },
   {
     id: "topological",
@@ -281,9 +338,9 @@ export const families: Family[] = [
     category: "Wave",
     tag: "Carries waves along an edge",
     origin:
-      "Purpose: create a repeating wave medium with a protected boundary route. The reference principle is the one-way edge current seen in the quantum Hall effect, recreated with classical waves.",
+      "Purpose: create a repeating wave medium with a boundary-guided route. This teaching model uses a classical-wave analogue and does not claim one-way transport.",
     mechanism:
-      "Structure: a periodic lattice is biased so its bulk blocks a frequency range while its boundary supports a special edge mode. The missing or changed boundary cells become the route.",
+      "Structure: a specially designed periodic lattice can block a frequency range in its interior while its boundary supports a guided edge mode. The changed boundary cells show the route.",
     behavior:
       "Behavior: a wave can follow the edge and bend around some defects with less backscatter than an ordinary path. Protection depends on the band gap and operating conditions.",
     application: "Robust waveguide",
@@ -299,8 +356,13 @@ export const families: Family[] = [
     variants: ["Straight edge", "Bent edge", "Defect-tested edge"],
     color: "#aa9cff",
     source: "https://www.nature.com/articles/nature08293",
-    defaultBase: 4,
+    defaultBase: 9,
     defaultSecondary: 5,
+    allowedBase: [9],
+    allowedSecondary: [5],
+    secondaryRole: "Copper boundary layer",
+    secondaryRequired: true,
+    materialNote: "This microwave teaching platform pairs magnetically biased ferrite with copper conductors. It also needs an external DC bias field.",
   },
   {
     id: "flux",
@@ -327,7 +389,10 @@ export const families: Family[] = [
     color: "#ff82b7",
     source: "https://www.nature.com/articles/srep44762",
     defaultBase: 7,
-    defaultSecondary: 5,
+    defaultSecondary: 7,
+    allowedBase: [7],
+    allowedSecondary: [],
+    materialNote: "A soft magnetic alloy guides an externally supplied field. Copper is not a second phase in this shell.",
   },
 ];
 export const bases = [
@@ -386,5 +451,26 @@ export const bases = [
     rho: 7500,
     color: "#8799b4",
     intro: "A magnetically responsive alloy that can guide an existing field.",
+  },
+  {
+    name: "Fiberglass/epoxy microwave laminate",
+    e: 24000,
+    rho: 1850,
+    color: "#8eae9e",
+    intro: "A low-loss composite board that supports patterned microwave conductors.",
+  },
+  {
+    name: "Magnetically biased ferrite",
+    e: 150000,
+    rho: 5000,
+    color: "#7792a8",
+    intro: "A microwave ceramic whose wave response changes when an external magnetic bias is applied.",
+  },
+  {
+    name: "Iron platelet",
+    e: 210000,
+    rho: 7870,
+    color: "#aeb7bd",
+    intro: "A small dense metal mass bonded to a membrane to shift its resonant motion.",
   },
 ];

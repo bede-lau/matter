@@ -388,17 +388,24 @@ export function createLattice(p: LatticeOptions, software = false) {
           new T.CylinderGeometry(step * 0.27, step * 0.27, 0.028, software ? 12 : 24),
         );
         diaphragm.position.set(px, 0, pz);
+        diaphragm.name = "membrane-diaphragm";
+        diaphragm.userData.cell = `${x}:${z}`;
+        diaphragm.userData.phase = x * 0.8 + z * 1.15;
         const frame = addMesh(
           new T.TorusGeometry(step * 0.27, r * 0.55, software ? 6 : 10, software ? 18 : 30),
         );
         frame.rotation.x = Math.PI / 2;
         frame.position.set(px, 0.03, pz);
-        const platelet = addMesh(
-          new T.CylinderGeometry(step * 0.105, step * 0.105, 0.025, software ? 12 : 20),
-          plateletMat,
-        );
-        platelet.position.set(px + step * 0.055, 0.027, pz);
-        platelet.rotation.y = (p.variant === 2 ? x - z : 0) * 0.18;
+        if (p.variant !== 0) {
+          const platelet = addMesh(
+            new T.CylinderGeometry(step * 0.105, step * 0.105, 0.025, software ? 12 : 20),
+            plateletMat,
+          );
+          platelet.name = "bonded-platelet";
+          platelet.userData.cell = `${x}:${z}`;
+          platelet.position.set(px + step * 0.055, 0.027, pz);
+          platelet.rotation.y = (p.variant === 2 ? x - z : 0) * 0.18;
+        }
       }
   } else if (p.kind === "thermal-cloak") {
     // Coplanar annuli read as a fabricated composite plate. Alternating
@@ -433,10 +440,12 @@ export function createLattice(p: LatticeOptions, software = false) {
       ring.rotation.x = -Math.PI / 2;
       ring.position.y = 0.012 + (i % 2) * 0.012;
     }
-    addMesh(
+    const protectedCore = addMesh(
       new T.CylinderGeometry(0.27, 0.27, 0.075, software ? 16 : 28),
       new T.MeshStandardMaterial({ color: 0x334853, roughness: 0.78 }),
-    ).position.y = 0.055;
+    );
+    protectedCore.name = "thermal-protected-core";
+    protectedCore.position.y = 0.055;
   } else if (p.kind === "topological") {
     // A planar photonic-crystal chip with a deliberate L-shaped domain wall.
     const postMat = new T.MeshPhysicalMaterial({
