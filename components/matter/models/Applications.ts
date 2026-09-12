@@ -55,6 +55,29 @@ export function createApplication(
       side,
       slot,
     });
+  // Explanatory fields are never physical parts of the product. Keeping their
+  // material independent prevents a material selector from recolouring light,
+  // heat, or magnetic field lines into opaque solids.
+  const fieldMaterial = (color: string, opacity = 0.68) =>
+    new T.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      blending: T.AdditiveBlending,
+    });
+  const fieldTube = (
+    parent: T.Object3D,
+    material: T.Material,
+    points: number[][],
+    radius = 0.018,
+    name = "explanatory-field",
+  ) => {
+    const line = tube(parent, material, points, radius, false, name);
+    line.castShadow = false;
+    line.receiveShadow = false;
+    return line;
+  };
   if (kind === "gyroid") {
     const shoe = buildShoe(lattice, color, variant, true);
     shoe.group.position.set(-1, -1.5, 0.5);
@@ -241,199 +264,252 @@ export function createApplication(
       return "Aircraft wing · internal load path";
     };
   } else if (kind === "metalens") {
-    const optic = fitLattice(lattice, [2.6, 0.42, 2.6], [-0.7, 0.52, 0], group);
-    const bench = box(group, p.dark, [5.8, 0.16, 3.25], [0, -0.9, 0], "optics-bench");
-    const sensor = box(group, p.metal, [0.58, 0.24, 0.58], [1.7, -0.58, 0], "image-sensor");
-    const sensorFace = ellipsoid(group, p.accent, [1.7, -0.39, 0], [0.18, 0.04, 0.18], "sensor-active-area");
-    const lightSource = ellipsoid(group, p.ivory, [-2.5, 0.65, 0], [0.28, 0.28, 0.28], "collimated-source");
+    // The post field is mounted upright, perpendicular to the optical axis.
+    // Its enlarged posts remain physically attached to a thin wafer.
+    const optic = fitLattice(lattice, [2.45, 0.2, 2.45], [0, 0.2, 0], group);
+    optic.rotation.z = Math.PI / 2;
+    const bench = box(group, p.dark, [5.9, 0.14, 3.2], [0, -1.05, 0], "optics-bench");
+    const mount = mesh(new T.TorusGeometry(1.32, 0.055, 8, 42), p.metal, group, "wafer-mount");
+    mount.rotation.y = Math.PI / 2;
+    mount.position.set(0, 0.2, 0);
+    const source = box(group, p.dark, [0.46, 0.52, 0.72], [-2.52, 0.2, 0], "collimated-light-source");
+    const aperture = mesh(new T.CylinderGeometry(0.12, 0.12, 0.035, 24), p.ivory, group, "source-aperture");
+    aperture.rotation.z = Math.PI / 2;
+    aperture.position.set(-2.27, 0.2, 0);
+    const sensor = box(group, p.dark, [0.26, 0.72, 0.82], [2.15, 0.2, 0], "image-sensor");
+    const sensorFace = mesh(new T.PlaneGeometry(0.56, 0.56), p.accent, group, "sensor-active-area");
+    sensorFace.rotation.y = -Math.PI / 2;
+    sensorFace.position.set(2.005, 0.2, 0);
+    const focus = ellipsoid(group, fieldMaterial("#72dcff", 0.88), [1.84, 0.2, 0], [0.055, 0.055, 0.055], "focal-spot");
+    focus.castShadow = false;
+    const light = fieldMaterial("#72dcff", 0.68);
     const rays: T.Mesh[] = [];
     for (let i = -2; i <= 2; i++) {
-      const z = i * 0.48;
+      const z = i * 0.43;
       rays.push(
-        tube(
+        fieldTube(
           group,
-          p.accent,
+          light,
           [
-            [-2.22, 0.65, z],
-            [-1.35, 0.65, z],
-            [-0.35, 0.64 - Math.abs(z) * 0.18, z * 0.64],
-            [0.75, 0.18 + Math.abs(z) * 0.04, z * 0.28],
-            [1.48, -0.27, 0],
+            [-2.23, 0.2, z],
+            [-0.16, 0.2, z],
+            [0.7, 0.2, z * 0.48],
+            [1.84, 0.2, 0],
           ],
-          0.024,
-          false,
-          "focused-ray",
+          0.016,
+          "focused-light-ray",
         ),
       );
     }
-    label("Nanopost field: delays each part of the wave", optic, [0, 0, 0], "left", 0);
-    label("Focused wavefront: light converges here", sensorFace, [0, 0, 0], "right", 1);
-    label("Sensor: records the focused image", sensor, [0, 0.1, 0], "right", 2);
-    label("Incoming light: parallel rays", lightSource, [0, 0, 0], "left", 2);
-    camera = [7.8, 4.7, 9.6];
-    target = [0, -0.1, 0];
+    label("Nanopost field: shapes the light phase", optic, [0, 0, 0], "left", 0);
+    label("Collimated source: sends parallel light", source, [0, 0, 0], "left", 1);
+    label("Focal spot: light meets here", focus, [0, 0, 0], "right", 0);
+    label("Image sensor: records the focused light", sensor, [0, 0, 0], "right", 1);
+    camera = [7.2, 4.1, 9.3];
+    target = [0, -0.15, 0];
+    const focusScale = focus.scale.clone();
     update = (t, e) => {
-      optic.rotation.y = Math.sin(t * 0.55) * 0.08;
-      const pulse = 0.62 + 0.38 * (0.5 + 0.5 * Math.sin(t * 5));
-      rays.forEach((ray, i) => {
-        ray.scale.set(1, pulse, 1);
-        ray.position.y = Math.sin(t * 2 + i) * 0.018;
-      });
-      sensorFace.scale.setScalar(0.8 + pulse * 0.28);
-      return e > 0.15 ? "Lens stack opened · phase path" : "Light focusing · wavefront shaped";
+      const pulse = 0.8 + 0.2 * (0.5 + 0.5 * Math.sin(t * 5));
+      rays.forEach((ray, i) => (ray.position.y = Math.sin(t * 2 + i) * 0.01));
+      focus.scale.copy(focusScale).multiplyScalar(pulse);
+      return e > 0.15 ? "Wafer opened · phase path" : "Light focused · wavefront shaped";
     };
   } else if (kind === "cloak") {
-    const shell = fitLattice(lattice, [3.0, 1.55, 3.0], [0, 0.08, 0], group);
-    const hidden = ellipsoid(group, p.dark, [0, 0.02, 0], [0.48, 0.48, 0.48], "hidden-object");
-    const floor = box(group, p.dark, [5.8, 0.14, 3.6], [0, -1.45, 0], "cloak-test-surface");
+    const shell = fitLattice(lattice, [3.45, 0.55, 3.45], [0, 0.03, 0], group);
+    const hidden = mesh(new T.CylinderGeometry(0.43, 0.43, 0.64, 32), p.dark, group, "hidden-test-cylinder");
+    hidden.position.y = 0.27;
+    const floor = box(group, p.dark, [6.1, 0.13, 3.85], [0, -0.58, 0], "cloak-test-surface");
+    const waves = fieldMaterial("#68d7ff", 0.68);
     const rays: T.Mesh[] = [];
-    for (let i = -2; i <= 2; i++) {
-      const z = i * 0.42;
+    for (let i = -3; i <= 3; i++) {
+      const z = i * 0.28;
+      const bypass = Math.max(0.16, 0.62 - Math.abs(z) * 0.35);
       rays.push(
-        tube(
+        fieldTube(
           group,
-          p.accent,
+          waves,
           [
-            [-3.0, 0.22, z],
-            [-2.0, 0.22, z],
-            [-1.25, 0.22 + (1 - Math.abs(z) / 0.9) * 0.42, z * 0.72],
-            [0, 0.38 + (1 - Math.abs(z) / 0.9) * 0.36, z * 0.48],
-            [1.25, 0.22 + (1 - Math.abs(z) / 0.9) * 0.42, z * 0.72],
-            [2.0, 0.22, z],
-            [3.0, 0.22, z],
+            [-3.05, 0.34, z],
+            [-1.48, 0.34, z],
+            [-0.72, 0.34 + bypass, z],
+            [0, 0.34 + bypass * 1.18, z],
+            [0.72, 0.34 + bypass, z],
+            [1.48, 0.34, z],
+            [3.05, 0.34, z],
           ],
-          0.025,
-          false,
-          "microwave-ray",
+          0.016,
+          "microwave-field-line",
         ),
       );
     }
-    label("Graded shell: changes the wave path", shell, [0.8, 0.25, 0.5], "left", 0);
-    label("Hidden region: reduced scattering at one design point", hidden, [0, 0, 0], "right", 1);
-    label("Microwave rays: routed around the centre", rays[2], [0, 0.1, 0], "left", 2);
-    label("Test surface: makes the comparison measurable", floor, [1.6, 0.1, 1.2], "right", 2);
-    camera = [7.4, 4.8, 9.8];
-    target = [0, -0.2, 0];
+    label("Segmented shell: redirects the microwave path", shell, [0.86, 0.04, 0.62], "left", 0);
+    label("Incoming field: straight before the shell", rays[0], [-1.7, 0, 0], "left", 1);
+    label("Hidden object: scattering is reduced at one frequency", hidden, [0, 0.2, 0], "right", 0);
+    label("Outgoing field: nearly parallel again", rays[6], [1.7, 0, 0], "right", 1);
+    camera = [7.5, 4.5, 9.8];
+    target = [0, -0.1, 0];
     update = (t, e) => {
-      shell.rotation.y = Math.sin(t * 0.4) * 0.06;
-      hidden.scale.setScalar(0.96 + 0.04 * Math.sin(t * 3));
-      rays.forEach((ray, i) => {
-        ray.position.x = ((t * 0.72 + i * 0.2) % 1) * 0.16;
-        ray.scale.y = 0.9 + 0.1 * Math.sin(t * 4 + i);
-      });
-      return e > 0.15 ? "Shell opened · scattering path" : "Microwave routing · cloak limits matter";
+      rays.forEach((ray, i) => (ray.position.z = Math.sin(t * 2.2 + i) * 0.012));
+      return e > 0.15 ? "Shell opened · microwave route" : "Cloak present · rays rejoin after the object";
     };
   } else if (kind === "membrane-absorber") {
-    const panel = fitLattice(lattice, [3.6, 0.52, 2.4], [0.2, -0.05, 0], group);
-    box(group, p.dark, [5.8, 0.16, 3.0], [0, -1.05, 0], "acoustic-panel-frame");
-    const source = ellipsoid(group, p.metal, [-2.25, 0.25, 0], [0.4, 0.4, 0.4], "sound-source");
+    const panel = fitLattice(lattice, [3.35, 0.44, 2.45], [0.34, 0.02, 0], group);
+    panel.rotation.z = Math.PI / 2;
+    const panelFrame = box(group, p.dark, [0.16, 3.45, 2.85], [0.31, 0, 0], "acoustic-panel-frame");
+    const speaker = mesh(new T.CylinderGeometry(0.46, 0.46, 0.46, 28), p.dark, group, "speaker-cabinet");
+    speaker.rotation.z = Math.PI / 2;
+    speaker.position.set(-2.25, 0, 0);
+    const speakerCone = mesh(new T.CylinderGeometry(0.29, 0.19, 0.06, 28), p.metal, group, "speaker-cone");
+    speakerCone.rotation.z = Math.PI / 2;
+    speakerCone.position.set(-1.99, 0, 0);
     const pressureRings: T.Mesh[] = [];
+    const sound = fieldMaterial("#81cdf4", 0.38);
     for (let i = 0; i < 4; i++) {
-      const ring = mesh(new T.TorusGeometry(0.45 + i * 0.34, 0.028, 8, 32), p.accent, group, "pressure-wave");
+      const ring = mesh(new T.TorusGeometry(0.34, 0.014, 8, 32), sound, group, "pressure-wave");
       ring.rotation.y = Math.PI / 2;
-      ring.position.set(-1.82, 0.25, 0);
+      ring.position.set(-1.74 + i * 0.38, 0, 0);
+      ring.castShadow = false;
+      ring.receiveShadow = false;
       pressureRings.push(ring);
     }
     label("Membrane cells: flex at a selected tone", panel, [0, 0, 0], "left", 0);
-    label("Sound source: sends a low-frequency pulse", source, [0, 0, 0], "left", 1);
-    label("Platelets: add a tuned local mass", panel, [0.45, 0.08, 0.25], "right", 1);
-    label("Panel frame: holds the thin absorber", group, [1.8, -0.94, 1.2], "right", 2);
-    camera = [7.8, 4.3, 9.5];
-    target = [0, -0.25, 0];
+    label("Speaker: sends a low-frequency pulse", speaker, [0, 0, 0], "left", 1);
+    label("Bonded platelets: add a local mass", panel, [0, 0.03, 0.3], "right", 0);
+    label("Panel frame: holds the recessed drums", panelFrame, [0, 0.7, 1.1], "right", 1);
+    camera = [7.7, 4.0, 9.7];
+    target = [0, -0.1, 0];
     update = (t, e) => {
-      panel.rotation.y = Math.sin(t * 0.35) * 0.04;
       pressureRings.forEach((ring, i) => {
         const scale = ((t * 1.1 + i * 0.22) % 1) * 1.2 + 0.25;
         ring.scale.setScalar(scale);
-        ring.material.opacity = 0.7 - scale * 0.25;
-        ring.material.transparent = true;
+        ring.position.x = -1.76 + scale * 1.26;
+        (ring.material as T.MeshBasicMaterial).opacity = 0.42 - scale * 0.16;
       });
       return e > 0.15 ? "Panel opened · membrane motion" : "Resonant absorption · selected low tone";
     };
   } else if (kind === "thermal-cloak") {
     const shield = fitLattice(lattice, [3.3, 0.34, 3.3], [0, -0.15, 0], group);
     box(group, p.dark, [5.9, 0.13, 3.2], [0, -0.72, 0], "thermal-plate");
-    const heatSource = ellipsoid(group, p.accent, [-2.3, -0.37, 0], [0.32, 0.32, 0.32], "heat-source");
-    const core = ellipsoid(group, p.ivory, [0, -0.31, 0], [0.28, 0.12, 0.28], "protected-core");
-    const heatDots: T.Mesh[] = [];
+    const heatSource = box(group, p.accent, [0.28, 0.23, 1.42], [-2.28, -0.35, 0], "heat-source");
+    const coolSink = box(group, p.metal, [0.28, 0.23, 1.42], [2.28, -0.35, 0], "cool-boundary");
+    const core = mesh(new T.CylinderGeometry(0.27, 0.27, 0.1, 28), p.ivory, group, "protected-core");
+    core.position.set(0, -0.06, 0);
+    const heat = fieldMaterial("#ffb266", 0.6);
+    const heatDots: { dot: T.Mesh; base: T.Vector3 }[] = [];
+    for (let z of [-0.82, -0.42, 0.42, 0.82])
+      fieldTube(
+        group,
+        heat,
+        [
+          [-2.05, -0.02, z],
+          [-0.95, -0.02, z],
+          [-0.42, -0.02, z * 1.12],
+          [0.42, -0.02, z * 1.12],
+          [0.95, -0.02, z],
+          [2.05, -0.02, z],
+        ],
+        0.014,
+        "thermal-flow-path",
+      );
     for (let i = 0; i < 9; i++) {
-      const dot = ellipsoid(group, p.accent, [-1.7 + i * 0.4, -0.28, 0.72 * Math.sin(i * 1.4)], [0.045, 0.045, 0.045], "heat-flow-dot");
-      heatDots.push(dot);
+      const dot = ellipsoid(group, heat, [-1.7 + i * 0.4, -0.02, 0.72 * Math.sin(i * 1.4)], [0.045, 0.045, 0.045], "heat-flow-dot");
+      dot.castShadow = false;
+      heatDots.push({ dot, base: dot.scale.clone() });
     }
-    label("Conductivity rings: turn heat around the core", shield, [0, 0, 0], "left", 0);
-    label("Heat source: sends a short thermal pulse", heatSource, [0, 0, 0], "left", 1);
-    label("Protected core: warms later, not never", core, [0, 0, 0], "right", 1);
-    label("Copper-like plate: carries heat onward", group, [1.7, -0.6, 1.1], "right", 2);
+    label("Conductivity rings: guide heat around the core", shield, [0, 0, 0], "left", 0);
+    label("Hot boundary: sends a short thermal pulse", heatSource, [0, 0, 0], "left", 1);
+    label("Protected core: warms later", core, [0, 0, 0], "right", 0);
+    label("Cool boundary: carries heat onward", coolSink, [0, 0, 0], "right", 1);
     camera = [7.5, 4.6, 9.2];
     target = [0, -0.4, 0];
     update = (t, e) => {
-      shield.rotation.y = Math.sin(t * 0.25) * 0.04;
       const travel = (t * 0.46) % 1;
-      heatDots.forEach((dot, i) => {
+      heatDots.forEach(({ dot, base }, i) => {
         const phase = (travel + i / heatDots.length) % 1;
         dot.position.x = -1.8 + phase * 3.6;
         dot.position.z = 0.78 * Math.sin(phase * Math.PI * 2);
-        dot.scale.setScalar(0.7 + 0.35 * Math.sin(phase * Math.PI));
+        dot.scale.copy(base).multiplyScalar(0.7 + 0.35 * Math.sin(phase * Math.PI));
       });
-      core.scale.y = 0.9 + 0.1 * Math.sin(t * 1.4);
       return e > 0.15 ? "Layered plate · transient heat path" : "Heat diverted · core warms over time";
     };
   } else if (kind === "topological") {
     const latticeHolder = fitLattice(lattice, [3.55, 0.65, 3.2], [0, 0.08, 0], group);
     box(group, p.dark, [5.8, 0.14, 3.4], [0, -0.82, 0], "photonic-chip");
-    const waveDots: T.Mesh[] = [];
+    const inputPort = box(group, p.metal, [0.34, 0.16, 0.22], [-1.92, 0.18, -1.18], "waveguide-input");
+    const signal = fieldMaterial("#66dbff", 0.75);
+    const edgeRoute = fieldTube(
+      group,
+      signal,
+      [
+        [-1.75, 0.31, -1.18],
+        [0.8, 0.31, -1.18],
+        [0.8, 0.31, 1.18],
+      ],
+      0.028,
+      "topological-edge-route",
+    );
+    const corner = anchor(group, [0.8, 0.31, -1.18], "edge-route-corner");
+    const waveDots: { dot: T.Mesh; base: T.Vector3 }[] = [];
     for (let i = 0; i < 10; i++) {
-      const dot = ellipsoid(group, p.accent, [-1.65 + i * 0.36, 0.28, -1.26 + Math.min(i, 5) * 0.32], [0.065, 0.065, 0.065], "edge-mode-packet");
-      waveDots.push(dot);
+      const dot = ellipsoid(group, signal, [-1.65 + i * 0.36, 0.31, -1.18], [0.052, 0.052, 0.052], "edge-mode-packet");
+      dot.castShadow = false;
+      waveDots.push({ dot, base: dot.scale.clone() });
     }
-    label("Periodic bulk: blocks the selected band", latticeHolder, [0, 0, 0], "left", 0);
-    label("Edge mode: carries the signal along the boundary", waveDots[4], [0, 0, 0], "right", 1);
-    label("Corner: the route bends without opening the bulk", latticeHolder, [1.55, 0, -1.3], "left", 2);
-    label("Chip substrate: supports the patterned lattice", group, [1.7, -0.72, 1.1], "right", 2);
+    label("Patterned bulk: blocks selected paths", latticeHolder, [-0.6, 0, 0.6], "left", 0);
+    label("Input port: launches the signal", inputPort, [0, 0, 0], "left", 1);
+    label("Edge route: carries the guided signal", edgeRoute, [0.8, 0.31, 0.15], "right", 0);
+    label("Corner: the signal follows the boundary", corner, [0, 0, 0], "right", 1);
     camera = [7.6, 4.8, 9.6];
     target = [0, -0.2, 0];
     update = (t, e) => {
-      latticeHolder.rotation.y = Math.sin(t * 0.35) * 0.05;
-      waveDots.forEach((dot, i) => {
+      waveDots.forEach(({ dot, base }, i) => {
         const phase = (t * 0.42 + i / waveDots.length) % 1;
-        const edgeIndex = phase * 9;
-        if (edgeIndex < 5) {
-          dot.position.set(-1.65 + edgeIndex * 0.36, 0.28, -1.26 + edgeIndex * 0.32);
+        if (phase < 0.52) {
+          dot.position.set(-1.75 + (phase / 0.52) * 2.55, 0.31, -1.18);
         } else {
-          const s = edgeIndex - 5;
-          dot.position.set(0.15 + s * 0.36, 0.28, 0.34 + s * 0.32);
+          dot.position.set(0.8, 0.31, -1.18 + ((phase - 0.52) / 0.48) * 2.36);
         }
-        dot.scale.setScalar(0.7 + 0.3 * Math.sin(phase * Math.PI * 2));
+        dot.scale.copy(base).multiplyScalar(0.75 + 0.25 * Math.sin(phase * Math.PI * 2));
       });
-      return e > 0.15 ? "Edge route opened · defect test" : "Boundary wave · backscatter reduced";
+      return e > 0.15 ? "Edge route opened · boundary test" : "Guided edge route · selected defects tolerated";
     };
   } else if (kind === "flux") {
-    const shell = fitLattice(lattice, [3.15, 1.25, 3.15], [0, 0.02, 0], group);
+    const shell = fitLattice(lattice, [3.7, 1.6, 2.6], [0, 0.02, 0], group);
     box(group, p.dark, [5.7, 0.13, 3.2], [0, -1.15, 0], "magnetic-test-bed");
-    const source = ellipsoid(group, p.accent, [-2.2, 0.02, 0], [0.34, 0.34, 0.34], "field-source");
-    const sensor = ellipsoid(group, p.ivory, [0, 0.2, 0], [0.18, 0.18, 0.18], "magnetic-sensor");
+    const coils = new T.Group();
+    group.add(coils);
+    for (let x of [-2.42, 2.42]) {
+      const coil = mesh(new T.TorusGeometry(0.78, 0.07, 10, 42), p.metal, coils, "helmholtz-coil");
+      coil.rotation.y = Math.PI / 2;
+      coil.position.x = x;
+    }
+    const sensor = box(group, p.dark, [0.16, 0.16, 0.46], [0, 0.02, 0], "hall-sensor-chip");
+    const contact = box(group, p.ivory, [0.07, 0.04, 0.62], [0, -0.08, 0], "sensor-contact");
     const fluxLines: T.Mesh[] = [];
+    const magneticField = fieldMaterial("#70dbff", 0.58);
     for (let i = 0; i < 5; i++) {
       const z = (i - 2) * 0.3;
       fluxLines.push(
-        tube(group, p.accent, [[-1.8, 0.02, z], [-0.9, 0.02 + i * 0.08, z * 0.8], [0, 0.2, z * 0.25], [1.4, 0.02, z * 0.8], [2.0, 0.02, z]], 0.022, false, "magnetic-flux-line"),
+        fieldTube(
+          group,
+          magneticField,
+          [[-3.0, 0.18, z], [-1.2, 0.18, z], [0, 0.18, z], [1.2, 0.18, z], [3.0, 0.18, z]],
+          0.018,
+          "straight-magnetic-field-line",
+        ),
       );
     }
-    label("Funnel shell: collects an existing field", shell, [0.8, 0.1, 0.4], "left", 0);
-    label("Sensor gap: receives concentrated flux", sensor, [0, 0, 0], "right", 1);
-    label("Field source: supplies the magnetic field", source, [0, 0, 0], "left", 2);
-    label("Flux lines: redistributed, never created", fluxLines[2], [0, 0.1, 0], "right", 2);
+    label("Open funnels: guide the existing field inward", shell, [-0.9, 0.1, 0.55], "left", 0);
+    label("Field coils: make a near-uniform background field", coils, [-2.42, 0, 0], "left", 1);
+    label("Hall-sensor gap: reads the concentrated field", sensor, [0, 0, 0], "right", 0);
+    label("Magnetic field lines: straight before and after the shell", fluxLines[2], [1.62, 0, 0], "right", 1);
     camera = [7.5, 4.6, 9.6];
     target = [0, -0.25, 0];
     update = (t, e) => {
-      shell.rotation.y = Math.sin(t * 0.32) * 0.05;
-      const pulse = 0.75 + 0.25 * Math.sin(t * 3.2);
-      sensor.scale.setScalar(pulse);
       fluxLines.forEach((line, i) => {
-        line.scale.x = 0.94 + 0.06 * Math.sin(t * 3 + i);
-        line.position.y = Math.sin(t * 2 + i) * 0.018;
+        line.position.y = Math.sin(t * 1.7 + i * 0.45) * 0.01;
       });
-      return e > 0.15 ? "Shell opened · field concentration" : "Flux gathered · sensor response";
+      return e > 0.15 ? "Funnels opened · sensing gap" : "Static field lines · flux concentrated at the gap";
     };
   } else if (kind === "auxetic") {
     return buildKneeBrace(lattice, color, variant);

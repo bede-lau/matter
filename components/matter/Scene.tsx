@@ -184,43 +184,66 @@ export default function Scene(p: SceneProps) {
         h = container.clientHeight;
       svg.setAttribute("width", String(w));
       svg.setAttribute("height", String(h));
-      for (const { c, label, line, dot } of calloutNodes) {
+      const compact = w < 760;
+      const leftInset = compact ? 8 : 24;
+      // This is an actual protected lane, not just a visual offset. It keeps
+      // prose clear of the orbit/reset/full-screen tool strip at every size.
+      const rightInset = compact ? 76 : 152;
+      const labelWidth = compact
+        ? Math.min(
+            116,
+            Math.max(78, Math.floor((w - leftInset - rightInset - 12) / 2)),
+          )
+        : Math.min(218, Math.max(172, Math.floor(w * 0.16)));
+      const projected = calloutNodes.map((entry) => {
+        const { c, label } = entry;
         const v = c.anchor.getWorldPosition(new T.Vector3()).project(camera);
         const px = ((v.x + 1) * w) / 2,
           py = ((1 - v.y) * h) / 2;
-        const compact = w < 560;
-        const leftInset = compact ? 8 : 18;
-        // Leave a dedicated lane for the scene controls. The labels must stay
-        // readable while the controls remain directly reachable in every view.
-        const rightInset = compact ? 72 : 104;
-        const labelWidth = compact
-          ? Math.min(
-              112,
-              Math.max(76, Math.floor((w - leftInset - rightInset - 12) / 2)),
-            )
-          : 168;
+        const visible = v.z > -1 && v.z < 1 && px > -40 && px < w + 40 && py > -40 && py < h + 40;
         const labelX =
           c.side === "left"
             ? leftInset
             : Math.max(leftInset, w - labelWidth - rightInset);
-        // The metadata chip occupies the upper-left corner. Start desktop
-        // labels below that protected header band rather than letting a callout
-        // compete with the selected-material summary.
-        const labelTop = compact
-          ? Math.max(160, h * 0.34)
-          : Math.max(180, h * 0.32);
-        const labelStep = h * (compact ? 0.17 : 0.18);
-        const labelY = Math.min(
-          h - (compact ? 92 : 108),
-          labelTop + c.slot * labelStep,
-        );
         label.style.left = labelX + "px";
-        label.style.top = labelY + "px";
         label.style.width = labelWidth + "px";
+        label.style.visibility = visible ? "visible" : "hidden";
+        return { ...entry, px, py, labelX, visible, labelY: 0 };
+      });
+      // Header material chips and the motion badge occupy their own protected
+      // bands. Sort anchors within each side lane and give labels measured
+      // vertical spacing so they never collide with each other or the footer.
+      const safeTop = compact ? Math.max(150, h * 0.27) : Math.max(165, h * 0.27);
+      const safeBottom = h - (compact ? 142 : 156);
+      for (const side of ["left", "right"] as const) {
+        const entries = projected
+          .filter((entry) => entry.visible && entry.c.side === side)
+          .sort((a, b) => a.py - b.py || a.c.slot - b.c.slot);
+        const gap = compact ? 9 : 16;
+        const heights = entries.map((entry) => Math.max(44, entry.label.offsetHeight));
+        const total = heights.reduce((sum, height) => sum + height, 0) + Math.max(0, entries.length - 1) * gap;
+        const anchorCenter = entries.length
+          ? entries.reduce((sum, entry) => sum + entry.py, 0) / entries.length
+          : safeTop;
+        let y = Math.max(safeTop, Math.min(safeBottom - total, anchorCenter - total * 0.46));
+        for (let i = 0; i < entries.length; i++) {
+          entries[i].labelY = y;
+          y += heights[i] + gap;
+        }
+      }
+      for (const { c, label, line, dot, px, py, labelX, labelY, visible } of projected) {
+        if (!visible) {
+          line.style.display = "none";
+          dot.style.display = "none";
+          continue;
+        }
+        line.style.display = "block";
+        dot.style.display = "block";
+        label.style.top = labelY + "px";
         const edge = c.side === "left" ? labelX + labelWidth : labelX;
         line.setAttribute(
           "points",
-          `${edge},${labelY + 18} ${edge + (c.side === "left" ? 16 : -16)},${labelY + 18} ${px},${py}`,
+          `${edge},${labelY + label.offsetHeight / 2} ${edge + (c.side === "left" ? 16 : -16)},${labelY + label.offsetHeight / 2} ${px},${py}`,
         );
         dot.setAttribute("cx", String(px));
         dot.setAttribute("cy", String(py));

@@ -325,30 +325,53 @@ export function createLattice(p: LatticeOptions, software = false) {
       ),
     );
   } else if (p.kind === "cloak") {
-    // Concentric graded rings make the transformation-optics idea legible:
-    // the shell is a wave-routing layer around an empty centre.
-    const rings = 4 + n;
-    for (let i = 0; i < rings; i++) {
-      const radius = 0.48 + (i / Math.max(1, rings - 1)) * 1.32;
-      const ring = addMesh(
-        new T.TorusGeometry(radius, 0.055 + (p.variant === 1 ? i * 0.009 : 0), software ? 8 : 14, software ? 28 : 52),
-      );
-      ring.rotation.x = Math.PI / 2;
-      ring.position.y = (i % 2 === 0 ? -1 : 1) * (0.12 + i * 0.055);
-    }
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      const inner = 0.46,
-        outer = 1.8,
-        y = Math.sin(a * 2 + p.variant) * 0.22;
-      rod(
-        [Math.cos(a) * inner, -y, Math.sin(a) * inner],
-        [Math.cos(a) * outer, y, Math.sin(a) * outer],
-        r * 1.3,
-      );
-    }
+    // A shallow, segmented resonator annulus. This is deliberately planar so
+    // it reads as a fabricated microwave shell, not an arbitrary wire cage.
+    const substrate = new T.MeshStandardMaterial({
+      color: 0x26333c,
+      roughness: 0.7,
+      metalness: 0.15,
+    });
+    const trace = new T.MeshPhysicalMaterial({
+      color: p.color,
+      roughness: 0.24,
+      metalness: 0.84,
+      clearcoat: 0.12,
+    });
+    addMesh(new T.CylinderGeometry(1.84, 1.84, 0.1, software ? 24 : 64), substrate).position.y = -0.07;
+    const layers = 3;
+    const rings = Math.max(4, n + 2);
+    for (let layer = 0; layer < layers; layer++)
+      for (let i = 0; i < rings; i++) {
+        const radius = 0.46 + (i / Math.max(1, rings - 1)) * 1.18;
+        const arc = addMesh(
+          new T.TorusGeometry(
+            radius,
+            0.032 + (p.variant === 1 ? i * 0.005 : 0),
+            software ? 6 : 10,
+            software ? 20 : 38,
+            Math.PI * 1.52,
+          ),
+          trace,
+        );
+        arc.rotation.x = Math.PI / 2;
+        arc.rotation.z = layer * 0.62 + i * 0.34;
+        arc.position.y = (layer - 1) * 0.1 + 0.015;
+      }
   } else if (p.kind === "membrane-absorber") {
-    // Repeated membrane cells: a thin diaphragm plus an offset platelet.
+    // Recessed drums: the membrane is seated in a rim and the low-profile
+    // platelet is bonded to the centre rather than floating above the panel.
+    const backing = new T.MeshStandardMaterial({
+      color: 0x26333c,
+      roughness: 0.7,
+      metalness: 0.12,
+    });
+    const plateletMat = new T.MeshPhysicalMaterial({
+      color: 0xd8dde0,
+      roughness: 0.36,
+      metalness: 0.45,
+    });
+    addMesh(new T.BoxGeometry(3.35, 0.09, 3.35), backing).position.y = -0.085;
     const cells = Math.max(2, n);
     for (let x = 0; x < cells; x++)
       for (let z = 0; z < cells; z++) {
@@ -364,82 +387,107 @@ export function createLattice(p: LatticeOptions, software = false) {
         frame.rotation.x = Math.PI / 2;
         frame.position.set(px, 0.03, pz);
         const platelet = addMesh(
-          new T.BoxGeometry(step * 0.16, 0.05, step * 0.1),
+          new T.CylinderGeometry(step * 0.105, step * 0.105, 0.025, software ? 12 : 20),
+          plateletMat,
         );
-        platelet.position.set(px + step * 0.07, 0.08, pz);
+        platelet.position.set(px + step * 0.055, 0.027, pz);
         platelet.rotation.y = (p.variant === 2 ? x - z : 0) * 0.18;
       }
   } else if (p.kind === "thermal-cloak") {
-    // Alternating annular paths are a compact visual model of directional
-    // conductivity around a protected centre.
+    // Coplanar annuli read as a fabricated composite plate. Alternating
+    // conductor and insulating paths are clearer than a stack of tubes.
+    const plate = new T.MeshStandardMaterial({
+      color: 0x26343e,
+      roughness: 0.68,
+      metalness: 0.2,
+    });
+    const copper = new T.MeshPhysicalMaterial({
+      color: 0xd89267,
+      roughness: 0.29,
+      metalness: 0.86,
+      clearcoat: 0.16,
+      side: T.DoubleSide,
+    });
+    const insulator = new T.MeshStandardMaterial({
+      color: 0x6f8591,
+      roughness: 0.78,
+      metalness: 0.08,
+      side: T.DoubleSide,
+    });
+    addMesh(new T.CylinderGeometry(1.86, 1.86, 0.1, software ? 24 : 64), plate).position.y = -0.08;
     const rings = 3 + n;
     for (let i = 0; i < rings; i++) {
-      const radius = 0.36 + i * (1.46 / Math.max(1, rings - 1));
+      const inner = 0.3 + i * (1.42 / rings);
+      const outer = inner + 1.27 / rings;
       const ring = addMesh(
-        new T.TorusGeometry(radius, 0.11 + (p.variant === 1 ? i * 0.012 : 0), software ? 8 : 12, software ? 26 : 48),
+        new T.RingGeometry(inner, outer, software ? 18 : 48),
+        i % 2 === 0 ? copper : insulator,
       );
-      ring.rotation.x = Math.PI / 2;
-      ring.position.y = (i % 2) * 0.06;
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.y = 0.012 + (i % 2) * 0.012;
     }
     addMesh(
-      new T.CylinderGeometry(0.27, 0.27, 0.16, software ? 16 : 28),
-      new T.MeshStandardMaterial({ color: 0x22313a, roughness: 0.7 }),
-    ).position.y = 0.1;
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      rod(
-        [Math.cos(a) * 0.28, 0.15, Math.sin(a) * 0.28],
-        [Math.cos(a) * 1.8, 0.15, Math.sin(a) * 1.8],
-        r * 0.75,
-      );
-    }
+      new T.CylinderGeometry(0.27, 0.27, 0.075, software ? 16 : 28),
+      new T.MeshStandardMaterial({ color: 0x334853, roughness: 0.78 }),
+    ).position.y = 0.055;
   } else if (p.kind === "topological") {
-    // A deformed kagome-like frame with a deliberately emphasized boundary.
-    const rows = Math.max(3, n + 1),
-      cols = Math.max(3, n + 1),
-      span = 3.15;
-    for (let y = 0; y < rows; y++)
-      for (let x = 0; x < cols; x++) {
-        const px = (x / (cols - 1) - 0.5) * span;
-        const py = (y / (rows - 1) - 0.5) * span;
-        const skew = p.variant === 1 ? Math.sin(y * 0.7) * 0.18 : p.variant === 2 ? (y / rows - 0.5) * 0.25 : 0;
-        const a = [px + skew, py, -0.38];
-        const b = [px + step * 0.42 + skew, py + step * 0.42, -0.38];
-        if (x < cols - 1) rod(a, [a[0] + span / (cols - 1), a[1], a[2]], r * 0.9);
-        if (y < rows - 1) rod(a, [a[0], a[1] + span / (rows - 1), a[2]], r * 0.9);
-        if (x < cols - 1 && y < rows - 1) rod(a, b, r * 0.8);
+    // A planar photonic-crystal chip with a deliberate L-shaped domain wall.
+    const postMat = new T.MeshPhysicalMaterial({
+      color: p.color,
+      roughness: 0.35,
+      metalness: 0.16,
+      clearcoat: 0.18,
+    });
+    const domainMat = new T.MeshStandardMaterial({
+      color: 0x718592,
+      roughness: 0.62,
+      metalness: 0.22,
+    });
+    const side = Math.max(6, n + 4);
+    const pitch = 3.15 / (side - 1);
+    for (let ix = 0; ix < side; ix++)
+      for (let iz = 0; iz < side; iz++) {
+        const x = (ix - (side - 1) / 2) * pitch;
+        const z = (iz - (side - 1) / 2) * pitch;
+        const route =
+          (Math.abs(z + 1.18) < pitch * 0.34 && x < 0.8) ||
+          (Math.abs(x - 0.8) < pitch * 0.34 && z > -1.18);
+        if (route) continue;
+        const post = addMesh(
+          new T.CylinderGeometry(0.095, 0.095, 0.26, software ? 8 : 16),
+          x < 0.8 || z < -1.18 ? postMat : domainMat,
+        );
+        post.position.set(x + (p.variant === 1 ? (iz % 2) * 0.055 : 0), 0.13, z);
       }
-    const edgeLoop = [
-      [-1.6, -1.6, -0.46],
-      [0, -1.6, -0.46],
-      [1.6, -1.6, -0.46],
-      [1.6, 0, -0.46],
-      [1.6, 1.6, -0.46],
-    ];
-    for (let i = 0; i < edgeLoop.length - 1; i++) rod(edgeLoop[i], edgeLoop[i + 1], r * 2.2);
   } else if (p.kind === "flux") {
-    // Nested funnel rings and radial collectors model a passive magnetic
-    // flux concentrator without implying that it creates a field.
-    const rings = 3 + n;
-    for (let i = 0; i < rings; i++) {
-      const radius = 0.38 + i * (1.38 / Math.max(1, rings - 1));
-      const ring = addMesh(
-        new T.TorusGeometry(radius, 0.07 + (p.variant === 1 ? i * 0.012 : 0), software ? 8 : 12, software ? 22 : 42),
-      );
-      ring.rotation.x = Math.PI / 2;
-      ring.position.y = (i - rings / 2) * 0.06;
-    }
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      const outer = 1.78,
-        inner = 0.34;
-      rod(
-        [Math.cos(a) * outer, Math.sin(a * 2) * 0.2, Math.sin(a) * outer],
-        [Math.cos(a) * inner, 0, Math.sin(a) * inner],
-        r * (p.variant === 2 ? 1.5 : 1.1),
-      );
-    }
-    addMesh(new T.CylinderGeometry(0.22, 0.22, 0.42, software ? 12 : 24)).position.y = 0.2;
+    // Five nested soft-magnetic funnels on each side of a small sensing gap.
+    const funnelMat = new T.MeshPhysicalMaterial({
+      color: p.color,
+      roughness: 0.22,
+      metalness: 0.82,
+      clearcoat: 0.16,
+      side: T.DoubleSide,
+    });
+    const layers = Math.min(5, Math.max(3, n + 2));
+    const gap = 0.28;
+    for (let side of [-1, 1])
+      for (let i = 0; i < layers; i++) {
+        const length = 0.62 + i * 0.11;
+        const narrow = 0.13 + i * 0.045;
+        const outer = 0.56 + i * 0.11;
+        const funnel = addMesh(
+          new T.CylinderGeometry(narrow, outer, length, software ? 16 : 40, 1, true),
+          funnelMat,
+        );
+        funnel.rotation.z = side < 0 ? -Math.PI / 2 : Math.PI / 2;
+        funnel.position.x = side * (gap / 2 + length / 2);
+        const mouth = addMesh(
+          new T.TorusGeometry(outer, 0.024, software ? 6 : 9, software ? 18 : 32),
+          funnelMat,
+        );
+        mouth.rotation.y = Math.PI / 2;
+        mouth.position.x = side * (gap / 2 + length);
+      }
   } else {
     for (let x = 0; x < n; x++)
       for (let y = 0; y < n; y++)
