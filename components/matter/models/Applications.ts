@@ -264,12 +264,11 @@ export function createApplication(
       return "Aircraft wing · internal load path";
     };
   } else if (kind === "metalens") {
-    // The post field is mounted upright, perpendicular to the optical axis.
-    // Its enlarged posts remain physically attached to a thin wafer.
-    // The wafer is positioned so its lower edge just meets the optics bench.
-    // This avoids both a floating panel and an impossible intersection.
-    const opticY = 0.25;
+    // The upright wafer rests on the bench at its lower rim. The tiny lift
+    // prevents z-fighting without allowing the plate to cut through the bench.
+    const opticY = 0.247;
     const optic = fitLattice(lattice, [2.45, 0.2, 2.45], [0, opticY, 0], group);
+    optic.name = "metalens-wafer";
     optic.rotation.z = Math.PI / 2;
     const bench = box(group, p.dark, [5.9, 0.14, 3.2], [0, -1.05, 0], "optics-bench");
     const mount = mesh(new T.TorusGeometry(1.32, 0.055, 8, 42), p.metal, group, "wafer-mount");
@@ -440,11 +439,20 @@ export function createApplication(
       return e > 0.15 ? "Layered plate · transient heat path" : "Heat diverted · core warms over time";
     };
   } else if (kind === "topological") {
-    // Seat the chip panel on the shared scene floor and keep every post base
-    // precisely on its upper face.
+    // fitLattice centres its result, so place its centre half its own height
+    // above the chip surface. This seats the lower ends of the posts exactly
+    // on the chip instead of cutting through it.
     const chipY = -2.38;
     const chipTop = chipY + 0.07;
-    const latticeHolder = fitLattice(lattice, [3.55, 0.65, 3.2], [0, chipTop, 0], group);
+    const latticeHeight = 0.65;
+    const latticeCenterY = chipTop + latticeHeight / 2;
+    const latticeHolder = fitLattice(
+      lattice,
+      [3.55, latticeHeight, 3.2],
+      [0, latticeCenterY, 0],
+      group,
+    );
+    latticeHolder.name = "topological-post-field";
     box(group, p.dark, [5.8, 0.14, 3.4], [0, chipY, 0], "photonic-chip");
     const inputPort = box(group, p.metal, [0.34, 0.16, 0.22], [-1.92, chipTop + 0.08, -1.18], "waveguide-input");
     const signal = fieldMaterial("#66dbff", 0.75);

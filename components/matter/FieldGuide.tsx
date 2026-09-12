@@ -10,7 +10,7 @@ import {
   Layers3,
 } from "lucide-react";
 import { families } from "@/lib/matter/catalog";
-import { learningSteps, materialCards, structureCards } from "@/lib/matter/learning";
+import { materialCards, structureCards } from "@/lib/matter/learning";
 import { GlossaryText } from "./Glossary";
 import MiniLattice from "./MiniLattice";
 
@@ -69,21 +69,6 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
 
   return (
     <section className="field-guide-v2" aria-label="Structure field guide">
-      <section className="field-guide-v2__map" aria-label="How a metamaterial is designed">
-        {learningSteps.map((step, index) => (
-          <article key={step.number}>
-            <span className="field-guide-v2__step-number">{step.number}</span>
-            <div>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </div>
-            {index < learningSteps.length - 1 && (
-              <ArrowRight className="field-guide-v2__step-arrow" aria-hidden="true" />
-            )}
-          </article>
-        ))}
-      </section>
-
       <section className="field-guide-v2__materials" aria-labelledby="starting-materials">
         <div className="field-guide-v2__section-heading">
           <div>

@@ -5,7 +5,6 @@ import {
   Layers3,
   ArrowUpRight,
   Search,
-  SlidersHorizontal,
   Play,
   Pause,
   RotateCcw,
@@ -502,10 +501,6 @@ export default function Studio() {
                 <span>{f.category}</span>
                 <strong>{f.variants[variant]}</strong>
                 <small>{f.tag}</small>
-              </div>
-              <div className="studio-toolbar__instruction">
-                <SlidersHorizontal size={16} />
-                Tune material and geometry in one view
               </div>
             </div>
             <div className="studio-grid">

@@ -189,6 +189,53 @@ for (const tail of aircraft.group.getObjectsByProperty(
     "horizontal tail tips sweep aft, away from +X nose",
   );
 }
+
+const opticalRoot = createLattice({
+  kind: "metalens",
+  variant: 1,
+  count: 3,
+  thickness: 0.8,
+  color: "#e7b5ff",
+});
+const optical = createApplication("metalens", 1, opticalRoot, "#e7b5ff");
+optical.group.updateMatrixWorld(true);
+const waferBounds = new T.Box3().setFromObject(
+  optical.group.getObjectByName("metalens-wafer")!,
+);
+const benchBounds = new T.Box3().setFromObject(
+  optical.group.getObjectByName("optics-bench")!,
+);
+assert.ok(
+  waferBounds.min.y >= benchBounds.max.y - 1e-6 &&
+    waferBounds.min.y - benchBounds.max.y < 0.01,
+  "metalens wafer meets the bench only at its lower rim",
+);
+
+const topologicalRoot = createLattice({
+  kind: "topological",
+  variant: 0,
+  count: 3,
+  thickness: 0.8,
+  color: "#97b3cf",
+});
+const topological = createApplication(
+  "topological",
+  0,
+  topologicalRoot,
+  "#97b3cf",
+);
+topological.group.updateMatrixWorld(true);
+const postFieldBounds = new T.Box3().setFromObject(
+  topological.group.getObjectByName("topological-post-field")!,
+);
+const chipBounds = new T.Box3().setFromObject(
+  topological.group.getObjectByName("photonic-chip")!,
+);
+assert.ok(
+  Math.abs(postFieldBounds.min.y - chipBounds.max.y) < 1e-6,
+  "topological posts start on the chip surface",
+);
+console.log("PASS: optical wafer rim and topological posts seat on their support surfaces");
 let seed = 414;
 const random = () => {
   seed = (seed * 1664525 + 1013904223) >>> 0;
