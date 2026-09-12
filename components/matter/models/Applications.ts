@@ -264,9 +264,9 @@ export function createApplication(
       return "Aircraft wing · internal load path";
     };
   } else if (kind === "metalens") {
-    // The upright wafer rests on the bench at its lower rim. The tiny lift
-    // prevents z-fighting without allowing the plate to cut through the bench.
-    const opticY = 0.247;
+    // Raise the full circular assembly until the mounting rim, rather than the
+    // wafer body, is the only feature that reaches the bench.
+    const opticY = 0.4;
     const optic = fitLattice(lattice, [2.45, 0.2, 2.45], [0, opticY, 0], group);
     optic.name = "metalens-wafer";
     optic.rotation.z = Math.PI / 2;

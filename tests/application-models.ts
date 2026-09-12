@@ -205,10 +205,17 @@ const waferBounds = new T.Box3().setFromObject(
 const benchBounds = new T.Box3().setFromObject(
   optical.group.getObjectByName("optics-bench")!,
 );
+const mountBounds = new T.Box3().setFromObject(
+  optical.group.getObjectByName("wafer-mount")!,
+);
 assert.ok(
-  waferBounds.min.y >= benchBounds.max.y - 1e-6 &&
-    waferBounds.min.y - benchBounds.max.y < 0.01,
-  "metalens wafer meets the bench only at its lower rim",
+  mountBounds.min.y >= benchBounds.max.y - 1e-6 &&
+    mountBounds.min.y - benchBounds.max.y < 0.01,
+  "metalens mounting rim meets the bench without penetrating it",
+);
+assert.ok(
+  waferBounds.min.y - benchBounds.max.y > 0.12,
+  "metalens wafer body remains raised above the bench",
 );
 
 const topologicalRoot = createLattice({
