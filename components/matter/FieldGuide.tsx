@@ -183,7 +183,7 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
               <span>{String(activeIndex + 1).padStart(2, "0")} / {family.category}</span>
               <div>
                 <h3>{family.name}</h3>
-                <p>{beginnerSummaries[family.id]}</p>
+                <p>{family.summary ?? beginnerSummaries[family.id]}</p>
               </div>
               <span className="field-guide-v2__behavior-tag">{family.tag}</span>
             </header>
@@ -193,7 +193,7 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
                 {reference && <img src={reference.image} alt={reference.alt} decoding="async" />}
                 <figcaption>
                   <span>START HERE</span>
-                  <strong>{reference?.eyebrow.split(" · ")[0] ?? "REAL REFERENCE"}</strong>
+                  <strong>{reference?.imageKind ?? reference?.eyebrow.split(" · ")[0] ?? "REAL REFERENCE"}</strong>
                 </figcaption>
               </figure>
               <div className="field-guide-v2__visual-arrow" aria-hidden="true">
@@ -209,11 +209,12 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
               </figure>
             </div>
 
+            {reference?.credit && <div className="field-guide-v2__reference-credit"><p>{reference.note}</p><SourceLink href={reference.sourceUrl} label={`View image source for ${family.name}`}>{reference.credit}</SourceLink></div>}
             <div className="field-guide-v2__lesson-notice">
               <BookOpen size={17} aria-hidden="true" />
               <div>
                 <span>TRY THIS</span>
-                <p>{tryPrompts[family.id]}</p>
+                <p>{family.tryPrompt ?? tryPrompts[family.id]}</p>
               </div>
             </div>
 
@@ -242,6 +243,7 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
                 More about this cell <ChevronRight size={16} aria-hidden="true" />
               </summary>
               <div>
+                {family.limitations && <p><GlossaryText>{family.limitations}</GlossaryText></p>}
                 <p>
                   These variants change the same basic cell. They are useful
                   comparisons, not finished product specifications.

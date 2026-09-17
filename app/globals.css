@@ -4800,3 +4800,7 @@ h1 {
     line-height: 1.48;
   }
 }
+
+.field-guide-v2__reference-credit { padding: 14px 0; color: #aebfca; font-size: 13px; line-height: 1.6; }
+.field-guide-v2__reference-credit a { display: inline-flex; gap: 6px; align-items: center; color: #c2ef72; text-decoration: underline; text-underline-offset: 3px; }
+.model-reading-note { margin-top: 18px; padding-top: 16px; border-top: 1px solid #334650; color: #b6c7d1; font-size: 13px; line-height: 1.6; }

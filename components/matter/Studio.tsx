@@ -412,6 +412,14 @@ export default function Studio() {
                   variant: f.variants[variant],
                   material: bases[base].name,
                   secondary_material: bases[second].name,
+                  ...(specialisedParameters ? {
+                    controls: {
+                      [specialisedParameters.thickness]: specialisedParameters.thicknessValue?.(thick) ?? `${thick.toFixed(2)} relative`,
+                      [specialisedParameters.count]: specialisedParameters.countValue?.(count) ?? count,
+                    },
+                    material_roles: f.materialNote,
+                    limitations: f.limitations,
+                  } : {
                   secondary_volume_fraction: fraction,
                   solid_reuss_bound_mpa: lower,
                   solid_voigt_bound_mpa: upper,
@@ -420,6 +428,7 @@ export default function Studio() {
                   relative_density_estimate: density,
                   modulus_mpa_illustrative_lower: estimateLow,
                   modulus_mpa_illustrative_upper: estimated,
+                  }),
                   evidence: "illustrative",
                   source_url: f.source,
                 },
@@ -1013,7 +1022,7 @@ export default function Studio() {
                     </output>
                   </label>
                   <Slider
-                    aria-label="Repetition"
+                    aria-label={specialisedParameters?.count ?? "Repetition"}
                     min={1}
                     max={5}
                     step={1}
@@ -1029,7 +1038,7 @@ export default function Studio() {
                 </div>
               </div>
               <div className="property-card compact-properties">
-                <div className="eyebrow">ILLUSTRATIVE TEACHING ESTIMATES</div>
+                <div className="eyebrow">{specialisedParameters ? "HOW TO READ THIS MODEL" : "ILLUSTRATIVE TEACHING ESTIMATES"}</div>
                 {specialisedParameters ? (
                   <div className="property-card__qualitative">
                     <span>Teaching model</span>
@@ -1046,7 +1055,7 @@ export default function Studio() {
                     </strong>
                   </div>
                 )}
-                <div>
+                {!specialisedParameters && <div>
                   <span>
                     <GlossaryText>{metricLabel}</GlossaryText>
                   </span>
@@ -1060,7 +1069,9 @@ export default function Studio() {
                       : `${Math.min(5, 1.2 + density * 4.2 + variant * 0.35).toFixed(1)}`}
                     <small>{metricUnit}</small>
                   </strong>
-                </div>
+                </div>}
+                {specialisedParameters && <p className="model-reading-note"><GlossaryText>{f.controlNote ?? "Compare the visible pattern and motion as you change the controls. Dimensions are illustrative."}</GlossaryText></p>}
+                {f.limitations && <p className="model-reading-note"><GlossaryText>{f.limitations}</GlossaryText></p>}
               </div>
             </aside>
           </div>

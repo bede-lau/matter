@@ -7,6 +7,8 @@ export type SourceCard = {
   sourceLabel: string;
   sourceUrl: string;
   note: string;
+  credit?: string;
+  imageKind?: string;
 };
 
 /** Real-world references used to ground the learning material. They are kept

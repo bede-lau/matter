@@ -24,6 +24,10 @@ export type Family = {
   /** Two materials are shown as fixed layers or inclusions, not a volume blend. */
   secondaryFixed?: boolean;
   materialNote?: string;
+  summary?: string;
+  tryPrompt?: string;
+  limitations?: string;
+  controlNote?: string;
 };
 export const families: Family[] = [
   {
