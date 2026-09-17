@@ -4817,3 +4817,7 @@ h1 {
 .frontier-datasets h3 { font-size: 20px; margin: 12px 0; }
 .frontier-datasets a { display: inline-flex; gap: 8px; align-items: center; color: #c2ef72; margin-top: 12px; }
 @media (max-width: 700px) { .frontier-datasets__grid { grid-template-columns: 1fr; } }
+
+.property-card:has(.property-card__qualitative) { display: block; }
+.property-card:has(.property-card__qualitative) .property-card__qualitative { margin-top: 20px; }
+.property-card:has(.property-card__qualitative) p { width: 100%; margin-top: 18px; }

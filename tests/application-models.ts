@@ -90,7 +90,7 @@ for (const kind of [
     );
   }
 
-assert.equal(families.length, 18, "the atlas contains 18 material families");
+assert.equal(families.length, 48, "the atlas contains 48 material families");
 assert.equal(new Set(families.map((family) => family.id)).size, families.length, "family IDs stay unique");
 families.forEach((family) => {
   assert.equal(family.variants.length, 3, family.id + " has three variants");
@@ -471,3 +471,5 @@ assert.ok(
   "software gyroid has a non-empty surface",
 );
 console.log("PASS: visible secondary-phase allocation survives product shaping");
+
+import "./expansion-models";

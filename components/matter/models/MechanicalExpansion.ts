@@ -36,8 +36,8 @@ export const mechanicalControls: Record<string,{thickness:string;count:string;th
  'miura-origami':{thickness:'Crease gauge',count:'Facet rows',thicknessValue:v=>`${(1+normalized(v)*2).toFixed(1)}% of edge`,countValue:v=>`${count(v)+1} rows`},
  'kirigami':{thickness:'Ribbon gauge',count:'Cut ribbons',thicknessValue:v=>`${(1+normalized(v)*2).toFixed(1)}% of width`,countValue:v=>`${count(v)+2} ribbons`},
  'bistable-beam':{thickness:'Beam gauge',count:'Arch lanes',thicknessValue:v=>`${(1+normalized(v)*2).toFixed(1)}% of span`,countValue:v=>`${count(v)} lanes`},
- 'tensegrity':{thickness:'Strut diameter',count:'Prism modules',thicknessValue:v=>`${(4+normalized(v)*4).toFixed(1)}% of radius`,countValue:v=>`${count(v)} modules`},
- 'spinodal-shell':{thickness:'Shell gauge',count:'Disorder frequency',thicknessValue:v=>`${(10+normalized(v)*13).toFixed(0)}% of local period`,countValue:v=>`${count(v)+1} relative cycles`},
+ 'tensegrity':{thickness:'Strut diameter',count:'Prism modules',thicknessValue:v=>`${(9+normalized(v)*7).toFixed(1)}% of radius`,countValue:v=>`${count(v)} modules`},
+ 'spinodal-shell':{thickness:'Shell gauge',count:'Disorder frequency',thicknessValue:v=>`${Math.round(normalized(v)*100)}% of illustrated range`,countValue:v=>`${(2.8+(count(v)-1)*.65).toFixed(2)} relative frequency`},
  'chainmail':{thickness:'Wire radius',count:'Links across',thicknessValue:v=>`${(5+normalized(v)*4).toFixed(1)}% of link radius`,countValue:v=>`${count(v)+1} links`},
  'thermal-expansion':{thickness:'Laminate gauge',count:'Bonded strips',thicknessValue:v=>`${(1+normalized(v)*2).toFixed(1)}% of length`,countValue:v=>`${count(v)} strips`},
 };
@@ -114,8 +114,9 @@ export function createMechanicalGeometry(p:LatticeOptions,software=false):T.Grou
   update=t=>{const snap=Math.tanh(5*Math.cos(t*.65)),height=h*snap;arches.forEach(({z,s})=>s.write((u,side,face)=>[-span/2+span*u,base+height*Math.sin(Math.PI*u)+face*th/2,z+side*spacing*(v===2?.065:.13)]));shuttle.position.y=base+height;on(landmarks[0],[-span/2,base,0]);on(landmarks[1],[-span*.25,base+height*.707,arches[0].z]);on(landmarks[2],[0,base+height,0]);on(landmarks[3],[span/2,base,0]);return 'Prescribed snap-through · the arch passes between two curved states';};
   labels=['Rigid end clamp','Precurved steel beam','Moving aluminium shuttle','Fixed beam end'];fixture='snap';
  }else if(p.kind==='tensegrity'){
-  const sides=3+v,moduleScale=Math.min(1,4.35/(n*1.8)),R=.66*moduleScale,L=2.02*moduleScale,barR=R*(.02+.02*q),cableR=R*.016;
-  const modules=Array.from({length:n},(_,k)=>{const x=(k-(n-1)/2)*1.8*moduleScale;const bars=Array.from({length:sides},()=>unitRod(g,primary,'isolated-steel-compression-strut'));const cables=Array.from({length:sides*3},()=>unitRod(g,metal,'steel-tension-cable'));const nodes=Array.from({length:sides*2},()=>mesh(new T.SphereGeometry(barR*1.55,8,6),metal,g,'cable-and-strut-node'));return {x,bars,cables,nodes};});
+  primary.color.lerp(new T.Color('#bac6cc'),.3);
+  const sides=3+v,moduleScale=Math.min(1,4.35/(n*1.8)),R=.66*moduleScale,L=2.02*moduleScale,barR=R*(.045+.035*q),cableR=R*.023;
+  const modules=Array.from({length:n},(_,k)=>{const x=(k-(n-1)/2)*1.8*moduleScale;const bars=Array.from({length:sides},()=>unitRod(g,primary,'isolated-composite-compression-strut'));const cables=Array.from({length:sides*3},()=>unitRod(g,metal,'steel-tension-cable'));const nodes=Array.from({length:sides*2},()=>mesh(new T.SphereGeometry(barR*1.55,8,6),metal,g,'cable-and-strut-node'));return {x,bars,cables,nodes};});
   update=t=>{const theta=Math.PI/2+Math.PI/sides+.07*Math.sin(t*.6),height=Math.sqrt(L*L-4*R*R*Math.sin(theta/2)**2);modules.forEach(mod=>{const b:V[]=[],u:V[]=[];for(let i=0;i<sides;i++){const a=i*Math.PI*2/sides;b.push([mod.x+R*Math.cos(a),barR*1.55,R*Math.sin(a)]);u.push([mod.x+R*Math.cos(a+theta),barR*1.55+height,R*Math.sin(a+theta)]);}for(let i=0;i<sides;i++){segment(mod.bars[i],b[i],u[i],barR);segment(mod.cables[i*3],b[i],b[(i+1)%sides],cableR);segment(mod.cables[i*3+1],u[i],u[(i+1)%sides],cableR);segment(mod.cables[i*3+2],b[i],u[(i+sides-1)%sides],cableR);on(mod.nodes[i],b[i]);on(mod.nodes[i+sides],u[i]);}if(mod===modules[0]){on(landmarks[0],mod.bars[0].position.toArray() as V);on(landmarks[1],mod.cables[2].position.toArray() as V);on(landmarks[2],u[0]);on(landmarks[3],b[0]);}});return 'Fixed-length struts · a prescribed twist changes cable geometry';};
   labels=['Isolated compression strut','Tension-only steel cable','Cable junction','Supported lower node'];fixture='tensegrity';
  }else if(p.kind==='spinodal-shell'){

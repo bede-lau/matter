@@ -1002,7 +1002,7 @@ export default function Studio() {
                     </output>
                   </label>
                   <Slider
-                    aria-label="Thickness"
+                    aria-label={specialisedParameters?.thickness ?? "Thickness"}
                     min={0.3}
                     max={1.6}
                     step={0.05}

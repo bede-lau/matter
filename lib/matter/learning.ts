@@ -1,3 +1,4 @@
+import expansionReferences from "./expansion-references.json";
 export type SourceCard = {
   id: string;
   title: string;
@@ -103,6 +104,7 @@ export const materialCards: SourceCard[] = [
 ];
 
 export const structureCards: SourceCard[] = [
+  ...expansionReferences,
   {
     id: "gyroid",
     title: "Gyroid",

@@ -1,156 +1,2821 @@
 [
-  {"id":"metamaterial","term":"Metamaterial","aliases":["engineered material","mechanical metamaterial","structural metamaterial","acoustic metamaterial","vibration metamaterial","thermal metamaterial","optical metamaterial","photonic metamaterial","magnetic metamaterial","wave metamaterial"],"definition":"Definition: A metamaterial is a designed structure whose small-scale pattern gives the whole object useful behavior. The pattern can matter as much as the substance it is made from.","context":"Key point: choose a base material, shape it into repeating cells, then test how that architecture changes force, motion, heat, sound, or light."},
-  {"id":"geometry","term":"Geometry","aliases":["shape","material architecture","architecture"],"definition":"Definition: Geometry is the size, shape, orientation, and arrangement of the solid parts and empty spaces in a structure.","context":"Key point: Changing geometry can alter stiffness, cushioning, directionality, or vibration response without changing the base material."},
-  {"id":"lattice","term":"Lattice","aliases":["cellular lattice","cellular network","network","cellular","cells"],"definition":"Definition: A lattice is a lightweight framework made by repeating connected cells, leaving controlled empty space between solid walls or beams.","context":"Key point: The same polymer or metal can behave differently when arranged as a gyroid, truss, honeycomb, or another lattice."},
-  {"id":"unit-cell","term":"Unit cell","aliases":["periodic unit cell"],"definition":"Definition: A unit cell is the smallest geometric building block that repeats to form a larger lattice.","context":"Key point: Changing one cell, including its angles, size, or thickness, changes the repeated structure built from it."},
-  {"id":"periodic","term":"Periodic structure","aliases":["repetition","periodic architecture"],"definition":"Definition: A periodic structure repeats a unit cell at regular intervals, like a three-dimensional tile pattern.","context":"Key point: Repeating more cells makes a larger sample; it does not by itself make each cell stronger."},
-  {"id":"cell-size","term":"Cell size","aliases":["unit-cell size"],"definition":"Definition: Cell size is the overall width, height, or spacing of one repeating cell.","context":"Key point: Smaller cells place more repeats into the same volume. Performance also depends on wall thickness, material, defects, and loading direction."},
-  {"id":"strut","term":"Strut","aliases":["lattice member","rib","strut diameter","strut thickness"],"definition":"Definition: A strut is a slender beam that connects points in a lattice. Its diameter is the width of that beam.","context":"Key point: Thicker struts usually add stiffness and mass; their angles determine whether loads mainly stretch or bend them."},
-  {"id":"wall-thickness","term":"Wall thickness","aliases":["sheet thickness"],"definition":"Definition: Wall thickness is the distance from one side of a sheet-like surface to the other.","context":"Key point: A sheet gyroid has curved walls rather than separate beams. Thicker walls use more material and usually resist deformation more strongly."},
-  {"id":"relative-density","term":"Density and relative density","aliases":["density","density_kg_m3","relative density","solid fraction","volume fraction"],"definition":"Definition: Density is mass per unit volume. Relative density compares a cellular structure with a fully solid block of the same base material.","context":"Key point: A 20% relative density means roughly one fifth of the volume is solid and the rest is open space; exact values require measuring the real geometry."},
-  {"id":"load-path","term":"Load path","aliases":["force path"],"definition":"Definition: A load path is the route a force follows through connected parts of a structure to its supports.","context":"Key point: Continuous sheets, triangular trusses, and bending cell walls send forces through different paths."},
-  {"id":"deformation","term":"Deformation","aliases":["compression","deflection"],"definition":"Definition: Deformation is a change in shape or size caused by a force. Compression is shortening; deflection is movement away from the original position.","context":"Key point: A visual animation can explain the motion, but measured deformation requires material data, boundary conditions, and a physical test or solver."},
-  {"id":"stiffness","term":"Stiffness","aliases":["rigidity"],"definition":"Definition: Stiffness describes how much a particular object resists changing shape under a force.","context":"Key point: Object stiffness depends on both the base material and the object’s geometry, dimensions, supports, and loading direction."},
-  {"id":"modulus","term":"Modulus","aliases":["elastic modulus","Young’s modulus"],"definition":"Definition: Elastic modulus measures how strongly a material resists elastic stretching or compression before permanent change begins.","context":"Key point: Modulus is a material property; the stiffness of a finished lattice also depends on its geometry and amount of solid material."},
-  {"id":"mpa","term":"MPa","aliases":["megapascal"],"definition":"Definition: MPa means megapascal, or one million pascals. It is a unit used for stress and elastic modulus.","context":"Key point: A larger modulus in MPa usually means the solid material is harder to stretch elastically."},
-  {"id":"voigt-bound","term":"Voigt and Reuss bounds","aliases":["Voigt estimate","upper mixture bound","Reuss bound","Reuss estimate","lower mixture bound","Voigt bound","Reuss–Voigt"],"definition":"Definition: Voigt and Reuss bounds are ideal upper and lower estimates of stiffness from the two material properties and their shares.","context":"Key point: They are simplified limits, not direct predictions for a printed lattice or a finished product."},
-  {"id":"two-phase-mixture","term":"Two-phase mixture","aliases":["two-material blend","secondary material"],"definition":"Definition: A two-phase mixture contains two distinct materials, called phases, in chosen proportions.","context":"Key point: The phases could be blended, layered, coated, or placed in different regions. Their arrangement and bonding determine the real result."},
-  {"id":"tpu","term":"TPU elastomer","aliases":["TPU","thermoplastic polyurethane","elastomer"],"definition":"Definition: TPU is thermoplastic polyurethane: a heat-processable polymer that can be flexible, tough, and rubber-like, depending on its grade.","context":"Key point: Its flexibility makes TPU a common candidate for cushioning lattices, flexible wearables, seals, and protective parts."},
-  {"id":"pa12","term":"Nylon PA12","aliases":["PA12","polyamide 12","nylon"],"definition":"Definition: Nylon PA12 is a polyamide plastic valued for toughness, low moisture uptake, and compatibility with powder-bed 3D printing.","context":"Key point: It is generally stiffer than flexible TPU, so the same lattice geometry can feel and respond very differently."},
-  {"id":"polymer","term":"Polymer","aliases":["polymers","polymeric material"],"definition":"Definition: A polymer is a material made from long, repeating molecular chains. TPU and nylon are common engineering polymers.","context":"Key point: The recipe and manufacturing process change whether a polymer feels soft, tough, flexible, or stiff."},
-  {"id":"metals","term":"Aluminium and titanium","aliases":["aluminium","aluminum","titanium"],"definition":"Definition: Aluminium is a lightweight metal; titanium is denser but notably strong, corrosion-resistant, and heat-resistant for its mass.","context":"Key point: Metal lattices can be far stiffer than polymer lattices, but manufacturing limits, fatigue, cost, and safety testing become crucial."},
-  {"id":"gyroid","term":"Gyroid","aliases":["gyroid geometry"],"definition":"Definition: A gyroid is a smooth, repeating surface that winds through three dimensions without straight beams or sharp junctions.","context":"Key point: Its continuous curves can distribute loads and create connected passages, which is useful for cushioning, heat exchange, and fluid flow studies."},
-  {"id":"sheet-gyroid","term":"Sheet gyroid","aliases":["gyroid sheet"],"definition":"Definition: A sheet gyroid turns the mathematical gyroid surface into a thin, continuous solid wall.","context":"Key point: Increasing wall thickness adds solid material; grading the thickness can create softer and firmer zones."},
-  {"id":"skeletal-gyroid","term":"Skeletal gyroid","aliases":["solid-network gyroid"],"definition":"Definition: A skeletal gyroid uses connected branch-like solids that follow one side of the gyroid’s labyrinth instead of thickening the dividing sheet.","context":"Key point: Sheet and skeletal versions have different solid paths and void shapes, so they should not be expected to perform identically."},
-  {"id":"minimal-surface","term":"Minimal surface","aliases":["minimal-area surface"],"definition":"Definition: A minimal surface is a smooth surface whose average curvature is zero at every point, similar to a soap film balanced by surface tension.","context":"Key point: The gyroid is a mathematical triply periodic minimal surface; biological gyroid-like patterns are related examples, not the source of the mathematics."},
-  {"id":"octet-truss","term":"Octet truss","aliases":["octet lattice","tetrahedral cell","octahedral cell"],"definition":"Definition: An octet truss is a repeating three-dimensional framework made from the edges of tetrahedra and octahedra.","context":"Key point: Its many triangles can carry loads mainly by stretching and compressing struts, producing high stiffness for relatively low mass."},
-  {"id":"anisotropic","term":"Anisotropic","aliases":["directional"],"definition":"Definition: Anisotropic means a material or structure responds differently when loaded in different directions.","context":"Key point: Stretching cells or aligning struts can create a preferred direction for stiffness, strength, flow, or wave travel."},
-  {"id":"graded","term":"Graded","aliases":["spatially graded","zoned"],"definition":"Definition: A graded structure gradually changes cell size, wall thickness, strut thickness, or material from one region to another.","context":"Key point: Grading can place support or cushioning where it is needed, but the best gradient must be designed and tested for the use case."},
-  {"id":"reentrant","term":"Re-entrant cell","aliases":["re-entrant honeycomb","inward-folded cell"],"definition":"Definition: A re-entrant cell is an indented lattice cell whose ribs point inward instead of forming an outward hexagon.","context":"Key point: When pulled, the angled ribs can rotate outward, changing both the cell’s length and width."},
-  {"id":"auxetic","term":"Auxetic","aliases":["negative-Poisson-ratio structure"],"definition":"Definition: An auxetic structure becomes wider when stretched and narrower when compressed in the tested directions.","context":"Key point: Re-entrant cells can create this behavior through rib rotation, but the effect depends on geometry, material, and loading direction."},
-  {"id":"poisson-ratio","term":"Poisson ratio","aliases":["negative Poisson ratio"],"definition":"Definition: Poisson ratio compares sideways deformation with deformation along the applied load. A negative value describes auxetic widening during stretching.","context":"Key point: Most ordinary solids narrow when stretched; some designed lattices can reverse that familiar response."},
-  {"id":"kelvin-cell","term":"Kelvin cell","aliases":["Kelvin foam cell"],"definition":"Definition: A Kelvin cell is a space-filling cell based on a 14-faced truncated octahedron, proposed as an idealized foam model.","context":"Key point: A network of its edges can bend and compress, suggesting lightweight energy-absorbing liners and cores."},
-  {"id":"truncated-octahedron","term":"Truncated octahedron","aliases":["Kelvin tetrakaidecahedron"],"definition":"Definition: A truncated octahedron is a 14-faced solid with six square faces and eight hexagonal faces that can tile space without gaps.","context":"Key point: Connecting its edges creates the open framework used in a Kelvin-cell lattice."},
-  {"id":"honeycomb","term":"Honeycomb","aliases":["hexagonal honeycomb"],"definition":"Definition: A honeycomb is a cellular core made from repeated wall-enclosed cells, commonly hexagons.","context":"Key point: Natural bee comb is a familiar example; engineered honeycomb may use paper, polymers, aluminium, or composites between stiff outer skins."},
-  {"id":"hexagonal-cell","term":"Hexagonal cell","aliases":["hexagon"],"definition":"Definition: A hexagonal cell has six sides. Repeating hexagons can fill a flat plane efficiently with shared walls.","context":"Key point: Elongating or rotating the hexagons changes how the core carries loads in different directions."},
-  {"id":"local-resonator","term":"Local resonator","aliases":["resonant unit","locally resonant supports"],"definition":"Definition: A local resonator is a small internal mass or part that vibrates relative to the surrounding structure.","context":"Key point: Near its tuned frequency, that local motion can interact with waves in the larger structure and reduce transmission over a limited band."},
-  {"id":"resonance","term":"Resonance","aliases":["resonant frequency"],"definition":"Definition: Resonance is the strong response that occurs when repeated forcing is near a system’s natural frequency.","context":"Key point: Resonators must be tuned: a design that helps at one frequency range may do little at another."},
-  {"id":"mass-spring","term":"Mass–spring oscillator","aliases":["mass-spring system","oscillator","oscillating internal masses"],"definition":"Definition: A mass–spring oscillator is a mass connected to a flexible element that pulls it back toward rest when displaced.","context":"Key point: Mass and spring stiffness set its natural frequency; damping controls how quickly the motion fades."},
-  {"id":"elastodynamic","term":"Elastodynamic","aliases":["elastodynamics"],"definition":"Definition: Elastodynamics studies how elastic deformation, vibration, and waves change through a solid over time.","context":"Key point: It combines material elasticity with motion, inertia, geometry, and boundary conditions."},
-  {"id":"band-gap","term":"Band gap","aliases":["frequency band gap","band-gap center","gap center","band-gap width","gap width"],"definition":"Definition: A band gap is a frequency range that cannot travel through the repeating interior of an ideal periodic structure.","context":"Key point: A specially designed edge can still guide a wave inside a bulk band gap. A finite real object needs experimental validation."},
-  {"id":"frequency","term":"Frequency","aliases":["Hz","hertz"],"definition":"Definition: Frequency is how many cycles of a vibration or wave occur each second. One hertz means one cycle per second.","context":"Key point: Low and high frequencies can interact very differently with the same resonator or periodic structure."},
-  {"id":"wave-propagation","term":"Wave propagation","aliases":["wave transmission"],"definition":"Definition: Wave propagation is the movement of energy and disturbance through a material or structure.","context":"Key point: Periodic cells and resonators can scatter, slow, redirect, or inhibit certain waves under specific conditions."},
-  {"id":"simulated-design","term":"Simulated design","aliases":["simulation","modeled design"],"definition":"Definition: A simulated design is evaluated with mathematical and computational models rather than measured directly on a manufactured specimen.","context":"Key point: Simulation can compare many candidates quickly, but results depend on assumptions and should be validated before safety-critical use."},
-  {"id":"evidence-label","term":"Evidence label","aliases":["evidence status","result label"],"definition":"Definition: An evidence label tells you whether a value was measured in an experiment, computed in a simulation, or created only to explain a concept.","context":"Key point: Keeping these labels visible prevents a teaching animation or rough estimate from being mistaken for tested performance."},
-  {"id":"measured","term":"Measured","aliases":["measured result","test result"],"definition":"Definition: A measured value comes from a physical test of a real sample.","context":"Key point: It describes the sample and test conditions used, not every version of the same design."},
-  {"id":"simulated","term":"Simulated","aliases":["simulation result","model result"],"definition":"Definition: A simulated value is calculated by a computer model instead of tested on a physical sample.","context":"Key point: It is useful for comparing ideas, but it depends on the model assumptions."},
-  {"id":"illustrative","term":"Illustrative","aliases":["teaching estimate","teaching value"],"definition":"Definition: An illustrative value is included to show how a setting can change an idea. It is not a tested performance claim.","context":"Key point: Use it to compare settings in this model, not to design a finished part."},
-  {"id":"source-encoding","term":"15-bit source encoding","aliases":["binary encoding","encoded design"],"definition":"Definition: A 15-bit source encoding is a sequence of 15 zeros and ones used by the dataset authors to identify a design pattern.","context":"Key point: It is a data code, not a picture of the unit cell. Consult the source dataset to reconstruct its exact meaning."},
-  {"id":"midsole","term":"Midsole","aliases":["cushioning midsole"],"definition":"Definition: The midsole is the main cushioning and support layer between a shoe’s upper and its ground-contacting outsole.","context":"Key point: A cellular midsole can be tuned by changing its base polymer, cell geometry, wall thickness, and regional grading."},
-  {"id":"outsole","term":"Outsole","aliases":["rubber outsole","traction"],"definition":"Definition: The outsole is the bottom layer of a shoe that contacts the ground and provides wear resistance and traction.","context":"Key point: It protects the softer midsole and uses tread geometry and material friction to grip the surface."},
-  {"id":"insole","term":"Insole and sockliner","aliases":["insole","sockliner","footbed"],"definition":"Definition: An insole or sockliner is the removable or built-in layer directly beneath the foot.","context":"Key point: It helps with fit and comfort but is distinct from the thicker structural and cushioning midsole below it."},
-  {"id":"strobel","term":"Strobel board","aliases":["strobel structural layer","strobel"],"definition":"Definition: A Strobel board is the flexible fabric-like layer stitched to the shoe upper to form the bottom of the foot-shaped cavity.","context":"Key point: It sits above the midsole and helps join the upper construction to the sole assembly."},
-  {"id":"shoe-upper","term":"Shoe upper","aliases":["upper","tongue","laces","eyestay","padded collar","heel counter","collar"],"definition":"Definition: The shoe upper wraps the foot. The tongue, laces, eyestay, collar, and heel counter work together to control fit and foot movement.","context":"Key point: These parts locate the foot while the sole layers handle ground contact, cushioning, and support."},
-  {"id":"airfoil","term":"Airfoil","aliases":["aerofoil"],"definition":"Definition: An airfoil is a cross-sectional shape designed to guide airflow and produce aerodynamic forces such as lift.","context":"Key point: A wing’s outer skin keeps the airfoil shape while the internal spars, ribs, or cellular core carry structural loads."},
-  {"id":"wing-skin","term":"Wing skin","aliases":["airfoil skin","inspection skin"],"definition":"Definition: Wing skin is the thin outer surface that preserves the aerodynamic shape and can help carry shear and bending loads.","context":"Key point: A cutaway can move part of the skin aside to reveal an internal core; a real wing also needs joints, spars, systems, and certification."},
-  {"id":"core","term":"Core","aliases":["wing core","sandwich core"],"definition":"Definition: A core is a lightweight internal layer placed between stronger outer skins to keep them apart and resist shear or crushing.","context":"Key point: Honeycomb, foam, and lattices are possible cores. Their attachment to the skins is as important as the cell geometry."},
-  {"id":"cutaway","term":"Cutaway","aliases":["inspection cutaway","section view"],"definition":"Definition: A cutaway view removes or moves an outer layer so hidden internal parts can be inspected.","context":"Key point: It is a teaching and inspection view; the separated components are not necessarily how the product operates."},
-  {"id":"helmet","term":"Helmet shell, liner, and vent","aliases":["helmet shell","helmet liner","vented shell","vent","vented outer shell","cellular liner"],"definition":"Definition: A helmet combines a hard outer shell, an energy-managing liner, fit padding, vents, and a retention system.","context":"Key point: A cellular liner is one possible concept. Real protection depends on the complete helmet and must pass standardized impact and retention tests."},
-  {"id":"knee-protection","term":"Knee-pad shell and insert","aliases":["knee pad","protective shell","cellular insert"],"definition":"Definition: Knee protection can combine a fitted sleeve, retention parts, a load-spreading shell, and a cushioning insert around the joint.","context":"Key point: An auxetic insert may conform as it bends, but comfort and protection require anatomy, movement, durability, and impact testing."},
-  {"id":"motor-mount","term":"Motor isolation mount","aliases":["isolation mount"],"definition":"Definition: A motor isolation mount sits between a vibrating motor and its support to reduce how much vibration is transmitted.","context":"Key point: A locally resonant mount can target selected frequencies; broad real-world vibration usually needs damping and multi-frequency design too."},
-  {"id":"motor-excitation","term":"Motor excitation","aliases":["motor vibration input"],"definition":"Definition: Motor excitation is the vibration or changing force a motor sends into its mounting structure.","context":"Key point: An isolation mount is designed to reduce how much of that vibration travels onward."},
-  {"id":"uniform","term":"Uniform","aliases":["constant"],"definition":"Definition: Uniform means the selected feature, such as cell size or strut thickness, stays the same throughout the structure.","context":"Key point: Uniform designs are easier to compare; graded designs deliberately change that feature by location."},
-  {"id":"isotropic","term":"Isotropic","aliases":["isotropy"],"definition":"Definition: Isotropic means a material property is the same in every direction at the scale being considered.","context":"Key point: A base material may be nearly isotropic while a lattice made from it becomes anisotropic because its geometry has preferred directions."},
-  {"id":"patella","term":"Patella support","aliases":["patella support ring","patella","kneecap"],"definition":"Definition: The patella is the kneecap. A surrounding support ring can help position padding while leaving the front of the kneecap unobstructed.","context":"Key point: A safe brace must match a wearer’s anatomy and allow the knee to bend without harmful pressure points."},
-  {"id":"sleeve","term":"Compression-knit sleeve","aliases":["textile sleeve","sleeve","textile"],"definition":"Definition: A compression-knit sleeve is a close-fitting stretch textile that wraps the limb and helps keep brace components in place.","context":"Key point: Its knit pattern, stretch, seams, sizing, and breathability affect comfort and retention."},
-  {"id":"dial","term":"Brace adjustment","aliases":["tension dial","side stays","articulated side supports"],"definition":"Definition: A tension dial tightens a cable in small steps; side stays reinforce the brace and may guide bending beside the knee.","context":"Key point: These parts control fit and alignment. They are separate from the cellular insert that manages local pressure or impact."},
-  {"id":"headform","term":"Headform","aliases":["anatomical headform"],"definition":"Definition: A headform is a standardized model of a human head used for fit checks or controlled helmet tests.","context":"Key point: It represents external shape and test mass, not living tissue or a prediction of injury."},
-  {"id":"retention","term":"Retention system","aliases":["chin retention system"],"definition":"Definition: A retention system uses straps, anchors, adjusters, and a buckle to keep protective equipment correctly positioned.","context":"Key point: A helmet can only protect as designed when it fits, stays in place, and meets the relevant safety standard."},
-  {"id":"gravity","term":"Gravity","aliases":[],"definition":"Definition: Gravity accelerates a released object downward. Near Earth’s surface, the ideal acceleration is about 9.81 metres per second squared.","context":"Key point: A falling object speeds up until impact; air resistance and the collision then change its motion."},
-  {"id":"rebound","term":"Rebound","aliases":[],"definition":"Definition: Rebound is upward motion after a collision. It is smaller when more impact energy is absorbed, dissipated, or converted to deformation.","context":"Key point: A simple bouncing-ball animation can show timing, but it cannot predict helmet safety or human injury."},
-  {"id":"tail","term":"Tail stabilizer","aliases":["horizontal stabilizer","vertical stabilizer","tail fin"],"definition":"Definition: An aircraft’s horizontal and vertical tail surfaces help control pitch and yaw and contribute to stability.","context":"Key point: Their size, angle, airfoil, and placement follow aerodynamic design; a visual model is not a flight-certified configuration."},
-  {"id":"stiff","term":"Stiff","aliases":[],"definition":"Definition: A stiff object changes shape only a little under a given force.","context":"Key point: Stiffness is not the same as strength: a part may resist bending yet still fail at a lower load than another part."},
-  {"id":"vibration","term":"Vibration","aliases":[],"definition":"Definition: Vibration is repeated motion back and forth around an equilibrium position.","context":"Key point: Its frequency, amplitude, damping, and direction determine how it feels and how it travels into nearby structures."},
-  {"id":"tetrahedra","term":"Tetrahedra and octahedra","aliases":["tetrahedron","octahedron"],"definition":"Definition: A tetrahedron has four triangular faces; an octahedron has eight triangular faces.","context":"Key point: Repeating their edges creates the triangulated load paths of an octet truss."},
-  {"id":"load","term":"Load","aliases":[],"definition":"Definition: A load is a force or combination of forces acting on a structure, such as body weight, impact, pressure, or engine weight.","context":"Key point: A design must be evaluated for where the load acts, its direction, duration, repetition, and supports."},
-  {"id":"tension","term":"Tension","aliases":["pulling force"],"definition":"Definition: Tension is a pulling force. Strain is the fractional change in length or shape caused by loading.","context":"Key point: When a re-entrant lattice is pulled, its angled ribs can rotate and make the structure expand sideways."},
-  {"id":"airframe","term":"Airframe","aliases":[],"definition":"Definition: The airframe is the load-carrying body of an aircraft, including the fuselage, wings, and tail but not the propulsion system.","context":"Key point: A lattice core could form one part of a wing concept; a real airframe also needs spars, joints, control surfaces, systems, and certification."},
-  {"id":"engine","term":"Aircraft engine","aliases":[],"definition":"Definition: An aircraft engine produces thrust. Its mass and vibration also create loads that the wing or fuselage must carry.","context":"Key point: Engine placement affects structure, aerodynamics, balance, maintenance, and safety."},
-  {"id":"grip","term":"Grip tape and deck skin","aliases":["grip tape","deck skin"],"definition":"Definition: Grip tape is the rough top surface under a rider’s shoes. A deck skin is a strong outer layer bonded to the lightweight core.","context":"Key point: Separating the skins with a core can increase bending stiffness without making the entire deck solid."},
-  {"id":"truck","term":"Skateboard trucks and axles","aliases":["skateboard trucks","axles"],"definition":"Definition: Skateboard trucks are the turning assemblies fixed below the deck; their axles support the wheels.","context":"Key point: Loads from the rider travel through the deck into the truck mounting areas, which need local reinforcement."},
-  {"id":"urethane","term":"Urethane wheels","aliases":["polyurethane wheels"],"definition":"Definition: Skateboard wheels are commonly made from polyurethane, a tough polymer that can be formulated in different hardnesses.","context":"Key point: Wheel hardness, size, shape, and bearings affect grip, comfort, speed, and rolling resistance."},
-  {"id":"motor","term":"Motor and rotating drive","aliases":[],"definition":"Definition: A motor converts energy into rotation. Small imbalances or changing forces can also produce vibration.","context":"Key point: A mount carries the motor’s weight while trying to reduce unwanted vibration reaching the supporting structure."},
-  {"id":"skid","term":"Mounting skid","aliases":[],"definition":"Definition: A mounting skid is a rigid base frame that supports equipment and transfers its loads to a floor or larger structure.","context":"Key point: Isolation elements sit between the vibrating machine and the anchored skid or foundation."},
-  {"id":"metasurface","term":"Metasurface","aliases":["engineered surface","wave-control surface"],"definition":"Definition: A metasurface is an extremely thin surface covered with tiny patterned elements that control how waves reflect, transmit, or bend.","context":"Key point: Its effect comes mainly from the pattern and spacing of the surface elements, not from a thick block of material."},
-  {"id":"metalens","term":"Metalens","aliases":["flat lens","metasurface lens","dielectric metalens"],"definition":"Definition: A metalens is a flat optical lens made from many tiny patterned elements that focus or shape light. It does not have to be made of metal.","context":"Key point: Unlike a conventional curved lens, a dielectric metalens can control light with a thin patterned surface."},
-  {"id":"subwavelength","term":"Subwavelength","aliases":["smaller than a wavelength","sub-wavelength"],"definition":"Definition: Subwavelength means smaller than the wavelength of the wave being studied.","context":"Key point: Features much smaller than a wavelength can change how a surface or material interacts with that wave."},
-  {"id":"transformation-optics","term":"Transformation optics","aliases":["coordinate transformation optics","transformed optical space"],"definition":"Definition: Transformation optics is a design method that uses chosen material properties to guide waves as though space itself had been reshaped.","context":"Key point: It can bend, focus, redirect, or route electromagnetic waves."},
-  {"id":"cloak","term":"Cloak","aliases":["invisibility cloak","wave cloak","electromagnetic cloak"],"definition":"Definition: A cloak is a device or material arrangement designed to redirect waves around a region so the region interacts less with incoming waves.","context":"Key point: A cloak works only over particular frequencies, directions, materials, and operating conditions."},
-  {"id":"microwave","term":"Microwave","aliases":["microwave radiation","microwave frequency"],"definition":"Definition: Microwaves are electromagnetic waves with wavelengths from roughly millimetres to metres, used in radar, communications, and heating.","context":"Key point: Microwave experiments are easier to build and measure than optical-scale experiments."},
-  {"id":"resonator-element","term":"Resonator","aliases":["resonant element","resonant device"],"definition":"Definition: A resonator is an object that responds especially strongly near one or more natural frequencies.","context":"Key point: Its size, mass, stiffness, and surrounding material set the frequencies at which it resonates."},
-  {"id":"membrane-absorber","term":"Membrane absorber","aliases":["membrane sound absorber","resonant membrane"],"definition":"Definition: A membrane absorber is a thin flexible sheet that vibrates and dissipates some of an incoming sound wave’s energy.","context":"Key point: It is usually tuned to absorb a selected frequency range rather than every frequency equally."},
-  {"id":"thermal-conductivity","term":"Thermal conductivity","aliases":["heat conductivity"],"definition":"Definition: Thermal conductivity measures how easily heat flows through a material.","context":"Key point: High conductivity spreads heat quickly; low conductivity helps insulate. Geometry and contact paths also matter."},
-  {"id":"thermal-cloak","term":"Thermal cloak","aliases":["heat cloak","thermal cloaking"],"definition":"Definition: A thermal cloak is a designed material arrangement that guides heat around a protected region.","context":"Key point: It changes heat-flow paths. It does not make heat disappear or provide perfect insulation."},
-  {"id":"topological-edge-state","term":"Topological edge state","aliases":["topological boundary state","edge mode"],"definition":"Definition: A topological edge state is a boundary-localized wave mode in a specially designed structure.","context":"Key point: It can guide around some defects while the required band gap and design conditions remain in place. It is not automatically one-way or immune to every defect."},
-  {"id":"photonic-lattice","term":"Photonic lattice","aliases":["optical lattice","photonic crystal lattice"],"definition":"Definition: A photonic lattice is a repeating arrangement that controls how light travels.","context":"Key point: Its spacing and refractive-index pattern can create allowed and blocked frequency ranges. A repeating optical lattice does not automatically create a protected edge route."},
-  {"id":"magnetic-flux","term":"Magnetic flux","aliases":["magnetic field flux","flux through an area"],"definition":"Definition: Magnetic flux describes how much magnetic field passes through a chosen area.","context":"Key point: Flux depends on field strength, area, and the angle between the field and the surface."},
-  {"id":"anisotropy","term":"Anisotropy","aliases":["directional dependence","direction-dependent behavior"],"definition":"Definition: Anisotropy is the property of responding differently in different directions.","context":"Key point: A structure can have directional stiffness, conductivity, wave speed, or optical response."},
-  {"id":"dielectric","term":"Dielectric","aliases":["electrical insulator","dielectric material"],"definition":"Definition: A dielectric is a material that conducts little electric current but can become polarized in an electric field.","context":"Key point: Dielectrics are used to store electric energy and change how electromagnetic waves travel."},
-  {"id":"negative-index","term":"Negative index","aliases":["negative refractive index","negative-index material"],"definition":"Definition: Negative index describes a material in which refraction bends a wave in an unusual direction because its effective refractive index is negative.","context":"Key point: The direction of phase travel can differ from the direction of energy flow."},
-  {"id":"phase","term":"Phase","aliases":["wave phase","phase angle"],"definition":"Definition: Phase indicates where a repeating wave is within its cycle, such as at a crest, trough, or zero crossing.","context":"Key point: Phase differences determine interference, focusing, and wavefront shape."},
-  {"id":"wavefront","term":"Wavefront","aliases":["constant-phase surface","wave surface"],"definition":"Definition: A wavefront is a line or surface connecting points on a wave that have the same phase.","context":"Key point: Wavefronts show how waves spread, focus, or are redirected."},
-  {"id":"silicon","term":"Silicon","aliases":["silicon wafer"],"definition":"Definition: Silicon is a semiconductor used to make electronic chips, sensors, and many tiny optical structures.","context":"Key point: A silicon component can be patterned at a very small scale to control light."},
-  {"id":"copper","term":"Copper","aliases":["copper metal"],"definition":"Definition: Copper is a metal that conducts electricity and heat very well.","context":"Key point: Its conductivity makes it useful in microwave resonators and heat-flow experiments."},
-  {"id":"pdms","term":"PDMS silicone","aliases":["polydimethylsiloxane","silicone elastomer"],"definition":"Definition: PDMS is a soft, clear silicone polymer that can bend without breaking.","context":"Key point: Its flexibility makes it useful for membranes and its low conductivity can help shape heat paths."},
-  {"id":"soft-magnetic-alloy","term":"Soft magnetic alloy","aliases":["permalloy","soft magnetic metal"],"definition":"Definition: A soft magnetic alloy is a metal that magnetizes easily and can guide a magnetic field.","context":"Key point: It is chosen for field routing because it can respond strongly without being a permanent magnet."},
-  {"id":"endoscope","term":"Endoscope","aliases":["borescope","medical endoscope","miniature imaging probe"],"definition":"Definition: An endoscope is a slender instrument with a light and camera or optical system for seeing inside a body, machine, or narrow space.","context":"Key point: A metalens can be one small imaging component inside an endoscope; it is not the whole instrument."},
-  {"id":"nanopost","term":"Nanopost","aliases":["nano-post","nanopillar","meta-atom"],"definition":"Definition: A nanopost is a tiny upright post, usually measured in nanometres, patterned across a surface to control light.","context":"Key point: Changing a nanopost’s size or height changes the phase delay it gives to light."},
-  {"id":"collimated-light","term":"Collimated light","aliases":["parallel light"],"definition":"Definition: Collimated light has rays that travel nearly parallel to one another.","context":"Key point: A lens can turn this nearly parallel light into a focused spot."},
-  {"id":"focal-spot","term":"Focal spot","aliases":["focus"],"definition":"Definition: A focal spot is the small region where a lens or optical surface brings light together most strongly.","context":"Key point: Its size and position depend on the lens design and the incoming light."},
-  {"id":"image-sensor","term":"Image sensor","aliases":["camera sensor","detector"],"definition":"Definition: An image sensor turns incoming light into an electrical image or measurement.","context":"Key point: It must be placed where the optical system forms the useful image."},
-  {"id":"scattering","term":"Scattering","aliases":["wave scattering","scattered field"],"definition":"Definition: Scattering is the redirection of a wave in many directions after it meets an object or irregularity.","context":"Key point: A cloak aims to reduce scattering only for its intended wave, frequency, and conditions."},
-  {"id":"waveguide","term":"Waveguide","aliases":["guided-wave path","optical waveguide","microwave waveguide"],"definition":"Definition: A waveguide is a structure that confines and directs a wave along a chosen path.","context":"Key point: It can guide light, radio waves, sound, or other waves depending on its material and shape."},
-  {"id":"platelet","term":"Platelet","aliases":["tuned plate"],"definition":"Definition: In this acoustic panel, a platelet is a small rigid mass bonded to a flexible membrane to change how it vibrates.","context":"Key point: It is a mechanical part, not a biological blood cell."},
-  {"id":"thermal-pulse","term":"Thermal pulse","aliases":["transient heat","transient heat response","heat pulse","short-duration heating"],"definition":"Definition: A thermal pulse is a short burst of heating. Its temperature response changes over time before it settles.","context":"Key point: A thermal cloak can delay heat at a core during this changing, or transient, stage."},
-  {"id":"bulk","term":"Bulk","aliases":["interior"],"definition":"Definition: The bulk is the repeating interior of a structured material, distinct from its outer edge or boundary.","context":"Key point: In an edge-guiding design, the bulk can block a frequency while the boundary carries a special route."},
-  {"id":"defect","term":"Defect","aliases":["structural defect","lattice imperfection"],"definition":"Definition: A defect is an intentional or accidental change in an otherwise repeating structure.","context":"Key point: Testing defects helps show whether a guided wave route still works under the stated design conditions."},
-  {"id":"hall-sensor","term":"Hall sensor","aliases":["Hall-effect sensor"],"definition":"Definition: A Hall sensor detects magnetic field by measuring a voltage created across a current-carrying material.","context":"Key point: A flux shell can redirect more of an existing field toward a small Hall sensor gap."},
-  {"id":"magnetic-saturation","term":"Magnetic saturation","aliases":["core saturation"],"definition":"Definition: Magnetic saturation is when a field-guiding material is already strongly magnetized, so more input field produces little extra response.","context":"Key point: A useful flux-shell design leaves headroom before saturation reduces its guiding effect."},
-  {"id":"helmholtz-coil","term":"Helmholtz coil","aliases":["field coil"],"definition":"Definition: A Helmholtz coil is a matched pair of coils arranged to create a fairly uniform magnetic field between them.","context":"Key point: It can provide the external field that a magnetic-flux experiment redistributes."},
-  {"id":"ferrite","term":"Magnetically biased ferrite","aliases":["ferrite","microwave ferrite","VCIG ferrite"],"definition":"Definition: A magnetically biased ferrite is a ceramic used in microwave devices whose wave response changes under an external magnetic field.","context":"Key point: It is a role-specific platform material, not a general replacement for silicon in every wave device."},
-  {"id":"microwave-laminate","term":"Fiberglass/epoxy microwave laminate","aliases":["microwave laminate","fiberglass epoxy","PCB substrate"],"definition":"Definition: A microwave laminate is a low-loss composite board that supports patterned conducting traces at microwave frequencies.","context":"Key point: It acts as a substrate under the copper pattern rather than as a random bulk mixture."},
-  {"id":"iron-platelet","term":"Iron platelet","aliases":["iron mass","iron platelets"],"definition":"Definition: An iron platelet is a small dense metal mass bonded to a flexible membrane to shift its resonant motion.","context":"Key point: Its mass works with the membrane stiffness to set the frequencies the cell responds to most strongly."},
-  {"id":"hyperbolic-multilayer","term":"Hyperbolic multilayer","aliases":["hyperlens","hyperbolic stack","hyperbolic material"],"definition":"Definition: A hyperbolic multilayer is a stack of very thin metal and insulating films that responds differently along and across its layers.","context":"Key point: It can carry selected fine optical patterns near a source, but the result depends on wavelength, loss, and the fabricated layer sizes."},
-  {"id":"hyperbolic-response","term":"Hyperbolic response","aliases":["hyperbolic dispersion"],"definition":"Definition: Hyperbolic response is direction-dependent electromagnetic behavior in which waves follow a different relation along one axis than across it.","context":"Key point: The name describes wave behavior, not a layer shaped like a drawn hyperbola."},
-  {"id":"near-field","term":"Near field","aliases":["near-field optical detail","near-field pattern"],"definition":"Definition: The near field is the region very close to a source where fine wave patterns can exist before fading rapidly with distance.","context":"Key point: Hyperlens research aims to transport selected near-field detail, not to make an ordinary far-away image perfectly sharp."},
-  {"id":"alumina","term":"Alumina","aliases":["aluminium oxide","aluminum oxide"],"definition":"Definition: Alumina is a hard ceramic electrical insulator made from aluminium and oxygen.","context":"Key point: In an optical multilayer it can separate thin metal films instead of mixing with them."},
-  {"id":"silver","term":"Silver","aliases":["silver film","silver layer"],"definition":"Definition: Silver is a highly conductive and reflective metal.","context":"Key point: Thin silver films can provide the metal part of an optical multilayer or a reflective backing below a cooling film."},
-  {"id":"chiral-polarizer","term":"Chiral helix polarizer","aliases":["chiral polarizer","helix polarizer","chiral helix"],"definition":"Definition: A chiral helix polarizer is a patterned layer of tiny corkscrew shapes that responds differently to the two handed twists of circularly polarized light.","context":"Key point: Its effect is tied to the helix geometry, operating wavelength, and direction of the incoming light."},
-  {"id":"chirality","term":"Chirality","aliases":["chiral","handed"],"definition":"Definition: Chirality means a shape has left- and right-handed versions that cannot be matched simply by rotating one onto the other.","context":"Key point: A left-handed helix and a right-handed helix are mirror forms, like left and right hands."},
-  {"id":"helix","term":"Helix","aliases":["helices","helical"],"definition":"Definition: A helix is a corkscrew-shaped curve that winds around an axis.","context":"Key point: Helix radius, pitch, number of turns, and handedness all change the shape used in the polarizer model."},
-  {"id":"pitch","term":"Pitch","aliases":["helix pitch"],"definition":"Definition: Pitch is the distance a helix rises during one complete turn.","context":"Key point: Raising the pitch makes the corkscrew more stretched along its axis."},
-  {"id":"circular-polarization","term":"Circular polarization","aliases":["circularly polarized light","polarized light"],"definition":"Definition: Circular polarization is light whose electric field rotates as the wave travels.","context":"Key point: The rotation can be left- or right-handed, which a chiral structure can distinguish under the right conditions."},
-  {"id":"polarizer","term":"Polarizer","aliases":["polarization filter"],"definition":"Definition: A polarizer is a component that passes some polarization states more readily than others.","context":"Key point: A chiral polarizer filters the handedness of circular polarization rather than simply blocking all light."},
-  {"id":"space-coiling","term":"Space coiling","aliases":["space-coiling","coiling-up space"],"definition":"Definition: Space coiling folds a wave's route into a smaller outside space.","context":"Key point: The sound travels through the full internal path, so a folded channel can create more delay than a straight opening of the same panel thickness."},
-  {"id":"labyrinthine-channel","term":"Labyrinthine channel","aliases":["labyrinth channel","serpentine channel","folded air path"],"definition":"Definition: A labyrinthine channel is one continuous passage that turns back and forth through a compact object.","context":"Key point: The rigid walls define the route while air carries the sound through it."},
-  {"id":"phase-delay","term":"Phase delay","aliases":["sound delay","wave delay"],"definition":"Definition: Phase delay is a shift in where a wave is in its repeating cycle after it travels a longer or slower route.","context":"Key point: A patterned set of delays can reshape the outgoing wavefront without needing to absorb all of the sound."},
-  {"id":"acoustic-metasurface","term":"Acoustic metasurface","aliases":["sound metasurface"],"definition":"Definition: An acoustic metasurface is a patterned surface that changes a passing or reflected sound wave.","context":"Key point: Its small channels, cavities, or membranes are designed for a particular frequency range and direction."},
-  {"id":"radiative-cooling","term":"Radiative cooling","aliases":["passive radiative cooling","radiative cooler"],"definition":"Definition: Radiative cooling is the loss of heat as emitted infrared light, sometimes combined with strong reflection of sunlight.","context":"Key point: Outdoor cooling depends on the sky, humidity, airflow, absorbed sunlight, and thermal contact, not only the film pattern."},
-  {"id":"infrared","term":"Infrared","aliases":["thermal infrared","infrared radiation"],"definition":"Definition: Infrared is light beyond visible red that warm objects can emit as thermal radiation.","context":"Key point: The cooling-film scene uses orange arrows for heat leaving as infrared, not for conducted heat moving through a solid."},
-  {"id":"emissivity","term":"Emissivity","aliases":["thermal emissivity"],"definition":"Definition: Emissivity describes how strongly a surface emits thermal radiation compared with an ideal emitter at the same temperature.","context":"Key point: High emissivity in the useful infrared range can help a surface shed heat, but it is only one part of the energy balance."},
-  {"id":"solar-reflectance","term":"Solar reflectance","aliases":["sunlight reflectance"],"definition":"Definition: Solar reflectance is the share of incoming sunlight that a surface reflects instead of absorbing.","context":"Key point: A reflective backing can reduce solar heating below a radiative-cooling film."},
-  {"id":"microsphere","term":"Microsphere","aliases":["microspheres","silica microsphere"],"definition":"Definition: A microsphere is a very small sphere, often made from glass-like silica.","context":"Key point: In the cooling-film model, the spheres are embedded inside the polymer instead of floating above it."},
-  {"id":"polymer-matrix","term":"Polymer matrix","aliases":["polymer film","polymethylpentene"],"definition":"Definition: A polymer matrix is the continuous plastic material that surrounds embedded particles or fibers.","context":"Key point: In the cooling film, it holds the silica microspheres in a fixed layer over the reflective backing."},
-  {"id":"seismic-metawedge","term":"Seismic metawedge","aliases":["metawedge","seismic metamaterial"],"definition":"Definition: A seismic metawedge is a graded array of anchored resonators used to study how selected ground-surface waves change direction or transmission.","context":"Key point: It is a research-scale wave-control concept, not a claim that any building becomes earthquake-proof."},
-  {"id":"seismic-wave","term":"Seismic wave","aliases":["ground wave","ground-surface wave"],"definition":"Definition: A seismic wave is an elastic disturbance that travels through the ground or along its surface.","context":"Key point: Its behavior depends on the local soil, frequency, source, depth, and structures it encounters."},
-  {"id":"rayleigh-wave","term":"Rayleigh wave","aliases":["Rayleigh surface wave"],"definition":"Definition: A Rayleigh wave is a ground-surface wave whose motion includes both vertical and horizontal movement.","context":"Key point: It is one important type of surface motion studied in seismic metamaterial experiments."},
-  {"id":"mode-conversion","term":"Mode conversion","aliases":["wave conversion"],"definition":"Definition: Mode conversion happens when wave energy changes from one type of motion into another at a structure or boundary.","context":"Key point: Redirected seismic energy is not destroyed. It may become a different type of wave motion in the ground."},
-  {"id":"water-wave-plate-array","term":"Water-wave plate array","aliases":["water-wave metamaterial","plate array"],"definition":"Definition: A water-wave plate array is a set of rigid plates fixed below the surface of a shallow water tank.","context":"Key point: The plates change the local depth and open channels that guide small experimental ripples."},
-  {"id":"bathymetry","term":"Bathymetry","aliases":["engineered bathymetry","tank bottom"],"definition":"Definition: Bathymetry is the shape and depth of the bottom beneath water.","context":"Key point: Changing bottom features changes the water depth seen by a surface wave and can alter its route."},
-  {"id":"surface-wave","term":"Surface wave","aliases":["water wave","surface ripples"],"definition":"Definition: A surface wave travels along the boundary between a fluid and the air above it.","context":"Key point: The water-wave model uses small tank ripples, not a full prediction of ocean-wave behavior."},
-  {"id":"submerged","term":"Submerged","aliases":["underwater"],"definition":"Definition: Submerged means placed below the water surface.","context":"Key point: The plate array stays attached to the tank floor while water passes above and between it."},
-  {"id":"gold","term":"Gold","aliases":["gold metal"],"definition":"Definition: Gold is a conductive metal that can be patterned into small optical structures.","context":"Key point: In the chiral-polarizer model, the gold forms the helix shapes rather than a bulk gold block."},
-  {"id":"stainless-steel","term":"Stainless steel","aliases":["steel"],"definition":"Definition: Stainless steel is a strong iron-based alloy that resists rust better than plain steel.","context":"Key point: The seismic model uses it as a simplified rigid resonator material, while real ground tests also depend on foundations and soil."},
-  {"id":"acrylic","term":"Acrylic","aliases":["acrylic plastic"],"definition":"Definition: Acrylic is a clear, rigid plastic that is easy to machine into test pieces.","context":"Key point: In the water-wave model, acrylic plates are fixed to a tank floor to change the local water depth."},
-  {"id":"strain","term":"Strain","aliases":["deformation ratio"],"definition":"Definition: Strain is the fractional change in a material’s length or shape caused by a load.","context":"Key point: Strain describes deformation, while tension describes the pulling force that can cause it."}
+  {
+    "id": "metamaterial",
+    "term": "Metamaterial",
+    "aliases": [
+      "engineered material",
+      "mechanical metamaterial",
+      "structural metamaterial",
+      "acoustic metamaterial",
+      "vibration metamaterial",
+      "thermal metamaterial",
+      "optical metamaterial",
+      "photonic metamaterial",
+      "magnetic metamaterial",
+      "wave metamaterial"
+    ],
+    "definition": "Definition: A metamaterial is a designed structure whose small-scale pattern gives the whole object useful behavior. The pattern can matter as much as the substance it is made from.",
+    "context": "Key point: choose a base material, shape it into repeating cells, then test how that architecture changes force, motion, heat, sound, or light."
+  },
+  {
+    "id": "geometry",
+    "term": "Geometry",
+    "aliases": [
+      "shape",
+      "material architecture",
+      "architecture"
+    ],
+    "definition": "Definition: Geometry is the size, shape, orientation, and arrangement of the solid parts and empty spaces in a structure.",
+    "context": "Key point: Changing geometry can alter stiffness, cushioning, directionality, or vibration response without changing the base material."
+  },
+  {
+    "id": "lattice",
+    "term": "Lattice",
+    "aliases": [
+      "cellular lattice",
+      "cellular network",
+      "network",
+      "cellular",
+      "cells"
+    ],
+    "definition": "Definition: A lattice is a lightweight framework made by repeating connected cells, leaving controlled empty space between solid walls or beams.",
+    "context": "Key point: The same polymer or metal can behave differently when arranged as a gyroid, truss, honeycomb, or another lattice."
+  },
+  {
+    "id": "unit-cell",
+    "term": "Unit cell",
+    "aliases": [
+      "periodic unit cell"
+    ],
+    "definition": "Definition: A unit cell is the smallest geometric building block that repeats to form a larger lattice.",
+    "context": "Key point: Changing one cell, including its angles, size, or thickness, changes the repeated structure built from it."
+  },
+  {
+    "id": "periodic",
+    "term": "Periodic structure",
+    "aliases": [
+      "repetition",
+      "periodic architecture"
+    ],
+    "definition": "Definition: A periodic structure repeats a unit cell at regular intervals, like a three-dimensional tile pattern.",
+    "context": "Key point: Repeating more cells makes a larger sample; it does not by itself make each cell stronger."
+  },
+  {
+    "id": "cell-size",
+    "term": "Cell size",
+    "aliases": [
+      "unit-cell size"
+    ],
+    "definition": "Definition: Cell size is the overall width, height, or spacing of one repeating cell.",
+    "context": "Key point: Smaller cells place more repeats into the same volume. Performance also depends on wall thickness, material, defects, and loading direction."
+  },
+  {
+    "id": "strut",
+    "term": "Strut",
+    "aliases": [
+      "lattice member",
+      "rib",
+      "strut diameter",
+      "strut thickness"
+    ],
+    "definition": "Definition: A strut is a slender beam that connects points in a lattice. Its diameter is the width of that beam.",
+    "context": "Key point: Thicker struts usually add stiffness and mass; their angles determine whether loads mainly stretch or bend them."
+  },
+  {
+    "id": "wall-thickness",
+    "term": "Wall thickness",
+    "aliases": [
+      "sheet thickness"
+    ],
+    "definition": "Definition: Wall thickness is the distance from one side of a sheet-like surface to the other.",
+    "context": "Key point: A sheet gyroid has curved walls rather than separate beams. Thicker walls use more material and usually resist deformation more strongly."
+  },
+  {
+    "id": "relative-density",
+    "term": "Density and relative density",
+    "aliases": [
+      "density",
+      "density_kg_m3",
+      "relative density",
+      "solid fraction",
+      "volume fraction"
+    ],
+    "definition": "Definition: Density is mass per unit volume. Relative density compares a cellular structure with a fully solid block of the same base material.",
+    "context": "Key point: A 20% relative density means roughly one fifth of the volume is solid and the rest is open space; exact values require measuring the real geometry."
+  },
+  {
+    "id": "load-path",
+    "term": "Load path",
+    "aliases": [
+      "force path"
+    ],
+    "definition": "Definition: A load path is the route a force follows through connected parts of a structure to its supports.",
+    "context": "Key point: Continuous sheets, triangular trusses, and bending cell walls send forces through different paths."
+  },
+  {
+    "id": "deformation",
+    "term": "Deformation",
+    "aliases": [
+      "compression",
+      "deflection"
+    ],
+    "definition": "Definition: Deformation is a change in shape or size caused by a force. Compression is shortening; deflection is movement away from the original position.",
+    "context": "Key point: A visual animation can explain the motion, but measured deformation requires material data, boundary conditions, and a physical test or solver."
+  },
+  {
+    "id": "stiffness",
+    "term": "Stiffness",
+    "aliases": [
+      "rigidity"
+    ],
+    "definition": "Definition: Stiffness describes how much a particular object resists changing shape under a force.",
+    "context": "Key point: Object stiffness depends on both the base material and the object’s geometry, dimensions, supports, and loading direction."
+  },
+  {
+    "id": "modulus",
+    "term": "Modulus",
+    "aliases": [
+      "elastic modulus",
+      "Young’s modulus"
+    ],
+    "definition": "Definition: Elastic modulus measures how strongly a material resists elastic stretching or compression before permanent change begins.",
+    "context": "Key point: Modulus is a material property; the stiffness of a finished lattice also depends on its geometry and amount of solid material."
+  },
+  {
+    "id": "mpa",
+    "term": "MPa",
+    "aliases": [
+      "megapascal"
+    ],
+    "definition": "Definition: MPa means megapascal, or one million pascals. It is a unit used for stress and elastic modulus.",
+    "context": "Key point: A larger modulus in MPa usually means the solid material is harder to stretch elastically."
+  },
+  {
+    "id": "voigt-bound",
+    "term": "Voigt and Reuss bounds",
+    "aliases": [
+      "Voigt estimate",
+      "upper mixture bound",
+      "Reuss bound",
+      "Reuss estimate",
+      "lower mixture bound",
+      "Voigt bound",
+      "Reuss–Voigt"
+    ],
+    "definition": "Definition: Voigt and Reuss bounds are ideal upper and lower estimates of stiffness from the two material properties and their shares.",
+    "context": "Key point: They are simplified limits, not direct predictions for a printed lattice or a finished product."
+  },
+  {
+    "id": "two-phase-mixture",
+    "term": "Two-phase mixture",
+    "aliases": [
+      "two-material blend",
+      "secondary material"
+    ],
+    "definition": "Definition: A two-phase mixture contains two distinct materials, called phases, in chosen proportions.",
+    "context": "Key point: The phases could be blended, layered, coated, or placed in different regions. Their arrangement and bonding determine the real result."
+  },
+  {
+    "id": "tpu",
+    "term": "TPU elastomer",
+    "aliases": [
+      "TPU",
+      "thermoplastic polyurethane",
+      "elastomer"
+    ],
+    "definition": "Definition: TPU is thermoplastic polyurethane: a heat-processable polymer that can be flexible, tough, and rubber-like, depending on its grade.",
+    "context": "Key point: Its flexibility makes TPU a common candidate for cushioning lattices, flexible wearables, seals, and protective parts."
+  },
+  {
+    "id": "pa12",
+    "term": "Nylon PA12",
+    "aliases": [
+      "PA12",
+      "polyamide 12",
+      "nylon"
+    ],
+    "definition": "Definition: Nylon PA12 is a polyamide plastic valued for toughness, low moisture uptake, and compatibility with powder-bed 3D printing.",
+    "context": "Key point: It is generally stiffer than flexible TPU, so the same lattice geometry can feel and respond very differently."
+  },
+  {
+    "id": "polymer",
+    "term": "Polymer",
+    "aliases": [
+      "polymers",
+      "polymeric material"
+    ],
+    "definition": "Definition: A polymer is a material made from long, repeating molecular chains. TPU and nylon are common engineering polymers.",
+    "context": "Key point: The recipe and manufacturing process change whether a polymer feels soft, tough, flexible, or stiff."
+  },
+  {
+    "id": "metals",
+    "term": "Aluminium and titanium",
+    "aliases": [
+      "aluminium",
+      "aluminum",
+      "titanium"
+    ],
+    "definition": "Definition: Aluminium is a lightweight metal; titanium is denser but notably strong, corrosion-resistant, and heat-resistant for its mass.",
+    "context": "Key point: Metal lattices can be far stiffer than polymer lattices, but manufacturing limits, fatigue, cost, and safety testing become crucial."
+  },
+  {
+    "id": "gyroid",
+    "term": "Gyroid",
+    "aliases": [
+      "gyroid geometry"
+    ],
+    "definition": "Definition: A gyroid is a smooth, repeating surface that winds through three dimensions without straight beams or sharp junctions.",
+    "context": "Key point: Its continuous curves can distribute loads and create connected passages, which is useful for cushioning, heat exchange, and fluid flow studies."
+  },
+  {
+    "id": "sheet-gyroid",
+    "term": "Sheet gyroid",
+    "aliases": [
+      "gyroid sheet"
+    ],
+    "definition": "Definition: A sheet gyroid turns the mathematical gyroid surface into a thin, continuous solid wall.",
+    "context": "Key point: Increasing wall thickness adds solid material; grading the thickness can create softer and firmer zones."
+  },
+  {
+    "id": "skeletal-gyroid",
+    "term": "Skeletal gyroid",
+    "aliases": [
+      "solid-network gyroid"
+    ],
+    "definition": "Definition: A skeletal gyroid uses connected branch-like solids that follow one side of the gyroid’s labyrinth instead of thickening the dividing sheet.",
+    "context": "Key point: Sheet and skeletal versions have different solid paths and void shapes, so they should not be expected to perform identically."
+  },
+  {
+    "id": "minimal-surface",
+    "term": "Minimal surface",
+    "aliases": [
+      "minimal-area surface"
+    ],
+    "definition": "Definition: A minimal surface is a smooth surface whose average curvature is zero at every point, similar to a soap film balanced by surface tension.",
+    "context": "Key point: The gyroid is a mathematical triply periodic minimal surface; biological gyroid-like patterns are related examples, not the source of the mathematics."
+  },
+  {
+    "id": "octet-truss",
+    "term": "Octet truss",
+    "aliases": [
+      "octet lattice",
+      "tetrahedral cell",
+      "octahedral cell"
+    ],
+    "definition": "Definition: An octet truss is a repeating three-dimensional framework made from the edges of tetrahedra and octahedra.",
+    "context": "Key point: Its many triangles can carry loads mainly by stretching and compressing struts, producing high stiffness for relatively low mass."
+  },
+  {
+    "id": "anisotropic",
+    "term": "Anisotropic",
+    "aliases": [
+      "directional"
+    ],
+    "definition": "Definition: Anisotropic means a material or structure responds differently when loaded in different directions.",
+    "context": "Key point: Stretching cells or aligning struts can create a preferred direction for stiffness, strength, flow, or wave travel."
+  },
+  {
+    "id": "graded",
+    "term": "Graded",
+    "aliases": [
+      "spatially graded",
+      "zoned"
+    ],
+    "definition": "Definition: A graded structure gradually changes cell size, wall thickness, strut thickness, or material from one region to another.",
+    "context": "Key point: Grading can place support or cushioning where it is needed, but the best gradient must be designed and tested for the use case."
+  },
+  {
+    "id": "reentrant",
+    "term": "Re-entrant cell",
+    "aliases": [
+      "re-entrant honeycomb",
+      "inward-folded cell"
+    ],
+    "definition": "Definition: A re-entrant cell is an indented lattice cell whose ribs point inward instead of forming an outward hexagon.",
+    "context": "Key point: When pulled, the angled ribs can rotate outward, changing both the cell’s length and width."
+  },
+  {
+    "id": "auxetic",
+    "term": "Auxetic",
+    "aliases": [
+      "negative-Poisson-ratio structure"
+    ],
+    "definition": "Definition: An auxetic structure becomes wider when stretched and narrower when compressed in the tested directions.",
+    "context": "Key point: Re-entrant cells can create this behavior through rib rotation, but the effect depends on geometry, material, and loading direction."
+  },
+  {
+    "id": "poisson-ratio",
+    "term": "Poisson ratio",
+    "aliases": [
+      "negative Poisson ratio"
+    ],
+    "definition": "Definition: Poisson ratio compares sideways deformation with deformation along the applied load. A negative value describes auxetic widening during stretching.",
+    "context": "Key point: Most ordinary solids narrow when stretched; some designed lattices can reverse that familiar response."
+  },
+  {
+    "id": "kelvin-cell",
+    "term": "Kelvin cell",
+    "aliases": [
+      "Kelvin foam cell"
+    ],
+    "definition": "Definition: A Kelvin cell is a space-filling cell based on a 14-faced truncated octahedron, proposed as an idealized foam model.",
+    "context": "Key point: A network of its edges can bend and compress, suggesting lightweight energy-absorbing liners and cores."
+  },
+  {
+    "id": "truncated-octahedron",
+    "term": "Truncated octahedron",
+    "aliases": [
+      "Kelvin tetrakaidecahedron"
+    ],
+    "definition": "Definition: A truncated octahedron is a 14-faced solid with six square faces and eight hexagonal faces that can tile space without gaps.",
+    "context": "Key point: Connecting its edges creates the open framework used in a Kelvin-cell lattice."
+  },
+  {
+    "id": "honeycomb",
+    "term": "Honeycomb",
+    "aliases": [
+      "hexagonal honeycomb"
+    ],
+    "definition": "Definition: A honeycomb is a cellular core made from repeated wall-enclosed cells, commonly hexagons.",
+    "context": "Key point: Natural bee comb is a familiar example; engineered honeycomb may use paper, polymers, aluminium, or composites between stiff outer skins."
+  },
+  {
+    "id": "hexagonal-cell",
+    "term": "Hexagonal cell",
+    "aliases": [
+      "hexagon"
+    ],
+    "definition": "Definition: A hexagonal cell has six sides. Repeating hexagons can fill a flat plane efficiently with shared walls.",
+    "context": "Key point: Elongating or rotating the hexagons changes how the core carries loads in different directions."
+  },
+  {
+    "id": "local-resonator",
+    "term": "Local resonator",
+    "aliases": [
+      "resonant unit",
+      "locally resonant supports"
+    ],
+    "definition": "Definition: A local resonator is a small internal mass or part that vibrates relative to the surrounding structure.",
+    "context": "Key point: Near its tuned frequency, that local motion can interact with waves in the larger structure and reduce transmission over a limited band."
+  },
+  {
+    "id": "resonance",
+    "term": "Resonance",
+    "aliases": [
+      "resonant frequency"
+    ],
+    "definition": "Definition: Resonance is the strong response that occurs when repeated forcing is near a system’s natural frequency.",
+    "context": "Key point: Resonators must be tuned: a design that helps at one frequency range may do little at another."
+  },
+  {
+    "id": "mass-spring",
+    "term": "Mass–spring oscillator",
+    "aliases": [
+      "mass-spring system",
+      "oscillator",
+      "oscillating internal masses"
+    ],
+    "definition": "Definition: A mass–spring oscillator is a mass connected to a flexible element that pulls it back toward rest when displaced.",
+    "context": "Key point: Mass and spring stiffness set its natural frequency; damping controls how quickly the motion fades."
+  },
+  {
+    "id": "elastodynamic",
+    "term": "Elastodynamic",
+    "aliases": [
+      "elastodynamics"
+    ],
+    "definition": "Definition: Elastodynamics studies how elastic deformation, vibration, and waves change through a solid over time.",
+    "context": "Key point: It combines material elasticity with motion, inertia, geometry, and boundary conditions."
+  },
+  {
+    "id": "band-gap",
+    "term": "Band gap",
+    "aliases": [
+      "frequency band gap",
+      "band-gap center",
+      "gap center",
+      "band-gap width",
+      "gap width"
+    ],
+    "definition": "Definition: A band gap is a frequency range that cannot travel through the repeating interior of an ideal periodic structure.",
+    "context": "Key point: A specially designed edge can still guide a wave inside a bulk band gap. A finite real object needs experimental validation."
+  },
+  {
+    "id": "frequency",
+    "term": "Frequency",
+    "aliases": [
+      "Hz",
+      "hertz"
+    ],
+    "definition": "Definition: Frequency is how many cycles of a vibration or wave occur each second. One hertz means one cycle per second.",
+    "context": "Key point: Low and high frequencies can interact very differently with the same resonator or periodic structure."
+  },
+  {
+    "id": "wave-propagation",
+    "term": "Wave propagation",
+    "aliases": [
+      "wave transmission"
+    ],
+    "definition": "Definition: Wave propagation is the movement of energy and disturbance through a material or structure.",
+    "context": "Key point: Periodic cells and resonators can scatter, slow, redirect, or inhibit certain waves under specific conditions."
+  },
+  {
+    "id": "simulated-design",
+    "term": "Simulated design",
+    "aliases": [
+      "simulation",
+      "modeled design"
+    ],
+    "definition": "Definition: A simulated design is evaluated with mathematical and computational models rather than measured directly on a manufactured specimen.",
+    "context": "Key point: Simulation can compare many candidates quickly, but results depend on assumptions and should be validated before safety-critical use."
+  },
+  {
+    "id": "evidence-label",
+    "term": "Evidence label",
+    "aliases": [
+      "evidence status",
+      "result label"
+    ],
+    "definition": "Definition: An evidence label tells you whether a value was measured in an experiment, computed in a simulation, or created only to explain a concept.",
+    "context": "Key point: Keeping these labels visible prevents a teaching animation or rough estimate from being mistaken for tested performance."
+  },
+  {
+    "id": "measured",
+    "term": "Measured",
+    "aliases": [
+      "measured result",
+      "test result"
+    ],
+    "definition": "Definition: A measured value comes from a physical test of a real sample.",
+    "context": "Key point: It describes the sample and test conditions used, not every version of the same design."
+  },
+  {
+    "id": "simulated",
+    "term": "Simulated",
+    "aliases": [
+      "simulation result",
+      "model result"
+    ],
+    "definition": "Definition: A simulated value is calculated by a computer model instead of tested on a physical sample.",
+    "context": "Key point: It is useful for comparing ideas, but it depends on the model assumptions."
+  },
+  {
+    "id": "illustrative",
+    "term": "Illustrative",
+    "aliases": [
+      "teaching estimate",
+      "teaching value"
+    ],
+    "definition": "Definition: An illustrative value is included to show how a setting can change an idea. It is not a tested performance claim.",
+    "context": "Key point: Use it to compare settings in this model, not to design a finished part."
+  },
+  {
+    "id": "source-encoding",
+    "term": "15-bit source encoding",
+    "aliases": [
+      "binary encoding",
+      "encoded design"
+    ],
+    "definition": "Definition: A 15-bit source encoding is a sequence of 15 zeros and ones used by the dataset authors to identify a design pattern.",
+    "context": "Key point: It is a data code, not a picture of the unit cell. Consult the source dataset to reconstruct its exact meaning."
+  },
+  {
+    "id": "midsole",
+    "term": "Midsole",
+    "aliases": [
+      "cushioning midsole"
+    ],
+    "definition": "Definition: The midsole is the main cushioning and support layer between a shoe’s upper and its ground-contacting outsole.",
+    "context": "Key point: A cellular midsole can be tuned by changing its base polymer, cell geometry, wall thickness, and regional grading."
+  },
+  {
+    "id": "outsole",
+    "term": "Outsole",
+    "aliases": [
+      "rubber outsole",
+      "traction"
+    ],
+    "definition": "Definition: The outsole is the bottom layer of a shoe that contacts the ground and provides wear resistance and traction.",
+    "context": "Key point: It protects the softer midsole and uses tread geometry and material friction to grip the surface."
+  },
+  {
+    "id": "insole",
+    "term": "Insole and sockliner",
+    "aliases": [
+      "insole",
+      "sockliner",
+      "footbed"
+    ],
+    "definition": "Definition: An insole or sockliner is the removable or built-in layer directly beneath the foot.",
+    "context": "Key point: It helps with fit and comfort but is distinct from the thicker structural and cushioning midsole below it."
+  },
+  {
+    "id": "strobel",
+    "term": "Strobel board",
+    "aliases": [
+      "strobel structural layer",
+      "strobel"
+    ],
+    "definition": "Definition: A Strobel board is the flexible fabric-like layer stitched to the shoe upper to form the bottom of the foot-shaped cavity.",
+    "context": "Key point: It sits above the midsole and helps join the upper construction to the sole assembly."
+  },
+  {
+    "id": "shoe-upper",
+    "term": "Shoe upper",
+    "aliases": [
+      "upper",
+      "tongue",
+      "laces",
+      "eyestay",
+      "padded collar",
+      "heel counter",
+      "collar"
+    ],
+    "definition": "Definition: The shoe upper wraps the foot. The tongue, laces, eyestay, collar, and heel counter work together to control fit and foot movement.",
+    "context": "Key point: These parts locate the foot while the sole layers handle ground contact, cushioning, and support."
+  },
+  {
+    "id": "airfoil",
+    "term": "Airfoil",
+    "aliases": [
+      "aerofoil"
+    ],
+    "definition": "Definition: An airfoil is a cross-sectional shape designed to guide airflow and produce aerodynamic forces such as lift.",
+    "context": "Key point: A wing’s outer skin keeps the airfoil shape while the internal spars, ribs, or cellular core carry structural loads."
+  },
+  {
+    "id": "wing-skin",
+    "term": "Wing skin",
+    "aliases": [
+      "airfoil skin",
+      "inspection skin"
+    ],
+    "definition": "Definition: Wing skin is the thin outer surface that preserves the aerodynamic shape and can help carry shear and bending loads.",
+    "context": "Key point: A cutaway can move part of the skin aside to reveal an internal core; a real wing also needs joints, spars, systems, and certification."
+  },
+  {
+    "id": "core",
+    "term": "Core",
+    "aliases": [
+      "wing core",
+      "sandwich core"
+    ],
+    "definition": "Definition: A core is a lightweight internal layer placed between stronger outer skins to keep them apart and resist shear or crushing.",
+    "context": "Key point: Honeycomb, foam, and lattices are possible cores. Their attachment to the skins is as important as the cell geometry."
+  },
+  {
+    "id": "cutaway",
+    "term": "Cutaway",
+    "aliases": [
+      "inspection cutaway",
+      "section view"
+    ],
+    "definition": "Definition: A cutaway view removes or moves an outer layer so hidden internal parts can be inspected.",
+    "context": "Key point: It is a teaching and inspection view; the separated components are not necessarily how the product operates."
+  },
+  {
+    "id": "helmet",
+    "term": "Helmet shell, liner, and vent",
+    "aliases": [
+      "helmet shell",
+      "helmet liner",
+      "vented shell",
+      "vent",
+      "vented outer shell",
+      "cellular liner"
+    ],
+    "definition": "Definition: A helmet combines a hard outer shell, an energy-managing liner, fit padding, vents, and a retention system.",
+    "context": "Key point: A cellular liner is one possible concept. Real protection depends on the complete helmet and must pass standardized impact and retention tests."
+  },
+  {
+    "id": "knee-protection",
+    "term": "Knee-pad shell and insert",
+    "aliases": [
+      "knee pad",
+      "protective shell",
+      "cellular insert"
+    ],
+    "definition": "Definition: Knee protection can combine a fitted sleeve, retention parts, a load-spreading shell, and a cushioning insert around the joint.",
+    "context": "Key point: An auxetic insert may conform as it bends, but comfort and protection require anatomy, movement, durability, and impact testing."
+  },
+  {
+    "id": "motor-mount",
+    "term": "Motor isolation mount",
+    "aliases": [
+      "isolation mount"
+    ],
+    "definition": "Definition: A motor isolation mount sits between a vibrating motor and its support to reduce how much vibration is transmitted.",
+    "context": "Key point: A locally resonant mount can target selected frequencies; broad real-world vibration usually needs damping and multi-frequency design too."
+  },
+  {
+    "id": "motor-excitation",
+    "term": "Motor excitation",
+    "aliases": [
+      "motor vibration input"
+    ],
+    "definition": "Definition: Motor excitation is the vibration or changing force a motor sends into its mounting structure.",
+    "context": "Key point: An isolation mount is designed to reduce how much of that vibration travels onward."
+  },
+  {
+    "id": "uniform",
+    "term": "Uniform",
+    "aliases": [
+      "constant"
+    ],
+    "definition": "Definition: Uniform means the selected feature, such as cell size or strut thickness, stays the same throughout the structure.",
+    "context": "Key point: Uniform designs are easier to compare; graded designs deliberately change that feature by location."
+  },
+  {
+    "id": "isotropic",
+    "term": "Isotropic",
+    "aliases": [
+      "isotropy"
+    ],
+    "definition": "Definition: Isotropic means a material property is the same in every direction at the scale being considered.",
+    "context": "Key point: A base material may be nearly isotropic while a lattice made from it becomes anisotropic because its geometry has preferred directions."
+  },
+  {
+    "id": "patella",
+    "term": "Patella support",
+    "aliases": [
+      "patella support ring",
+      "patella",
+      "kneecap"
+    ],
+    "definition": "Definition: The patella is the kneecap. A surrounding support ring can help position padding while leaving the front of the kneecap unobstructed.",
+    "context": "Key point: A safe brace must match a wearer’s anatomy and allow the knee to bend without harmful pressure points."
+  },
+  {
+    "id": "sleeve",
+    "term": "Compression-knit sleeve",
+    "aliases": [
+      "textile sleeve",
+      "sleeve",
+      "textile"
+    ],
+    "definition": "Definition: A compression-knit sleeve is a close-fitting stretch textile that wraps the limb and helps keep brace components in place.",
+    "context": "Key point: Its knit pattern, stretch, seams, sizing, and breathability affect comfort and retention."
+  },
+  {
+    "id": "dial",
+    "term": "Brace adjustment",
+    "aliases": [
+      "tension dial",
+      "side stays",
+      "articulated side supports"
+    ],
+    "definition": "Definition: A tension dial tightens a cable in small steps; side stays reinforce the brace and may guide bending beside the knee.",
+    "context": "Key point: These parts control fit and alignment. They are separate from the cellular insert that manages local pressure or impact."
+  },
+  {
+    "id": "headform",
+    "term": "Headform",
+    "aliases": [
+      "anatomical headform"
+    ],
+    "definition": "Definition: A headform is a standardized model of a human head used for fit checks or controlled helmet tests.",
+    "context": "Key point: It represents external shape and test mass, not living tissue or a prediction of injury."
+  },
+  {
+    "id": "retention",
+    "term": "Retention system",
+    "aliases": [
+      "chin retention system"
+    ],
+    "definition": "Definition: A retention system uses straps, anchors, adjusters, and a buckle to keep protective equipment correctly positioned.",
+    "context": "Key point: A helmet can only protect as designed when it fits, stays in place, and meets the relevant safety standard."
+  },
+  {
+    "id": "gravity",
+    "term": "Gravity",
+    "aliases": [],
+    "definition": "Definition: Gravity accelerates a released object downward. Near Earth’s surface, the ideal acceleration is about 9.81 metres per second squared.",
+    "context": "Key point: A falling object speeds up until impact; air resistance and the collision then change its motion."
+  },
+  {
+    "id": "rebound",
+    "term": "Rebound",
+    "aliases": [],
+    "definition": "Definition: Rebound is upward motion after a collision. It is smaller when more impact energy is absorbed, dissipated, or converted to deformation.",
+    "context": "Key point: A simple bouncing-ball animation can show timing, but it cannot predict helmet safety or human injury."
+  },
+  {
+    "id": "tail",
+    "term": "Tail stabilizer",
+    "aliases": [
+      "horizontal stabilizer",
+      "vertical stabilizer",
+      "tail fin"
+    ],
+    "definition": "Definition: An aircraft’s horizontal and vertical tail surfaces help control pitch and yaw and contribute to stability.",
+    "context": "Key point: Their size, angle, airfoil, and placement follow aerodynamic design; a visual model is not a flight-certified configuration."
+  },
+  {
+    "id": "stiff",
+    "term": "Stiff",
+    "aliases": [],
+    "definition": "Definition: A stiff object changes shape only a little under a given force.",
+    "context": "Key point: Stiffness is not the same as strength: a part may resist bending yet still fail at a lower load than another part."
+  },
+  {
+    "id": "vibration",
+    "term": "Vibration",
+    "aliases": [],
+    "definition": "Definition: Vibration is repeated motion back and forth around an equilibrium position.",
+    "context": "Key point: Its frequency, amplitude, damping, and direction determine how it feels and how it travels into nearby structures."
+  },
+  {
+    "id": "tetrahedra",
+    "term": "Tetrahedra and octahedra",
+    "aliases": [
+      "tetrahedron",
+      "octahedron"
+    ],
+    "definition": "Definition: A tetrahedron has four triangular faces; an octahedron has eight triangular faces.",
+    "context": "Key point: Repeating their edges creates the triangulated load paths of an octet truss."
+  },
+  {
+    "id": "load",
+    "term": "Load",
+    "aliases": [],
+    "definition": "Definition: A load is a force or combination of forces acting on a structure, such as body weight, impact, pressure, or engine weight.",
+    "context": "Key point: A design must be evaluated for where the load acts, its direction, duration, repetition, and supports."
+  },
+  {
+    "id": "tension",
+    "term": "Tension",
+    "aliases": [
+      "pulling force"
+    ],
+    "definition": "Definition: Tension is a pulling force. Strain is the fractional change in length or shape caused by loading.",
+    "context": "Key point: When a re-entrant lattice is pulled, its angled ribs can rotate and make the structure expand sideways."
+  },
+  {
+    "id": "airframe",
+    "term": "Airframe",
+    "aliases": [],
+    "definition": "Definition: The airframe is the load-carrying body of an aircraft, including the fuselage, wings, and tail but not the propulsion system.",
+    "context": "Key point: A lattice core could form one part of a wing concept; a real airframe also needs spars, joints, control surfaces, systems, and certification."
+  },
+  {
+    "id": "engine",
+    "term": "Aircraft engine",
+    "aliases": [],
+    "definition": "Definition: An aircraft engine produces thrust. Its mass and vibration also create loads that the wing or fuselage must carry.",
+    "context": "Key point: Engine placement affects structure, aerodynamics, balance, maintenance, and safety."
+  },
+  {
+    "id": "grip",
+    "term": "Grip tape and deck skin",
+    "aliases": [
+      "grip tape",
+      "deck skin"
+    ],
+    "definition": "Definition: Grip tape is the rough top surface under a rider’s shoes. A deck skin is a strong outer layer bonded to the lightweight core.",
+    "context": "Key point: Separating the skins with a core can increase bending stiffness without making the entire deck solid."
+  },
+  {
+    "id": "truck",
+    "term": "Skateboard trucks and axles",
+    "aliases": [
+      "skateboard trucks",
+      "axles"
+    ],
+    "definition": "Definition: Skateboard trucks are the turning assemblies fixed below the deck; their axles support the wheels.",
+    "context": "Key point: Loads from the rider travel through the deck into the truck mounting areas, which need local reinforcement."
+  },
+  {
+    "id": "urethane",
+    "term": "Urethane wheels",
+    "aliases": [
+      "polyurethane wheels"
+    ],
+    "definition": "Definition: Skateboard wheels are commonly made from polyurethane, a tough polymer that can be formulated in different hardnesses.",
+    "context": "Key point: Wheel hardness, size, shape, and bearings affect grip, comfort, speed, and rolling resistance."
+  },
+  {
+    "id": "motor",
+    "term": "Motor and rotating drive",
+    "aliases": [],
+    "definition": "Definition: A motor converts energy into rotation. Small imbalances or changing forces can also produce vibration.",
+    "context": "Key point: A mount carries the motor’s weight while trying to reduce unwanted vibration reaching the supporting structure."
+  },
+  {
+    "id": "skid",
+    "term": "Mounting skid",
+    "aliases": [],
+    "definition": "Definition: A mounting skid is a rigid base frame that supports equipment and transfers its loads to a floor or larger structure.",
+    "context": "Key point: Isolation elements sit between the vibrating machine and the anchored skid or foundation."
+  },
+  {
+    "id": "metasurface",
+    "term": "Metasurface",
+    "aliases": [
+      "engineered surface",
+      "wave-control surface"
+    ],
+    "definition": "Definition: A metasurface is an extremely thin surface covered with tiny patterned elements that control how waves reflect, transmit, or bend.",
+    "context": "Key point: Its effect comes mainly from the pattern and spacing of the surface elements, not from a thick block of material."
+  },
+  {
+    "id": "metalens",
+    "term": "Metalens",
+    "aliases": [
+      "flat lens",
+      "metasurface lens",
+      "dielectric metalens"
+    ],
+    "definition": "Definition: A metalens is a flat optical lens made from many tiny patterned elements that focus or shape light. It does not have to be made of metal.",
+    "context": "Key point: Unlike a conventional curved lens, a dielectric metalens can control light with a thin patterned surface."
+  },
+  {
+    "id": "subwavelength",
+    "term": "Subwavelength",
+    "aliases": [
+      "smaller than a wavelength",
+      "sub-wavelength"
+    ],
+    "definition": "Definition: Subwavelength means smaller than the wavelength of the wave being studied.",
+    "context": "Key point: Features much smaller than a wavelength can change how a surface or material interacts with that wave."
+  },
+  {
+    "id": "transformation-optics",
+    "term": "Transformation optics",
+    "aliases": [
+      "coordinate transformation optics",
+      "transformed optical space"
+    ],
+    "definition": "Definition: Transformation optics is a design method that uses chosen material properties to guide waves as though space itself had been reshaped.",
+    "context": "Key point: It can bend, focus, redirect, or route electromagnetic waves."
+  },
+  {
+    "id": "cloak",
+    "term": "Cloak",
+    "aliases": [
+      "invisibility cloak",
+      "wave cloak",
+      "electromagnetic cloak"
+    ],
+    "definition": "Definition: A cloak is a device or material arrangement designed to redirect waves around a region so the region interacts less with incoming waves.",
+    "context": "Key point: A cloak works only over particular frequencies, directions, materials, and operating conditions."
+  },
+  {
+    "id": "microwave",
+    "term": "Microwave",
+    "aliases": [
+      "microwave radiation",
+      "microwave frequency"
+    ],
+    "definition": "Definition: Microwaves are electromagnetic waves with wavelengths from roughly millimetres to metres, used in radar, communications, and heating.",
+    "context": "Key point: Microwave experiments are easier to build and measure than optical-scale experiments."
+  },
+  {
+    "id": "resonator-element",
+    "term": "Resonator",
+    "aliases": [
+      "resonant element",
+      "resonant device"
+    ],
+    "definition": "Definition: A resonator is an object that responds especially strongly near one or more natural frequencies.",
+    "context": "Key point: Its size, mass, stiffness, and surrounding material set the frequencies at which it resonates."
+  },
+  {
+    "id": "membrane-absorber",
+    "term": "Membrane absorber",
+    "aliases": [
+      "membrane sound absorber",
+      "resonant membrane"
+    ],
+    "definition": "Definition: A membrane absorber is a thin flexible sheet that vibrates and dissipates some of an incoming sound wave’s energy.",
+    "context": "Key point: It is usually tuned to absorb a selected frequency range rather than every frequency equally."
+  },
+  {
+    "id": "thermal-conductivity",
+    "term": "Thermal conductivity",
+    "aliases": [
+      "heat conductivity"
+    ],
+    "definition": "Definition: Thermal conductivity measures how easily heat flows through a material.",
+    "context": "Key point: High conductivity spreads heat quickly; low conductivity helps insulate. Geometry and contact paths also matter."
+  },
+  {
+    "id": "thermal-cloak",
+    "term": "Thermal cloak",
+    "aliases": [
+      "heat cloak",
+      "thermal cloaking"
+    ],
+    "definition": "Definition: A thermal cloak is a designed material arrangement that guides heat around a protected region.",
+    "context": "Key point: It changes heat-flow paths. It does not make heat disappear or provide perfect insulation."
+  },
+  {
+    "id": "topological-edge-state",
+    "term": "Topological edge state",
+    "aliases": [
+      "topological boundary state",
+      "edge mode"
+    ],
+    "definition": "Definition: A topological edge state is a boundary-localized wave mode in a specially designed structure.",
+    "context": "Key point: It can guide around some defects while the required band gap and design conditions remain in place. It is not automatically one-way or immune to every defect."
+  },
+  {
+    "id": "photonic-lattice",
+    "term": "Photonic lattice",
+    "aliases": [
+      "optical lattice",
+      "photonic crystal lattice"
+    ],
+    "definition": "Definition: A photonic lattice is a repeating arrangement that controls how light travels.",
+    "context": "Key point: Its spacing and refractive-index pattern can create allowed and blocked frequency ranges. A repeating optical lattice does not automatically create a protected edge route."
+  },
+  {
+    "id": "magnetic-flux",
+    "term": "Magnetic flux",
+    "aliases": [
+      "magnetic field flux",
+      "flux through an area"
+    ],
+    "definition": "Definition: Magnetic flux describes how much magnetic field passes through a chosen area.",
+    "context": "Key point: Flux depends on field strength, area, and the angle between the field and the surface."
+  },
+  {
+    "id": "anisotropy",
+    "term": "Anisotropy",
+    "aliases": [
+      "directional dependence",
+      "direction-dependent behavior"
+    ],
+    "definition": "Definition: Anisotropy is the property of responding differently in different directions.",
+    "context": "Key point: A structure can have directional stiffness, conductivity, wave speed, or optical response."
+  },
+  {
+    "id": "dielectric",
+    "term": "Dielectric",
+    "aliases": [
+      "electrical insulator",
+      "dielectric material"
+    ],
+    "definition": "Definition: A dielectric is a material that conducts little electric current but can become polarized in an electric field.",
+    "context": "Key point: Dielectrics are used to store electric energy and change how electromagnetic waves travel."
+  },
+  {
+    "id": "negative-index",
+    "term": "Negative index",
+    "aliases": [
+      "negative refractive index",
+      "negative-index material"
+    ],
+    "definition": "Definition: Negative index describes a material in which refraction bends a wave in an unusual direction because its effective refractive index is negative.",
+    "context": "Key point: The direction of phase travel can differ from the direction of energy flow."
+  },
+  {
+    "id": "phase",
+    "term": "Phase",
+    "aliases": [
+      "wave phase",
+      "phase angle"
+    ],
+    "definition": "Definition: Phase indicates where a repeating wave is within its cycle, such as at a crest, trough, or zero crossing.",
+    "context": "Key point: Phase differences determine interference, focusing, and wavefront shape."
+  },
+  {
+    "id": "wavefront",
+    "term": "Wavefront",
+    "aliases": [
+      "constant-phase surface",
+      "wave surface"
+    ],
+    "definition": "Definition: A wavefront is a line or surface connecting points on a wave that have the same phase.",
+    "context": "Key point: Wavefronts show how waves spread, focus, or are redirected."
+  },
+  {
+    "id": "silicon",
+    "term": "Silicon",
+    "aliases": [
+      "silicon wafer"
+    ],
+    "definition": "Definition: Silicon is a semiconductor used to make electronic chips, sensors, and many tiny optical structures.",
+    "context": "Key point: A silicon component can be patterned at a very small scale to control light."
+  },
+  {
+    "id": "copper",
+    "term": "Copper",
+    "aliases": [
+      "copper metal"
+    ],
+    "definition": "Definition: Copper is a metal that conducts electricity and heat very well.",
+    "context": "Key point: Its conductivity makes it useful in microwave resonators and heat-flow experiments."
+  },
+  {
+    "id": "pdms",
+    "term": "PDMS silicone",
+    "aliases": [
+      "polydimethylsiloxane",
+      "silicone elastomer"
+    ],
+    "definition": "Definition: PDMS is a soft, clear silicone polymer that can bend without breaking.",
+    "context": "Key point: Its flexibility makes it useful for membranes and its low conductivity can help shape heat paths."
+  },
+  {
+    "id": "soft-magnetic-alloy",
+    "term": "Soft magnetic alloy",
+    "aliases": [
+      "permalloy",
+      "soft magnetic metal"
+    ],
+    "definition": "Definition: A soft magnetic alloy is a metal that magnetizes easily and can guide a magnetic field.",
+    "context": "Key point: It is chosen for field routing because it can respond strongly without being a permanent magnet."
+  },
+  {
+    "id": "endoscope",
+    "term": "Endoscope",
+    "aliases": [
+      "borescope",
+      "medical endoscope",
+      "miniature imaging probe"
+    ],
+    "definition": "Definition: An endoscope is a slender instrument with a light and camera or optical system for seeing inside a body, machine, or narrow space.",
+    "context": "Key point: A metalens can be one small imaging component inside an endoscope; it is not the whole instrument."
+  },
+  {
+    "id": "nanopost",
+    "term": "Nanopost",
+    "aliases": [
+      "nano-post",
+      "nanopillar",
+      "meta-atom"
+    ],
+    "definition": "Definition: A nanopost is a tiny upright post, usually measured in nanometres, patterned across a surface to control light.",
+    "context": "Key point: Changing a nanopost’s size or height changes the phase delay it gives to light."
+  },
+  {
+    "id": "collimated-light",
+    "term": "Collimated light",
+    "aliases": [
+      "parallel light"
+    ],
+    "definition": "Definition: Collimated light has rays that travel nearly parallel to one another.",
+    "context": "Key point: A lens can turn this nearly parallel light into a focused spot."
+  },
+  {
+    "id": "focal-spot",
+    "term": "Focal spot",
+    "aliases": [
+      "focus"
+    ],
+    "definition": "Definition: A focal spot is the small region where a lens or optical surface brings light together most strongly.",
+    "context": "Key point: Its size and position depend on the lens design and the incoming light."
+  },
+  {
+    "id": "image-sensor",
+    "term": "Image sensor",
+    "aliases": [
+      "camera sensor",
+      "detector"
+    ],
+    "definition": "Definition: An image sensor turns incoming light into an electrical image or measurement.",
+    "context": "Key point: It must be placed where the optical system forms the useful image."
+  },
+  {
+    "id": "scattering",
+    "term": "Scattering",
+    "aliases": [
+      "wave scattering",
+      "scattered field"
+    ],
+    "definition": "Definition: Scattering is the redirection of a wave in many directions after it meets an object or irregularity.",
+    "context": "Key point: A cloak aims to reduce scattering only for its intended wave, frequency, and conditions."
+  },
+  {
+    "id": "waveguide",
+    "term": "Waveguide",
+    "aliases": [
+      "guided-wave path",
+      "optical waveguide",
+      "microwave waveguide"
+    ],
+    "definition": "Definition: A waveguide is a structure that confines and directs a wave along a chosen path.",
+    "context": "Key point: It can guide light, radio waves, sound, or other waves depending on its material and shape."
+  },
+  {
+    "id": "platelet",
+    "term": "Platelet",
+    "aliases": [
+      "tuned plate"
+    ],
+    "definition": "Definition: In this acoustic panel, a platelet is a small rigid mass bonded to a flexible membrane to change how it vibrates.",
+    "context": "Key point: It is a mechanical part, not a biological blood cell."
+  },
+  {
+    "id": "thermal-pulse",
+    "term": "Thermal pulse",
+    "aliases": [
+      "transient heat",
+      "transient heat response",
+      "heat pulse",
+      "short-duration heating"
+    ],
+    "definition": "Definition: A thermal pulse is a short burst of heating. Its temperature response changes over time before it settles.",
+    "context": "Key point: A thermal cloak can delay heat at a core during this changing, or transient, stage."
+  },
+  {
+    "id": "bulk",
+    "term": "Bulk",
+    "aliases": [
+      "interior"
+    ],
+    "definition": "Definition: The bulk is the repeating interior of a structured material, distinct from its outer edge or boundary.",
+    "context": "Key point: In an edge-guiding design, the bulk can block a frequency while the boundary carries a special route."
+  },
+  {
+    "id": "defect",
+    "term": "Defect",
+    "aliases": [
+      "structural defect",
+      "lattice imperfection"
+    ],
+    "definition": "Definition: A defect is an intentional or accidental change in an otherwise repeating structure.",
+    "context": "Key point: Testing defects helps show whether a guided wave route still works under the stated design conditions."
+  },
+  {
+    "id": "hall-sensor",
+    "term": "Hall sensor",
+    "aliases": [
+      "Hall-effect sensor"
+    ],
+    "definition": "Definition: A Hall sensor detects magnetic field by measuring a voltage created across a current-carrying material.",
+    "context": "Key point: A flux shell can redirect more of an existing field toward a small Hall sensor gap."
+  },
+  {
+    "id": "magnetic-saturation",
+    "term": "Magnetic saturation",
+    "aliases": [
+      "core saturation"
+    ],
+    "definition": "Definition: Magnetic saturation is when a field-guiding material is already strongly magnetized, so more input field produces little extra response.",
+    "context": "Key point: A useful flux-shell design leaves headroom before saturation reduces its guiding effect."
+  },
+  {
+    "id": "helmholtz-coil",
+    "term": "Helmholtz coil",
+    "aliases": [
+      "field coil"
+    ],
+    "definition": "Definition: A Helmholtz coil is a matched pair of coils arranged to create a fairly uniform magnetic field between them.",
+    "context": "Key point: It can provide the external field that a magnetic-flux experiment redistributes."
+  },
+  {
+    "id": "ferrite",
+    "term": "Magnetically biased ferrite",
+    "aliases": [
+      "ferrite",
+      "microwave ferrite",
+      "VCIG ferrite"
+    ],
+    "definition": "Definition: A magnetically biased ferrite is a ceramic used in microwave devices whose wave response changes under an external magnetic field.",
+    "context": "Key point: It is a role-specific platform material, not a general replacement for silicon in every wave device."
+  },
+  {
+    "id": "microwave-laminate",
+    "term": "Fiberglass/epoxy microwave laminate",
+    "aliases": [
+      "microwave laminate",
+      "fiberglass epoxy",
+      "PCB substrate"
+    ],
+    "definition": "Definition: A microwave laminate is a low-loss composite board that supports patterned conducting traces at microwave frequencies.",
+    "context": "Key point: It acts as a substrate under the copper pattern rather than as a random bulk mixture."
+  },
+  {
+    "id": "iron-platelet",
+    "term": "Iron platelet",
+    "aliases": [
+      "iron mass",
+      "iron platelets"
+    ],
+    "definition": "Definition: An iron platelet is a small dense metal mass bonded to a flexible membrane to shift its resonant motion.",
+    "context": "Key point: Its mass works with the membrane stiffness to set the frequencies the cell responds to most strongly."
+  },
+  {
+    "id": "hyperbolic-multilayer",
+    "term": "Hyperbolic multilayer",
+    "aliases": [
+      "hyperlens",
+      "hyperbolic stack",
+      "hyperbolic material"
+    ],
+    "definition": "Definition: A hyperbolic multilayer is a stack of very thin metal and insulating films that responds differently along and across its layers.",
+    "context": "Key point: It can carry selected fine optical patterns near a source, but the result depends on wavelength, loss, and the fabricated layer sizes."
+  },
+  {
+    "id": "hyperbolic-response",
+    "term": "Hyperbolic response",
+    "aliases": [
+      "hyperbolic dispersion"
+    ],
+    "definition": "Definition: Hyperbolic response is direction-dependent electromagnetic behavior in which waves follow a different relation along one axis than across it.",
+    "context": "Key point: The name describes wave behavior, not a layer shaped like a drawn hyperbola."
+  },
+  {
+    "id": "near-field",
+    "term": "Near field",
+    "aliases": [
+      "near-field optical detail",
+      "near-field pattern"
+    ],
+    "definition": "Definition: The near field is the region very close to a source where fine wave patterns can exist before fading rapidly with distance.",
+    "context": "Key point: Hyperlens research aims to transport selected near-field detail, not to make an ordinary far-away image perfectly sharp."
+  },
+  {
+    "id": "alumina",
+    "term": "Alumina",
+    "aliases": [
+      "aluminium oxide",
+      "aluminum oxide"
+    ],
+    "definition": "Definition: Alumina is a hard ceramic electrical insulator made from aluminium and oxygen.",
+    "context": "Key point: In an optical multilayer it can separate thin metal films instead of mixing with them."
+  },
+  {
+    "id": "silver",
+    "term": "Silver",
+    "aliases": [
+      "silver film",
+      "silver layer"
+    ],
+    "definition": "Definition: Silver is a highly conductive and reflective metal.",
+    "context": "Key point: Thin silver films can provide the metal part of an optical multilayer or a reflective backing below a cooling film."
+  },
+  {
+    "id": "chiral-polarizer",
+    "term": "Chiral helix polarizer",
+    "aliases": [
+      "chiral polarizer",
+      "helix polarizer",
+      "chiral helix"
+    ],
+    "definition": "Definition: A chiral helix polarizer is a patterned layer of tiny corkscrew shapes that responds differently to the two handed twists of circularly polarized light.",
+    "context": "Key point: Its effect is tied to the helix geometry, operating wavelength, and direction of the incoming light."
+  },
+  {
+    "id": "chirality",
+    "term": "Chirality",
+    "aliases": [
+      "chiral",
+      "handed"
+    ],
+    "definition": "Definition: Chirality means a shape has left- and right-handed versions that cannot be matched simply by rotating one onto the other.",
+    "context": "Key point: A left-handed helix and a right-handed helix are mirror forms, like left and right hands."
+  },
+  {
+    "id": "helix",
+    "term": "Helix",
+    "aliases": [
+      "helices",
+      "helical"
+    ],
+    "definition": "Definition: A helix is a corkscrew-shaped curve that winds around an axis.",
+    "context": "Key point: Helix radius, pitch, number of turns, and handedness all change the shape used in the polarizer model."
+  },
+  {
+    "id": "pitch",
+    "term": "Pitch",
+    "aliases": [
+      "helix pitch"
+    ],
+    "definition": "Definition: Pitch is the distance a helix rises during one complete turn.",
+    "context": "Key point: Raising the pitch makes the corkscrew more stretched along its axis."
+  },
+  {
+    "id": "circular-polarization",
+    "term": "Circular polarization",
+    "aliases": [
+      "circularly polarized light",
+      "polarized light"
+    ],
+    "definition": "Definition: Circular polarization is light whose electric field rotates as the wave travels.",
+    "context": "Key point: The rotation can be left- or right-handed, which a chiral structure can distinguish under the right conditions."
+  },
+  {
+    "id": "polarizer",
+    "term": "Polarizer",
+    "aliases": [
+      "polarization filter"
+    ],
+    "definition": "Definition: A polarizer is a component that passes some polarization states more readily than others.",
+    "context": "Key point: A chiral polarizer filters the handedness of circular polarization rather than simply blocking all light."
+  },
+  {
+    "id": "space-coiling",
+    "term": "Space coiling",
+    "aliases": [
+      "space-coiling",
+      "coiling-up space"
+    ],
+    "definition": "Definition: Space coiling folds a wave's route into a smaller outside space.",
+    "context": "Key point: The sound travels through the full internal path, so a folded channel can create more delay than a straight opening of the same panel thickness."
+  },
+  {
+    "id": "labyrinthine-channel",
+    "term": "Labyrinthine channel",
+    "aliases": [
+      "labyrinth channel",
+      "serpentine channel",
+      "folded air path"
+    ],
+    "definition": "Definition: A labyrinthine channel is one continuous passage that turns back and forth through a compact object.",
+    "context": "Key point: The rigid walls define the route while air carries the sound through it."
+  },
+  {
+    "id": "phase-delay",
+    "term": "Phase delay",
+    "aliases": [
+      "sound delay",
+      "wave delay"
+    ],
+    "definition": "Definition: Phase delay is a shift in where a wave is in its repeating cycle after it travels a longer or slower route.",
+    "context": "Key point: A patterned set of delays can reshape the outgoing wavefront without needing to absorb all of the sound."
+  },
+  {
+    "id": "acoustic-metasurface",
+    "term": "Acoustic metasurface",
+    "aliases": [
+      "sound metasurface"
+    ],
+    "definition": "Definition: An acoustic metasurface is a patterned surface that changes a passing or reflected sound wave.",
+    "context": "Key point: Its small channels, cavities, or membranes are designed for a particular frequency range and direction."
+  },
+  {
+    "id": "radiative-cooling",
+    "term": "Radiative cooling",
+    "aliases": [
+      "passive radiative cooling",
+      "radiative cooler"
+    ],
+    "definition": "Definition: Radiative cooling is the loss of heat as emitted infrared light, sometimes combined with strong reflection of sunlight.",
+    "context": "Key point: Outdoor cooling depends on the sky, humidity, airflow, absorbed sunlight, and thermal contact, not only the film pattern."
+  },
+  {
+    "id": "infrared",
+    "term": "Infrared",
+    "aliases": [
+      "thermal infrared",
+      "infrared radiation"
+    ],
+    "definition": "Definition: Infrared is light beyond visible red that warm objects can emit as thermal radiation.",
+    "context": "Key point: The cooling-film scene uses orange arrows for heat leaving as infrared, not for conducted heat moving through a solid."
+  },
+  {
+    "id": "emissivity",
+    "term": "Emissivity",
+    "aliases": [
+      "thermal emissivity"
+    ],
+    "definition": "Definition: Emissivity describes how strongly a surface emits thermal radiation compared with an ideal emitter at the same temperature.",
+    "context": "Key point: High emissivity in the useful infrared range can help a surface shed heat, but it is only one part of the energy balance."
+  },
+  {
+    "id": "solar-reflectance",
+    "term": "Solar reflectance",
+    "aliases": [
+      "sunlight reflectance"
+    ],
+    "definition": "Definition: Solar reflectance is the share of incoming sunlight that a surface reflects instead of absorbing.",
+    "context": "Key point: A reflective backing can reduce solar heating below a radiative-cooling film."
+  },
+  {
+    "id": "microsphere",
+    "term": "Microsphere",
+    "aliases": [
+      "microspheres",
+      "silica microsphere"
+    ],
+    "definition": "Definition: A microsphere is a very small sphere, often made from glass-like silica.",
+    "context": "Key point: In the cooling-film model, the spheres are embedded inside the polymer instead of floating above it."
+  },
+  {
+    "id": "polymer-matrix",
+    "term": "Polymer matrix",
+    "aliases": [
+      "polymer film",
+      "polymethylpentene"
+    ],
+    "definition": "Definition: A polymer matrix is the continuous plastic material that surrounds embedded particles or fibers.",
+    "context": "Key point: In the cooling film, it holds the silica microspheres in a fixed layer over the reflective backing."
+  },
+  {
+    "id": "seismic-metawedge",
+    "term": "Seismic metawedge",
+    "aliases": [
+      "metawedge",
+      "seismic metamaterial"
+    ],
+    "definition": "Definition: A seismic metawedge is a graded array of anchored resonators used to study how selected ground-surface waves change direction or transmission.",
+    "context": "Key point: It is a research-scale wave-control concept, not a claim that any building becomes earthquake-proof."
+  },
+  {
+    "id": "seismic-wave",
+    "term": "Seismic wave",
+    "aliases": [
+      "ground wave",
+      "ground-surface wave"
+    ],
+    "definition": "Definition: A seismic wave is an elastic disturbance that travels through the ground or along its surface.",
+    "context": "Key point: Its behavior depends on the local soil, frequency, source, depth, and structures it encounters."
+  },
+  {
+    "id": "rayleigh-wave",
+    "term": "Rayleigh wave",
+    "aliases": [
+      "Rayleigh surface wave"
+    ],
+    "definition": "Definition: A Rayleigh wave is a ground-surface wave whose motion includes both vertical and horizontal movement.",
+    "context": "Key point: It is one important type of surface motion studied in seismic metamaterial experiments."
+  },
+  {
+    "id": "mode-conversion",
+    "term": "Mode conversion",
+    "aliases": [
+      "wave conversion"
+    ],
+    "definition": "Definition: Mode conversion happens when wave energy changes from one type of motion into another at a structure or boundary.",
+    "context": "Key point: Redirected seismic energy is not destroyed. It may become a different type of wave motion in the ground."
+  },
+  {
+    "id": "water-wave-plate-array",
+    "term": "Water-wave plate array",
+    "aliases": [
+      "water-wave metamaterial",
+      "plate array"
+    ],
+    "definition": "Definition: A water-wave plate array is a set of rigid plates fixed below the surface of a shallow water tank.",
+    "context": "Key point: The plates change the local depth and open channels that guide small experimental ripples."
+  },
+  {
+    "id": "bathymetry",
+    "term": "Bathymetry",
+    "aliases": [
+      "engineered bathymetry",
+      "tank bottom"
+    ],
+    "definition": "Definition: Bathymetry is the shape and depth of the bottom beneath water.",
+    "context": "Key point: Changing bottom features changes the water depth seen by a surface wave and can alter its route."
+  },
+  {
+    "id": "surface-wave",
+    "term": "Surface wave",
+    "aliases": [
+      "water wave",
+      "surface ripples"
+    ],
+    "definition": "Definition: A surface wave travels along the boundary between a fluid and the air above it.",
+    "context": "Key point: The water-wave model uses small tank ripples, not a full prediction of ocean-wave behavior."
+  },
+  {
+    "id": "submerged",
+    "term": "Submerged",
+    "aliases": [
+      "underwater"
+    ],
+    "definition": "Definition: Submerged means placed below the water surface.",
+    "context": "Key point: The plate array stays attached to the tank floor while water passes above and between it."
+  },
+  {
+    "id": "gold",
+    "term": "Gold",
+    "aliases": [
+      "gold metal"
+    ],
+    "definition": "Definition: Gold is a conductive metal that can be patterned into small optical structures.",
+    "context": "Key point: In the chiral-polarizer model, the gold forms the helix shapes rather than a bulk gold block."
+  },
+  {
+    "id": "stainless-steel",
+    "term": "Stainless steel",
+    "aliases": [
+      "steel"
+    ],
+    "definition": "Definition: Stainless steel is a strong iron-based alloy that resists rust better than plain steel.",
+    "context": "Key point: The seismic model uses it as a simplified rigid resonator material, while real ground tests also depend on foundations and soil."
+  },
+  {
+    "id": "acrylic",
+    "term": "Acrylic",
+    "aliases": [
+      "acrylic plastic"
+    ],
+    "definition": "Definition: Acrylic is a clear, rigid plastic that is easy to machine into test pieces.",
+    "context": "Key point: In the water-wave model, acrylic plates are fixed to a tank floor to change the local water depth."
+  },
+  {
+    "id": "strain",
+    "term": "Strain",
+    "aliases": [
+      "deformation ratio"
+    ],
+    "definition": "Definition: Strain is the fractional change in a material’s length or shape caused by a load.",
+    "context": "Key point: Strain describes deformation, while tension describes the pulling force that can cause it."
+  },
+  {
+    "id": "pentamode",
+    "term": "Pentamode material",
+    "aliases": [
+      "pentamode metamaterial",
+      "pentamode lattice"
+    ],
+    "definition": "Definition: A pentamode material is a porous structure designed to support compression while offering very little resistance to shear. Its name refers to one dominant stiffness mode among the six small-strain modes of a three-dimensional solid.",
+    "context": "Key point: Tapered joints and slender links tune the ratio of bulk stiffness to shear stiffness; the rendered result is an illustrative design study."
+  },
+  {
+    "id": "rotating-squares",
+    "term": "Rotating-squares lattice",
+    "aliases": [
+      "rotating squares",
+      "rotating square mechanism",
+      "rotating-squares metamaterial"
+    ],
+    "definition": "Definition: A rotating-squares lattice joins square plates with hinges so the plates turn as a load changes. Rotation changes the spacing and can produce an unusual sideways response.",
+    "context": "Key point: The fold or rotation angle controls the kinematic motion; hinge flexibility and friction determine how closely a real part follows it."
+  },
+  {
+    "id": "chiral-honeycomb",
+    "term": "Chiral honeycomb",
+    "aliases": [
+      "chiral cellular lattice",
+      "chiral honeycomb metamaterial"
+    ],
+    "definition": "Definition: A chiral honeycomb uses handed rings or nodes connected by angled ligaments. A load can make the nodes rotate as well as translate, coupling motion in two directions.",
+    "context": "Key point: The handed geometry sets the sign and strength of the coupling; it is distinct from a honeycomb made only of straight hexagonal walls."
+  },
+  {
+    "id": "miura-origami",
+    "term": "Miura-ori origami",
+    "aliases": [
+      "Miura-ori",
+      "Miura origami",
+      "Miura fold pattern",
+      "Miura-ori metamaterial"
+    ],
+    "definition": "Definition: Miura-ori is a repeating origami fold made from parallelograms that open and close through a coordinated motion. One fold angle can control several dimensions at once.",
+    "context": "Key point: The fold angle is a geometric state, not a material property; crease stiffness and panel thickness limit real deployment."
+  },
+  {
+    "id": "kirigami",
+    "term": "Kirigami metamaterial",
+    "aliases": [
+      "kirigami structure",
+      "cut-and-fold lattice",
+      "kirigami sheet"
+    ],
+    "definition": "Definition: Kirigami is a sheet architecture that combines cuts with folds so a flat sheet can stretch, bend, or deploy. The cuts create hinges and openings that ordinary folding alone does not provide.",
+    "context": "Key point: Cut spacing, ligament width, and fold angle set the available motion; edge damage and fatigue matter in a manufactured sheet."
+  },
+  {
+    "id": "bistable-beam",
+    "term": "Bistable beam",
+    "aliases": [
+      "bistable strut",
+      "two-state beam",
+      "bistable metamaterial",
+      "bistability",
+      "snap-through"
+    ],
+    "definition": "Definition: A bistable beam has two stable shapes and can switch between them after passing a force barrier. It can hold either state without continuous external force.",
+    "context": "Key point: Prestrain and beam curvature set the switching threshold; imperfections can change the threshold and the repeatability."
+  },
+  {
+    "id": "tensegrity",
+    "term": "Tensegrity",
+    "aliases": [
+      "tensegrity lattice",
+      "tensional-integrity structure"
+    ],
+    "definition": "Definition: Tensegrity is a structure where isolated compression members are held in place by a continuous network of tension members. The balance of these forces is called prestress.",
+    "context": "Key point: Changing cable prestrain changes the equilibrium and stiffness before an external load is applied."
+  },
+  {
+    "id": "spinodal-shell",
+    "term": "Spinodal shell",
+    "aliases": [
+      "spinodal architecture",
+      "spinodal porous shell",
+      "spinodal metamaterial"
+    ],
+    "definition": "Definition: A spinodal shell is a thin, smoothly branching shell based on spinodal decomposition patterns, which form interwoven domains during phase separation. Its continuous curves avoid the repeated straight cells of a truss lattice.",
+    "context": "Key point: The pattern wavelength and shell thickness control the scale and amount of solid material; a generated pattern is not a material microstructure measurement."
+  },
+  {
+    "id": "chainmail",
+    "term": "Chainmail lattice",
+    "aliases": [
+      "interlocking-ring lattice",
+      "chainmail metamaterial"
+    ],
+    "definition": "Definition: A chainmail lattice is an array of interlocking rings or links that can rotate and slide while remaining connected. It is compliant in some motions and resistant in others.",
+    "context": "Key point: Link clearance and contact friction govern the transition from free motion to load carrying."
+  },
+  {
+    "id": "thermal-expansion",
+    "term": "Thermal expansion",
+    "aliases": [
+      "coefficient of thermal expansion",
+      "CTE",
+      "thermal-expansion coefficient",
+      "thermal-expansion"
+    ],
+    "definition": "Definition: Thermal expansion is the change in length or volume that accompanies a temperature change. The coefficient of thermal expansion (CTE) gives the fractional change per degree.",
+    "context": "Key point: Combining materials with different CTEs can bend, gap, or preload a structure as it heats and cools."
+  },
+  {
+    "id": "epsilon-near-zero",
+    "term": "Epsilon-near-zero material",
+    "aliases": [
+      "ENZ",
+      "epsilon near zero",
+      "ENZ metamaterial"
+    ],
+    "definition": "Definition: An epsilon-near-zero material has a relative permittivity whose real part is close to zero near a chosen frequency. Electromagnetic fields in it can show unusual phase and transmission behavior.",
+    "context": "Key point: ENZ behavior is frequency-dependent and is affected by loss, thickness, incidence angle, and polarization."
+  },
+  {
+    "id": "photonic-bandgap",
+    "term": "Photonic bandgap",
+    "aliases": [
+      "photonic band gap",
+      "photonic-bandgap",
+      "optical bandgap",
+      "photonic crystal gap"
+    ],
+    "definition": "Definition: A photonic bandgap is a frequency range in which a periodic optical structure does not support an extended propagating mode in a specified direction and polarization. It is the optical counterpart of a stop band.",
+    "context": "Key point: The gap depends on refractive-index contrast, lattice spacing, thickness, direction, and polarization; a finite sample can still leak at its boundaries."
+  },
+  {
+    "id": "bound-state-continuum",
+    "term": "Bound state in the continuum",
+    "aliases": [
+      "BIC",
+      "quasi-BIC",
+      "bound state in continuum",
+      "optical BIC"
+    ],
+    "definition": "Definition: A bound state in the continuum (BIC) is a mode whose frequency lies among radiating waves but that remains trapped because coupling to those waves cancels or is forbidden by symmetry. Small imperfections usually turn an ideal BIC into a very narrow resonance.",
+    "context": "Key point: The ideal cancellation is sensitive to symmetry, geometry, and loss; a high quality factor is not automatically a lossless or broadband response."
+  },
+  {
+    "id": "phase-change",
+    "term": "Phase-change material",
+    "aliases": [
+      "phase change material",
+      "phase-change",
+      "reconfigurable phase-change medium",
+      "PCM"
+    ],
+    "definition": "Definition: A phase-change material switches between physical states or structural phases when heat, light, or an electrical pulse is applied. The switch changes properties such as optical absorption or electrical resistance.",
+    "context": "Key point: Switching temperature, pulse history, hysteresis, and cooling rate affect the state; the transition is not an instantaneous ideal toggle in every device."
+  },
+  {
+    "id": "liquid-crystal",
+    "term": "Liquid crystal",
+    "aliases": [
+      "LC",
+      "liquid-crystal",
+      "liquid-crystal medium",
+      "nematic liquid crystal"
+    ],
+    "definition": "Definition: A liquid crystal flows like a liquid while its elongated molecules tend to align, giving it direction-dependent optical properties. An electric field or surface treatment can rotate that alignment.",
+    "context": "Key point: The molecular alignment direction, called the director, sets the optical response and changes how a patterned device controls light."
+  },
+  {
+    "id": "huygens",
+    "term": "Huygens metasurface",
+    "aliases": [
+      "Huygens",
+      "Huygens surface",
+      "Huygens meta-atom",
+      "Huygens optical metasurface"
+    ],
+    "definition": "Definition: A Huygens metasurface uses co-located electric and magnetic responses to shape the transmitted wave with low reflection. Its elements approximate secondary wave sources described by Huygens’ principle.",
+    "context": "Key point: Electric and magnetic resonances must be balanced at the design frequency; fabrication tolerance and material loss limit the match."
+  },
+  {
+    "id": "structural-color",
+    "term": "Structural color",
+    "aliases": [
+      "structural coloration",
+      "structural-colour",
+      "nanostructure color"
+    ],
+    "definition": "Definition: Structural color is color produced by a surface’s nanoscale geometry filtering, scattering, or interfering with light rather than mainly by a dye or pigment. Changing the geometry can shift the reflected hue.",
+    "context": "Key point: Viewing angle, polarization, feature size, and surrounding medium all influence the observed color."
+  },
+  {
+    "id": "graphene-absorber",
+    "term": "Graphene absorber",
+    "aliases": [
+      "graphene metamaterial absorber",
+      "graphene-based absorber"
+    ],
+    "definition": "Definition: A graphene absorber uses electrically tunable graphene with a patterned structure to take in electromagnetic energy at selected frequencies. The absorbed energy becomes heat or is dissipated through material loss.",
+    "context": "Key point: Chemical potential, bias, pattern dimensions, substrate, and frequency set the absorption; a visual field is not a measured absorption spectrum."
+  },
+  {
+    "id": "space-time",
+    "term": "Space-time metamaterial",
+    "aliases": [
+      "space-time modulation",
+      "spatiotemporal metamaterial",
+      "space-time metasurface"
+    ],
+    "definition": "Definition: A space-time metamaterial changes its pattern or material response across position and time. That modulation can mix frequencies and steer waves in ways a fixed periodic pattern cannot.",
+    "context": "Key point: Modulation rate, spatial period, phase, and drive power determine the generated sidebands and directionality."
+  },
+  {
+    "id": "helmholtz",
+    "term": "Helmholtz resonator",
+    "aliases": [
+      "Helmholtz cavity",
+      "neck-and-cavity resonator"
+    ],
+    "definition": "Definition: A Helmholtz resonator is an air cavity connected to the outside through a narrow neck. Air in the neck oscillates against the compressibility of the trapped air, creating a tunable acoustic resonance.",
+    "context": "Key point: Cavity volume, neck length, opening area, and end correction set the resonance frequency and its damping."
+  },
+  {
+    "id": "acoustic-hologram",
+    "term": "Acoustic hologram",
+    "aliases": [
+      "acoustic holography",
+      "holographic sound field",
+      "acoustic holographic plate"
+    ],
+    "definition": "Definition: An acoustic hologram is a patterned surface or phased source that reconstructs a target sound-pressure field. It controls the phase and sometimes amplitude of many local wave contributions.",
+    "context": "Key point: The target field is valid over a designed frequency range and distance; a rendered focal pattern is an illustrative reconstruction."
+  },
+  {
+    "id": "ventilated-silencer",
+    "term": "Ventilated acoustic silencer",
+    "aliases": [
+      "ventilated silencer",
+      "ventilated noise barrier",
+      "open acoustic silencer"
+    ],
+    "definition": "Definition: A ventilated acoustic silencer reduces sound transmission while leaving openings for air or fluid flow. It combines passages with resonant or absorptive features.",
+    "context": "Key point: Quieting, pressure drop, flow speed, and frequency range trade against one another; an open path cannot block sound in every condition."
+  },
+  {
+    "id": "bubble-metascreen",
+    "term": "Bubble metascreen",
+    "aliases": [
+      "bubble acoustic metascreen",
+      "air-bubble screen",
+      "bubble curtain metamaterial"
+    ],
+    "definition": "Definition: A bubble metascreen is a layer or array of gas bubbles in a liquid that interacts strongly with sound near the bubbles’ oscillation frequencies. The bubbles scatter and reradiate the acoustic wave.",
+    "context": "Key point: Bubble radius, gas pressure, spacing, depth, and dissolution set the response, which can change over time."
+  },
+  {
+    "id": "acoustic-luneburg",
+    "term": "Acoustic Luneburg lens",
+    "aliases": [
+      "Luneburg lens",
+      "Luneburg acoustic lens",
+      "graded-index acoustic lens"
+    ],
+    "definition": "Definition: An acoustic Luneburg lens is a roughly spherical lens whose sound speed or refractive index varies with radius. The gradient bends sound toward a focus on the opposite surface.",
+    "context": "Key point: The ideal profile is continuous; printed layers or cells approximate it and introduce scattering, loss, and bandwidth limits."
+  },
+  {
+    "id": "thermal-concentrator",
+    "term": "Thermal concentrator",
+    "aliases": [
+      "heat concentrator",
+      "thermal flux concentrator"
+    ],
+    "definition": "Definition: A thermal concentrator guides heat so that heat flux becomes larger in a selected region than in the surrounding material. It uses geometry and conductivity distribution to redirect conduction.",
+    "context": "Key point: A concentrator does not create heat; its temperature field depends on sources, contacts, conductivity, and steady or transient conditions."
+  },
+  {
+    "id": "thermal-diode",
+    "term": "Thermal diode",
+    "aliases": [
+      "heat diode",
+      "thermal rectifier",
+      "thermal rectification"
+    ],
+    "definition": "Definition: A thermal diode is a device intended to conduct heat more readily in one direction than the other under comparable boundary conditions. This directional asymmetry is called thermal rectification.",
+    "context": "Key point: Rectification requires temperature-dependent properties, asymmetric geometry, or another nonlinearity; it is not the same as simply having a thermal gradient."
+  },
+  {
+    "id": "thermal-emitter",
+    "term": "Selective thermal emitter",
+    "aliases": [
+      "thermal emitter",
+      "narrowband thermal emitter",
+      "selective emitter"
+    ],
+    "definition": "Definition: A selective thermal emitter radiates strongly in chosen wavelength bands and weakly elsewhere. Its spectrum is shaped by resonances, materials, and surface structure.",
+    "context": "Key point: Emission depends on temperature, angle, polarization, and wavelength; Kirchhoff’s law links an object’s ability to emit and absorb at thermal equilibrium."
+  },
+  {
+    "id": "magnetic-programmable",
+    "term": "Magnetically programmable metamaterial",
+    "aliases": [
+      "magnetic programmable",
+      "programmable magnetic metamaterial",
+      "reconfigurable magnetic lattice"
+    ],
+    "definition": "Definition: A magnetically programmable metamaterial changes its shape, stiffness, or field response when an applied magnetic field rearranges magnetic elements. The programmed state can often be changed without rebuilding the lattice.",
+    "context": "Key point: Magnet strength, spacing, orientation, and magnetic history set the torque; mechanical constraints determine the resulting motion."
+  },
+  {
+    "id": "piezo-shunt",
+    "term": "Piezoelectric shunt",
+    "aliases": [
+      "piezo shunt",
+      "piezo-shunted beam",
+      "piezoelectric shunt damping",
+      "RL shunt",
+      "resistive-inductive shunt"
+    ],
+    "definition": "Definition: A piezoelectric shunt connects a piezoelectric patch to an electrical circuit so mechanical vibration is converted into electrical energy and dissipated or stored. An RL shunt uses a resistor and inductor to target a selected mode.",
+    "context": "Key point: Circuit resistance, inductance, capacitance, and patch placement set the tuning; the circuit must be connected for shunt damping to occur."
+  },
+  {
+    "id": "cfrp",
+    "term": "CFRP composite",
+    "aliases": [
+      "carbon-fiber-reinforced polymer",
+      "carbon-fiber composite",
+      "carbon-fibre composite",
+      "carbon fiber reinforced plastic"
+    ],
+    "definition": "Definition: CFRP is carbon-fiber-reinforced polymer: stiff carbon fibers embedded in a polymer matrix. Fiber direction makes its stiffness and thermal expansion strongly directional.",
+    "context": "Key point: In a thermal-expansion design, fiber orientation and the matrix determine the effective CTE; a material selector cannot represent every layup."
+  },
+  {
+    "id": "invar",
+    "term": "Invar",
+    "aliases": [
+      "Invar alloy",
+      "low-expansion Invar"
+    ],
+    "definition": "Definition: Invar is an iron–nickel alloy with unusually low thermal expansion over a useful temperature range. It is used when dimensional stability matters during heating and cooling.",
+    "context": "Key point: Its low CTE makes a clear contrast with high-expansion materials in a thermal mismatch demonstration."
+  },
+  {
+    "id": "silicon-nitride",
+    "term": "Silicon nitride",
+    "aliases": [
+      "SiN",
+      "Si3N4",
+      "silicon nitride ceramic"
+    ],
+    "definition": "Definition: Silicon nitride is a hard, electrically insulating ceramic used in optical and mechanical microstructures. Thin SiN films can support low-loss patterned resonators.",
+    "context": "Key point: Film thickness, refractive index, stress, and absorption affect an optical response; SiN is not the same material as elemental silicon."
+  },
+  {
+    "id": "gst",
+    "term": "GST phase-change alloy",
+    "aliases": [
+      "GST",
+      "GST phase-change film",
+      "Ge2Sb2Te5",
+      "germanium-antimony-tellurium"
+    ],
+    "definition": "Definition: GST is a germanium–antimony–tellurium phase-change alloy whose amorphous and crystalline states have different optical and electrical properties. Short heat or electrical pulses can switch the state.",
+    "context": "Key point: The two states have different refractive index and loss, while partial crystallization can create intermediate responses."
+  },
+  {
+    "id": "graphene",
+    "term": "Graphene",
+    "aliases": [
+      "graphene sheet",
+      "monolayer graphene"
+    ],
+    "definition": "Definition: Graphene is a one-atom-thick carbon sheet with mobile charge carriers and strong in-plane conductivity. Its electromagnetic response can be tuned by changing its carrier concentration.",
+    "context": "Key point: A graphene absorber model uses this tunability as a design parameter; substrate, bias, defects, and frequency remain important."
+  },
+  {
+    "id": "paraffin",
+    "term": "Paraffin phase-change medium",
+    "aliases": [
+      "paraffin wax",
+      "paraffin PCM",
+      "wax phase-change material"
+    ],
+    "definition": "Definition: Paraffin is a hydrocarbon wax that melts and solidifies over a chosen temperature range, storing latent heat during the transition. It is a common thermal phase-change medium.",
+    "context": "Key point: The useful storage depends on melting range, latent heat, containment, and heat-transfer paths, not only on the material label."
+  },
+  {
+    "id": "pzt",
+    "term": "PZT piezoelectric ceramic",
+    "aliases": [
+      "PZT",
+      "PZT ceramic",
+      "lead zirconate titanate",
+      "piezoelectric PZT"
+    ],
+    "definition": "Definition: PZT is lead zirconate titanate, a ceramic that develops electric charge when strained and deforms when an electric field is applied. This coupling is called piezoelectricity.",
+    "context": "Key point: A PZT patch can exchange energy with a vibration mode; electrodes, poling direction, and circuit loading affect the result."
+  },
+  {
+    "id": "ndfeb",
+    "term": "NdFeB permanent magnet",
+    "aliases": [
+      "NdFeB",
+      "NdFeB magnet",
+      "neodymium-iron-boron magnet",
+      "neodymium magnet"
+    ],
+    "definition": "Definition: NdFeB is a neodymium–iron–boron permanent-magnet material with high magnetic energy density. Its field provides forces or torques when paired with other magnets or magnetic parts.",
+    "context": "Key point: Magnetization direction, air gap, temperature, and nearby ferromagnetic material control the usable force."
+  },
+  {
+    "id": "te10",
+    "term": "TE10 mode",
+    "aliases": [
+      "TE₁₀ mode",
+      "rectangular-waveguide TE10",
+      "dominant waveguide mode"
+    ],
+    "definition": "Definition: TE10 is the lowest-cutoff transverse-electric mode in a hollow rectangular waveguide. Its electric field is transverse to propagation and varies across the wider guide dimension.",
+    "context": "Key point: Guide dimensions and frequency determine whether TE10 propagates; it is a field pattern, not a material or a broadband guarantee."
+  },
+  {
+    "id": "enz",
+    "term": "ENZ response",
+    "aliases": [
+      "epsilon-near-zero response",
+      "near-zero permittivity"
+    ],
+    "definition": "Definition: An ENZ response occurs near a frequency where the real part of a material’s relative permittivity approaches zero. The phase and field distribution can then differ sharply from those in ordinary dielectrics.",
+    "context": "Key point: Loss and the imaginary part of permittivity still matter, so an ENZ label alone does not specify high transmission or field enhancement."
+  },
+  {
+    "id": "mie",
+    "term": "Mie resonance",
+    "aliases": [
+      "Mie scattering resonance",
+      "dielectric Mie mode",
+      "Mie resonator"
+    ],
+    "definition": "Definition: A Mie resonance is a resonant electric or magnetic response of a particle whose size is comparable to the wavelength. It arises from the particle’s internal electromagnetic field pattern and scattering.",
+    "context": "Key point: Particle size, refractive index, shape, and surrounding medium set the resonance and its linewidth."
+  },
+  {
+    "id": "kirchhoff-law",
+    "term": "Kirchhoff’s law of thermal radiation",
+    "aliases": [
+      "Kirchhoff radiation law",
+      "thermal radiation reciprocity"
+    ],
+    "definition": "Definition: Kirchhoff’s law states that, at thermal equilibrium, a surface’s emissivity equals its absorptivity at the same wavelength, direction, and polarization. A good absorber is therefore a good emitter under the matching conditions.",
+    "context": "Key point: The equality is spectral and directional; it does not mean every surface emits the same total power."
+  },
+  {
+    "id": "fano",
+    "term": "Fano resonance",
+    "aliases": [
+      "Fano interference",
+      "Fano line shape"
+    ],
+    "definition": "Definition: A Fano resonance is an asymmetric spectral feature caused by interference between a narrow resonant pathway and a broad background pathway. The interference can create a sharp peak beside a dip.",
+    "context": "Key point: Coupling strength, detuning, and loss set the line shape; the feature is frequency-selective rather than automatically broadband."
+  },
+  {
+    "id": "luneburg",
+    "term": "Luneburg index profile",
+    "aliases": [
+      "Luneburg gradient",
+      "graded-index Luneburg profile"
+    ],
+    "definition": "Definition: A Luneburg index profile varies refractive index smoothly with radius so incoming rays bend toward a focal point on the far side of a spherical lens. The same idea can be implemented for sound with an acoustic index profile.",
+    "context": "Key point: Layered or discretized profiles approximate the ideal gradient and can add reflection and scattering."
+  },
+  {
+    "id": "director",
+    "term": "Liquid-crystal director",
+    "aliases": [
+      "director field",
+      "LC director"
+    ],
+    "definition": "Definition: The director is the local average orientation of elongated liquid-crystal molecules. It has no arrow, because reversing every molecule gives the same nematic orientation.",
+    "context": "Key point: Electric fields, anchoring surfaces, and elastic energy can rotate the director and change birefringence."
+  },
+  {
+    "id": "prestrain",
+    "term": "Prestrain",
+    "aliases": [
+      "pre-strain",
+      "built-in strain",
+      "pre-stretch"
+    ],
+    "definition": "Definition: Prestrain is deformation built into a component before the external load or field is applied. It creates internal stress and can alter stiffness, curvature, or switching thresholds.",
+    "context": "Key point: The sign and amount of prestrain must be specified; a nominally relaxed part does not have the same equilibrium as a prestretched one."
+  },
+  {
+    "id": "fold-angle",
+    "term": "Fold angle",
+    "aliases": [
+      "crease angle",
+      "origami fold angle"
+    ],
+    "definition": "Definition: Fold angle is the angle between panels meeting along a crease or hinge. It describes the deployed state of an origami or kirigami structure.",
+    "context": "Key point: Fold angle changes projected dimensions and contact; the actual crease also has finite thickness and bending stiffness."
+  },
+  {
+    "id": "shear",
+    "term": "Shear deformation",
+    "aliases": [
+      "shear strain",
+      "shearing"
+    ],
+    "definition": "Definition: Shear deformation changes the angle between material lines, like pushing the top of a rectangle sideways. Shear stiffness measures resistance to that shape change.",
+    "context": "Key point: Pentamode designs aim for low shear stiffness while retaining high resistance to volume change."
+  },
+  {
+    "id": "bifurcation",
+    "term": "Bifurcation",
+    "aliases": [
+      "buckling bifurcation",
+      "stability bifurcation"
+    ],
+    "definition": "Definition: Bifurcation is a point where a small change in load or parameter allows a system to branch from one equilibrium path to another. Buckling is a familiar structural example.",
+    "context": "Key point: A bistable beam can use a controlled bifurcation to switch states, but imperfections shift the observed transition."
+  },
+  {
+    "id": "prestress",
+    "term": "Prestress",
+    "aliases": [
+      "pre-stress",
+      "initial stress"
+    ],
+    "definition": "Definition: Prestress is stress present in a structure before an external load is applied. It can keep tensegrity members taut and change the structure’s small-motion stiffness.",
+    "context": "Key point: Prestress is an initial condition that must be distinguished from stress caused by the current test load."
+  },
+  {
+    "id": "spinodal-decomposition",
+    "term": "Spinodal decomposition",
+    "aliases": [
+      "spinodal phase separation",
+      "spinodal pattern"
+    ],
+    "definition": "Definition: Spinodal decomposition is a spontaneous phase-separation process in which small composition fluctuations grow into interwoven domains. The resulting pattern can inspire smooth porous architectures.",
+    "context": "Key point: A spinodal-inspired geometry is a design analogue; it does not prove that the printed material underwent phase separation."
+  },
+  {
+    "id": "refractive-index",
+    "term": "Refractive index",
+    "aliases": [
+      "optical index",
+      "index of refraction"
+    ],
+    "definition": "Definition: Refractive index describes how fast a wave’s phase travels in a medium relative to a reference vacuum or fluid. It also controls how strongly a wave bends at an interface.",
+    "context": "Key point: Index can depend on frequency, direction, polarization, temperature, and whether absorption is included."
+  },
+  {
+    "id": "relative-permittivity",
+    "term": "Relative permittivity",
+    "aliases": [
+      "dielectric constant",
+      "electric permittivity",
+      "epsilon"
+    ],
+    "definition": "Definition: Relative permittivity measures how an electric field polarizes a material compared with vacuum. At wave frequencies it can be complex, with the imaginary part representing loss.",
+    "context": "Key point: ENZ means the real part is near zero at a chosen frequency; the complete complex value still determines propagation and absorption."
+  },
+  {
+    "id": "quality-factor",
+    "term": "Quality factor",
+    "aliases": [
+      "Q factor",
+      "resonator Q"
+    ],
+    "definition": "Definition: Quality factor, or Q, compares the energy stored in a resonance with the energy lost per cycle. A high-Q resonance is narrow in frequency and persists for many cycles.",
+    "context": "Key point: Radiation, material absorption, and imperfect coupling all lower Q; high Q does not by itself mean high transmitted power."
+  },
+  {
+    "id": "hysteresis",
+    "term": "Hysteresis",
+    "aliases": [
+      "switching hysteresis",
+      "thermal hysteresis"
+    ],
+    "definition": "Definition: Hysteresis means a system’s state depends on its history, so the path during increasing input differs from the path during decreasing input. Phase-change materials often show separate switching and reset thresholds.",
+    "context": "Key point: A hysteresis loop can provide state retention, but it also means the same instantaneous temperature or field may correspond to different states."
+  },
+  {
+    "id": "piezoelectricity",
+    "term": "Piezoelectricity",
+    "aliases": [
+      "piezoelectric coupling",
+      "piezoelectric effect"
+    ],
+    "definition": "Definition: Piezoelectricity couples mechanical strain and electric charge: deforming a piezoelectric material produces voltage, and applying voltage produces deformation. The coupling is directional and depends on electrode and poling geometry.",
+    "context": "Key point: A piezoelectric shunt uses this two-way coupling to move vibration energy into an electrical circuit."
+  },
+  {
+    "id": "magnetization",
+    "term": "Magnetization direction",
+    "aliases": [
+      "magnetic moment direction",
+      "magnetization vector"
+    ],
+    "definition": "Definition: Magnetization direction is the direction in which a permanent magnet’s internal magnetic moments are aligned. It determines the direction of the field and the forces or torques between magnets.",
+    "context": "Key point: Reorienting NdFeB elements can program a magnetic lattice, while the same magnet strength with another orientation can move it differently."
+  },
+  {
+    "id": "air-medium",
+    "term": "Air as acoustic medium",
+    "aliases": [
+      "air medium",
+      "air-filled medium",
+      "air-filled throat",
+      "air cavity medium"
+    ],
+    "definition": "Definition: Air is the compressible gas that carries ordinary airborne sound. Its density and sound speed set the acoustic wavelength and the resonance of air-filled cavities.",
+    "context": "Key point: Helmholtz resonators, ventilated silencers, and acoustic holograms depend on the air volume and openings around their solid features."
+  },
+  {
+    "id": "hinge",
+    "term": "Hinge",
+    "aliases": [
+      "compliant hinge",
+      "corner hinge"
+    ],
+    "definition": "Definition: A hinge is a joint that permits rotation around a preferred axis while connecting two parts. A compliant hinge gets that motion from flexible material rather than a pin.",
+    "context": "Key point: The square, origami, and kirigami models use flexible hinge regions to localize motion."
+  },
+  {
+    "id": "ligament",
+    "term": "Ligament",
+    "aliases": [
+      "lattice ligament",
+      "connecting ligament"
+    ],
+    "definition": "Definition: A ligament is a slender connection between larger nodes, tiles, or rings in a structure. It can stretch, bend, or act like a flexible hinge.",
+    "context": "Key point: Ligament width and orientation change how a chiral or cellular structure couples motion."
+  },
+  {
+    "id": "gauge",
+    "term": "Gauge",
+    "aliases": [
+      "material gauge",
+      "strip gauge"
+    ],
+    "definition": "Definition: Gauge is a thickness or diameter used to describe a thin structural feature, such as a wire, crease, ribbon, or shell. In this studio it is a normalized visual setting.",
+    "context": "Key point: A gauge slider changes illustrated geometry; it is not a standard material grade or a measured strength value."
+  },
+  {
+    "id": "crease",
+    "term": "Crease",
+    "aliases": [
+      "fold crease",
+      "crease line"
+    ],
+    "definition": "Definition: A crease is a narrow line where a sheet bends, often separating two facets in an origami pattern. Its stiffness controls how easily the panels fold.",
+    "context": "Key point: Miura-ori uses shared mountain and valley creases so neighbouring facets deploy together."
+  },
+  {
+    "id": "facet",
+    "term": "Facet",
+    "aliases": [
+      "folded facet",
+      "planar facet"
+    ],
+    "definition": "Definition: A facet is one flat panel or face in a folded or faceted surface. A tessellation arranges many facets according to a repeating rule.",
+    "context": "Key point: The Miura model rotates rigid facets around creases rather than stretching the panels."
+  },
+  {
+    "id": "tessellation",
+    "term": "Tessellation",
+    "aliases": [
+      "tessellated sheet",
+      "tiling pattern"
+    ],
+    "definition": "Definition: A tessellation is a repeated arrangement of shapes that covers a region without gaps or overlaps. Folded sheets use tessellations to coordinate many panels.",
+    "context": "Key point: A repeating pattern can constrain motion across a sheet while still allowing a global deployment."
+  },
+  {
+    "id": "kinematics",
+    "term": "Kinematics",
+    "aliases": [
+      "kinematic motion",
+      "kinematic state"
+    ],
+    "definition": "Definition: Kinematics describes positions and motion without calculating the forces that cause them. A kinematic model can prescribe a shape change for teaching.",
+    "context": "Key point: The opening and fold controls show kinematic states, not force, stress, or strain solutions."
+  },
+  {
+    "id": "spatial-frequency",
+    "term": "Spatial frequency",
+    "aliases": [
+      "pattern frequency",
+      "disorder frequency"
+    ],
+    "definition": "Definition: Spatial frequency describes how rapidly a pattern repeats or varies across distance. Higher spatial frequency means features change over a shorter distance.",
+    "context": "Key point: The spinodal control changes the number of qualitative pattern cycles; it does not specify a measured pore spectrum."
+  },
+  {
+    "id": "laminate",
+    "term": "Laminate",
+    "aliases": [
+      "layered laminate",
+      "bonded laminate"
+    ],
+    "definition": "Definition: A laminate is a bonded stack of layers, which may use different materials or orientations. The layers act together while retaining distinct interfaces.",
+    "context": "Key point: The thermal-expansion model uses an aluminium–Invar laminate to show curvature from unequal expansion."
+  },
+  {
+    "id": "spring-steel",
+    "term": "Spring steel",
+    "aliases": [
+      "spring-steel strip",
+      "precurved steel beam",
+      "elastic steel strip"
+    ],
+    "definition": "Definition: Spring steel is steel processed to return toward its original shape after elastic bending. Its useful response depends on alloy, heat treatment, thickness, and loading.",
+    "context": "Key point: Bistable arches use spring steel as a qualitative elastic member; the displayed snap load is not measured."
+  },
+  {
+    "id": "fused-silica",
+    "term": "Fused silica",
+    "aliases": [
+      "silica glass",
+      "quartz glass",
+      "silica support"
+    ],
+    "definition": "Definition: Fused silica is a highly pure glass made from silicon dioxide. It is transparent over a wide optical range and is used as a stable substrate for thin optical features.",
+    "context": "Key point: In the optical models it is a fixed support under the patterned layer, not a second selectable phase."
+  },
+  {
+    "id": "fr-4",
+    "term": "FR-4 laminate",
+    "aliases": [
+      "FR-4",
+      "fiberglass-epoxy board",
+      "PCB laminate"
+    ],
+    "definition": "Definition: FR-4 is a fiberglass-reinforced epoxy laminate commonly used for printed circuit boards. Copper traces can be bonded to its surface.",
+    "context": "Key point: The microwave and space-time models use FR-4 as a support board; its electrical response is not numerically solved here."
+  },
+  {
+    "id": "radio-frequency",
+    "term": "Radio frequency",
+    "aliases": [
+      "RF",
+      "radio-frequency signal"
+    ],
+    "definition": "Definition: Radio frequency (RF) refers to electromagnetic oscillations used for radio, microwave, and related electronics. RF labels in this studio identify the source, receiver, or bias signal.",
+    "context": "Key point: An RF source or receiver is an instrument role; the schematic does not provide a calibrated frequency or power level."
+  },
+  {
+    "id": "electric-field",
+    "term": "Electric field",
+    "aliases": [
+      "E field",
+      "E-field"
+    ],
+    "definition": "Definition: An electric field describes the force per unit charge at each point in space. In an electromagnetic wave it oscillates with a direction and magnitude.",
+    "context": "Key point: The optical status uses E to mark the illustrative electric-field orientation around a resonator array."
+  },
+  {
+    "id": "magnetic-field",
+    "term": "Magnetic field",
+    "aliases": [
+      "H field",
+      "H-field",
+      "B field"
+    ],
+    "definition": "Definition: A magnetic field describes how magnetic poles, currents, or moving charges would be influenced at each point. Wave diagrams often label its field components H or B.",
+    "context": "Key point: The displayed H orientation is a schematic field direction, while a magnetic-flux measurement would require a defined area and instrument."
+  },
+  {
+    "id": "cutoff-frequency",
+    "term": "Cutoff frequency",
+    "aliases": [
+      "waveguide cutoff",
+      "cutoff"
+    ],
+    "definition": "Definition: Cutoff frequency is the boundary below or above which a particular guided-wave mode changes between propagating and evanescent behaviour. It depends on the guide geometry and mode.",
+    "context": "Key point: The TE10 example is described near cutoff; its channel shape alone does not establish a measured cutoff value."
+  },
+  {
+    "id": "defect-mode",
+    "term": "Defect mode",
+    "aliases": [
+      "localized defect mode",
+      "crystal defect mode"
+    ],
+    "definition": "Definition: A defect mode is a wave mode localized by a deliberate change inside an otherwise periodic structure. The defect can create an allowed state inside a surrounding stop band.",
+    "context": "Key point: Removing or changing a pillar illustrates localization; the model does not calculate the mode frequency or lifetime."
+  },
+  {
+    "id": "symmetry-breaking",
+    "term": "Symmetry breaking",
+    "aliases": [
+      "symmetry break",
+      "geometric asymmetry",
+      "pair asymmetry"
+    ],
+    "definition": "Definition: Symmetry breaking is a change that removes an otherwise exact geometric or physical symmetry. It can allow modes that were previously unable to couple to an external wave.",
+    "context": "Key point: The quasi-BIC model uses small pair asymmetry to illustrate radiative coupling from a formerly protected mode."
+  },
+  {
+    "id": "polarization",
+    "term": "Polarization",
+    "aliases": [
+      "wave polarization",
+      "linear polarization"
+    ],
+    "definition": "Definition: Polarization describes the direction or pattern in which a transverse wave’s field oscillates. Optical responses can differ for different polarizations.",
+    "context": "Key point: Pillar, liquid-crystal, and Huygens responses depend on polarization as well as wavelength and geometry."
+  },
+  {
+    "id": "birefringence",
+    "term": "Birefringence",
+    "aliases": [
+      "double refraction",
+      "birefringent response"
+    ],
+    "definition": "Definition: Birefringence is direction-dependent refraction in which different polarization components see different refractive indices. It can arise from an aligned material or an anisotropic structure.",
+    "context": "Key point: Liquid-crystal director rotation changes the optical anisotropy that produces birefringent phase delay."
+  },
+  {
+    "id": "anchoring",
+    "term": "Liquid-crystal anchoring",
+    "aliases": [
+      "surface anchoring",
+      "director anchoring"
+    ],
+    "definition": "Definition: Anchoring is the tendency of liquid-crystal molecules at a surface to prefer a particular orientation. It sets the boundary condition for the director field.",
+    "context": "Key point: Different anchoring at the two glass surfaces can produce planar, tilted, or twisted director states."
+  },
+  {
+    "id": "electrode",
+    "term": "Electrode",
+    "aliases": [
+      "addressing electrode",
+      "transparent electrode"
+    ],
+    "definition": "Definition: An electrode is a conductor connected to a circuit so it can apply or measure electric potential. In an optical cell it can address a liquid crystal or heat a phase-change film.",
+    "context": "Key point: Electrodes are contextual device layers in the models; their voltage and current are not solved."
+  },
+  {
+    "id": "carrier-density",
+    "term": "Carrier density",
+    "aliases": [
+      "charge-carrier density",
+      "carrier concentration"
+    ],
+    "definition": "Definition: Carrier density is the number of mobile charge carriers per volume or area. Changing it changes the electrical and electromagnetic response of materials such as graphene.",
+    "context": "Key point: The graphene gate control is a qualitative carrier-setting cue, not a calibrated voltage or density."
+  },
+  {
+    "id": "spacer",
+    "term": "Dielectric spacer",
+    "aliases": [
+      "optical spacer",
+      "insulating spacer layer"
+    ],
+    "definition": "Definition: A dielectric spacer is an insulating layer that separates conductive or resonant layers by a controlled distance. Its thickness affects coupling and phase delay.",
+    "context": "Key point: Silicon nitride and alumina spacers in the models are fixed layers; their optical constants are not fitted."
+  },
+  {
+    "id": "modulation",
+    "term": "Temporal modulation",
+    "aliases": [
+      "time modulation",
+      "bias modulation"
+    ],
+    "definition": "Definition: Temporal modulation means deliberately changing a material property or applied bias over time. A travelling modulation changes across both position and time.",
+    "context": "Key point: Space-time variants animate a modulation sequence; frequency conversion and power requirements are not calculated."
+  },
+  {
+    "id": "nonreciprocity",
+    "term": "Nonreciprocity",
+    "aliases": [
+      "non-reciprocity",
+      "nonreciprocal response"
+    ],
+    "definition": "Definition: Nonreciprocity means that exchanging source and receiver does not produce the same wave response under otherwise matched conditions. Time modulation or magnetic bias can break reciprocity.",
+    "context": "Key point: The space-time model presents nonreciprocity as a research concept and does not claim one-way isolation."
+  },
+  {
+    "id": "frequency-conversion",
+    "term": "Frequency conversion",
+    "aliases": [
+      "frequency mixing",
+      "frequency translation"
+    ],
+    "definition": "Definition: Frequency conversion moves energy from an input frequency to one or more different output frequencies. A time-varying medium can supply or remove the required frequency difference.",
+    "context": "Key point: The space-time catalog mentions conversion as a limitation; no converted spectrum is computed by the teaching model."
+  },
+  {
+    "id": "sideband",
+    "term": "Sideband",
+    "aliases": [
+      "modulation sideband",
+      "frequency sideband"
+    ],
+    "definition": "Definition: A sideband is a spectral component offset from a carrier or original frequency by a modulation frequency or its multiple. It is a common signature of time-varying excitation.",
+    "context": "Key point: Sidebands may occur in a modulated resonator, but the expansion scene only visualizes the modulation pattern."
+  },
+  {
+    "id": "acoustic-path-length",
+    "term": "Acoustic path length",
+    "aliases": [
+      "sound path length",
+      "channel detour"
+    ],
+    "definition": "Definition: Acoustic path length is the distance a sound wave travels through a channel or around a feature. Different path lengths create different propagation delays.",
+    "context": "Key point: The acoustic hologram’s coiled channels use path-length differences as an ordinal phase-delay illustration."
+  },
+  {
+    "id": "acoustic-impedance",
+    "term": "Acoustic impedance",
+    "aliases": [
+      "sound impedance",
+      "specific acoustic impedance"
+    ],
+    "definition": "Definition: Acoustic impedance relates sound pressure to particle velocity at a location. Differences in impedance cause reflection, transmission, and energy exchange at interfaces.",
+    "context": "Key point: Resonators and silencers depend on impedance matching and mismatch, which this display does not calculate."
+  },
+  {
+    "id": "hydrophone",
+    "term": "Hydrophone",
+    "aliases": [
+      "underwater acoustic receiver",
+      "underwater microphone"
+    ],
+    "definition": "Definition: A hydrophone is a sensor that detects sound pressure in water or another liquid. It converts underwater acoustic motion into an electrical readout.",
+    "context": "Key point: The bubble metascreen application uses a hydrophone as a receiver marker, not as measured data."
+  },
+  {
+    "id": "transducer",
+    "term": "Acoustic transducer",
+    "aliases": [
+      "sound transducer",
+      "underwater transducer"
+    ],
+    "definition": "Definition: An acoustic transducer converts electrical energy into sound or sound into an electrical signal. A source transducer launches a wave; a receiver transducer senses it.",
+    "context": "Key point: The underwater application labels a source transducer to distinguish excitation from the hydrophone receiver."
+  },
+  {
+    "id": "compressibility",
+    "term": "Compressibility",
+    "aliases": [
+      "fluid compressibility",
+      "bulk compressibility"
+    ],
+    "definition": "Definition: Compressibility measures how much a material’s volume changes under pressure. Gas in an acoustic cavity can act like a compliant spring because it is comparatively compressible.",
+    "context": "Key point: Helmholtz and bubble resonators use compressibility as part of their qualitative resonance explanation."
+  },
+  {
+    "id": "heat-flux",
+    "term": "Heat flux",
+    "aliases": [
+      "thermal flux",
+      "heat-flow density"
+    ],
+    "definition": "Definition: Heat flux is the rate of heat transfer through a unit area, with a direction. It differs from temperature, which describes thermal state rather than flow rate.",
+    "context": "Key point: Arrows in the concentrator and diode scenes show intended heat-flow direction, not a computed flux magnitude."
+  },
+  {
+    "id": "inclusion",
+    "term": "Inclusion",
+    "aliases": [
+      "embedded inclusion",
+      "functional inclusion"
+    ],
+    "definition": "Definition: An inclusion is a distinct region or object embedded in a surrounding material. Its geometry and interface can change the effective response of the whole structure.",
+    "context": "Key point: NdFeB domains and trapped gas bubbles are inclusions with fixed roles in their respective qualitative models."
+  },
+  {
+    "id": "porosity",
+    "term": "Porosity",
+    "aliases": [
+      "pore fraction",
+      "void fraction"
+    ],
+    "definition": "Definition: Porosity is the fraction of a material or structure occupied by pores or empty space. Pore size, connectivity, and shape also affect transport and mechanics.",
+    "context": "Key point: A spinodal shell has winding pore openings, but the model does not report a measured porosity."
+  },
+  {
+    "id": "morphology",
+    "term": "Morphology",
+    "aliases": [
+      "pattern morphology",
+      "microstructure morphology"
+    ],
+    "definition": "Definition: Morphology is the form and spatial organization of features in a material or structure. It describes the pattern’s shape and connectivity rather than its chemistry alone.",
+    "context": "Key point: The spinodal family borrows a phase-separation morphology as a geometry inspiration."
+  },
+  {
+    "id": "buckling",
+    "term": "Buckling",
+    "aliases": [
+      "out-of-plane buckling",
+      "buckled state"
+    ],
+    "definition": "Definition: Buckling is a sudden change to a different shape when a slender part loses stability under load. It can occur before the material itself yields.",
+    "context": "Key point: Kirigami ribbons may buckle out of plane; the scene prescribes their shape and does not solve a critical load."
+  },
+  {
+    "id": "fatigue",
+    "term": "Fatigue",
+    "aliases": [
+      "cyclic fatigue",
+      "fatigue life"
+    ],
+    "definition": "Definition: Fatigue is damage that accumulates under repeated or cyclic loading, sometimes leading to failure below a one-time strength limit. Hinges, creases, and links can be fatigue-sensitive.",
+    "context": "Key point: The expansion scenes show motion but do not estimate fatigue life or cycle endurance."
+  },
+  {
+    "id": "friction",
+    "term": "Friction",
+    "aliases": [
+      "contact friction",
+      "sliding friction"
+    ],
+    "definition": "Definition: Friction is resistance to sliding or relative motion between contacting surfaces. It can dissipate energy and help links or interfaces carry load.",
+    "context": "Key point: Chainmail drape and jamming depend on contact friction, which is not simulated in the visual model."
+  },
+  {
+    "id": "jamming",
+    "term": "Mechanical jamming",
+    "aliases": [
+      "granular jamming",
+      "link jamming"
+    ],
+    "definition": "Definition: Mechanical jamming is a transition from mobile parts to a constrained load-bearing arrangement as contacts and confinement increase. It can make an assembly appear solid without bonding its parts.",
+    "context": "Key point: Chainmail may restrict motion when links crowd, but this model does not compute contact forces or a jamming threshold."
+  },
+  {
+    "id": "cantilever",
+    "term": "Cantilever",
+    "aliases": [
+      "cantilever beam",
+      "fixed-free beam"
+    ],
+    "definition": "Definition: A cantilever is a beam fixed at one end and free at the other. Bending and vibration are largest near the free end in many simple tests.",
+    "context": "Key point: The piezo-shunt family uses a beam-like test piece to introduce circuit-coupled vibration control."
+  },
+  {
+    "id": "damping",
+    "term": "Damping",
+    "aliases": [
+      "vibration damping",
+      "dissipation"
+    ],
+    "definition": "Definition: Damping is the loss of vibration energy over time, through friction, material loss, radiation, or an attached circuit. More damping usually makes a resonance decay faster.",
+    "context": "Key point: A piezoelectric shunt can provide circuit-mediated damping, but the expansion model does not calculate a damping ratio."
+  },
+  {
+    "id": "electrical-impedance",
+    "term": "Electrical impedance",
+    "aliases": [
+      "circuit impedance",
+      "impedance"
+    ],
+    "definition": "Definition: Electrical impedance describes how a circuit opposes and phase-shifts alternating current. Resistance dissipates energy, while reactance stores and returns energy through capacitors or inductors.",
+    "context": "Key point: The digital and RL shunt labels indicate circuit loading concepts; their impedance values are not specified."
+  },
+  {
+    "id": "feedback-control",
+    "term": "Feedback control",
+    "aliases": [
+      "active feedback",
+      "closed-loop control"
+    ],
+    "definition": "Definition: Feedback control measures a system’s response and uses that measurement to adjust an input. A controller can use feedback to alter vibration or position while it operates.",
+    "context": "Key point: The active piezo variant is a powered concept marker, not a tested controller or stability guarantee."
+  },
+  {
+    "id": "torque",
+    "term": "Torque",
+    "aliases": [
+      "turning moment",
+      "magnetic torque"
+    ],
+    "definition": "Definition: Torque is the turning effect of a force about an axis. Its size depends on the force and the perpendicular distance from the axis.",
+    "context": "Key point: NdFeB domains can exert torque on a programmed elastomer, while the field strength and resulting deformation remain qualitative."
+  },
+  {
+    "id": "beam-steering",
+    "term": "Beam steering",
+    "aliases": [
+      "beam deflection",
+      "optical beam steering"
+    ],
+    "definition": "Definition: Beam steering changes the direction in which a concentrated wave beam travels. A spatial phase gradient can make neighbouring wave contributions leave at a new angle.",
+    "context": "Key point: Huygens and phase-change variants depict steering concepts without calculating efficiency or steering angle."
+  },
+  {
+    "id": "absorptance",
+    "term": "Absorptance",
+    "aliases": [
+      "spectral absorptance",
+      "optical absorptivity"
+    ],
+    "definition": "Definition: Absorptance is the fraction of incident radiation absorbed by a surface at a specified wavelength, direction, and polarization. The remaining energy may reflect or transmit.",
+    "context": "Key point: Graphene and thermal-emitter studies use absorption and emission language, but this expansion provides no measured spectrum."
+  },
+  {
+    "id": "field-strength",
+    "term": "Field strength",
+    "aliases": [
+      "magnetic-field strength",
+      "applied field strength"
+    ],
+    "definition": "Definition: Field strength describes the magnitude of an electric or magnetic field at a location. The force or torque on an object also depends on its geometry and orientation.",
+    "context": "Key point: The magnetic-programmable control is an illustrative field cue; it is not a calibrated tesla or ampere-per-metre setting."
+  },
+  {
+    "id": "actuator",
+    "term": "Actuator",
+    "aliases": [
+      "soft actuator",
+      "magnetic actuator"
+    ],
+    "definition": "Definition: An actuator converts an input such as voltage, pressure, heat, or magnetic field into controlled motion or force. A soft actuator uses a compliant body to produce that motion.",
+    "context": "Key point: The magnetic-programmable family shows an actuator body and field source as separate functional parts."
+  },
+  {
+    "id": "index-contrast",
+    "term": "Refractive-index contrast",
+    "aliases": [
+      "index contrast",
+      "optical index contrast"
+    ],
+    "definition": "Definition: Refractive-index contrast is the difference in refractive index between neighbouring materials or regions. Larger contrast can strengthen reflection, scattering, or confinement in a patterned wave structure.",
+    "context": "Key point: The acoustic Luneburg control uses contrast as a qualitative grading cue, not as a specified index profile."
+  },
+  {
+    "id": "crystallinity",
+    "term": "Crystallinity",
+    "aliases": [
+      "crystalline fraction",
+      "crystalline share"
+    ],
+    "definition": "Definition: Crystallinity is the fraction or degree of a material in an ordered crystalline state. A phase-change film can contain amorphous and crystalline regions at the same time.",
+    "context": "Key point: The GST control uses crystalline share as an illustrative state, not a measured fraction or switching calibration."
+  },
+  {
+    "id": "rigid-photopolymer",
+    "term": "Rigid photopolymer",
+    "aliases": [
+      "rigid printable polymer",
+      "photopolymer resin"
+    ],
+    "definition": "Definition: A rigid photopolymer is a light-cured printing resin formulated to hold a relatively stiff shape after exposure. Its exact strength, brittleness, and temperature response depend on the resin and print process.",
+    "context": "Key point: The expansion models use it as a qualitative teaching material, with no engineering property values implied."
+  },
+  {
+    "id": "resonator-neck",
+    "term": "Resonator neck",
+    "aliases": [
+      "acoustic neck",
+      "neck radius",
+      "neck length"
+    ],
+    "definition": "Definition: A resonator neck is the narrow opening or passage that connects an acoustic cavity to its surroundings. Air in the neck moves against the compressibility of the cavity contents.",
+    "context": "Key point: Neck length, opening area, and cavity volume influence a Helmholtz resonance; the control is qualitative here."
+  },
+  {
+    "id": "conductive-trace",
+    "term": "Conductive trace",
+    "aliases": [
+      "copper trace",
+      "printed trace",
+      "metal trace"
+    ],
+    "definition": "Definition: A conductive trace is a narrow patterned strip that carries electric current across a board or surface. Copper traces are common in microwave and circuit devices.",
+    "context": "Key point: The negative-index and space-time models use traces as resonant conductors, with no circuit or index solution implied."
+  },
+  {
+    "id": "acoustic-channel",
+    "term": "Acoustic channel",
+    "aliases": [
+      "sound channel",
+      "wave channel",
+      "air channel"
+    ],
+    "definition": "Definition: An acoustic channel is a passage that guides sound through a structure or medium. Its shape and length affect delay, reflection, and loss.",
+    "context": "Key point: Coiled channels in the acoustic hologram and air routes in the silencer are shown as paths, not calibrated waveguides."
+  },
+  {
+    "id": "photonic-crystal",
+    "term": "Photonic crystal",
+    "aliases": [
+      "optical crystal",
+      "photonic pillar crystal"
+    ],
+    "definition": "Definition: A photonic crystal is a material or structure with a repeating refractive-index pattern that changes how light propagates. Its periodicity can create allowed bands and photonic bandgaps.",
+    "context": "Key point: The pillar array is a qualitative photonic crystal; wavelength, polarization, and substrate determine any real gap."
+  },
+  {
+    "id": "optical-pixel",
+    "term": "Optical pixel",
+    "aliases": [
+      "optical pixels",
+      "pixel array",
+      "pixel row"
+    ],
+    "definition": "Definition: An optical pixel is a small patterned region designed to contribute a chosen phase, color, or intensity to an optical field. An array of pixels can encode a larger wavefront.",
+    "context": "Key point: GST pixels are switched qualitatively in the phase-change model; their optical state is not measured."
+  },
+  {
+    "id": "acoustic-cavity",
+    "term": "Acoustic cavity",
+    "aliases": [
+      "air cavity",
+      "cavity resonator",
+      "cavity depth"
+    ],
+    "definition": "Definition: An acoustic cavity is an enclosed or partly enclosed volume in which air or another fluid can compress and expand. Its volume and opening help set a resonance.",
+    "context": "Key point: Helmholtz cavities are drawn with an intentional opening so the air path remains visible."
+  },
+  {
+    "id": "acoustic-bubble",
+    "term": "Acoustic bubble",
+    "aliases": [
+      "air bubble",
+      "trapped air bubble",
+      "bubble radius"
+    ],
+    "definition": "Definition: An acoustic bubble is a gas pocket in a liquid whose volume can oscillate when driven by sound. That pulsation can produce strong frequency-selective scattering.",
+    "context": "Key point: Bubble size, pressure, depth, and lifetime affect the response; the bubble metascreen is a schematic."
+  },
+  {
+    "id": "radiative-leakage",
+    "term": "Radiative leakage",
+    "aliases": [
+      "radiation leakage",
+      "radiative loss"
+    ],
+    "definition": "Definition: Radiative leakage is energy escaping from a nominally confined wave mode into propagating waves outside the structure. Breaking a symmetry can increase that coupling.",
+    "context": "Key point: The quasi-BIC scene uses asymmetry to illustrate leakage from a protected mode, without calculating a quality factor."
+  },
+  {
+    "id": "boundary-condition",
+    "term": "Boundary condition",
+    "aliases": [
+      "boundary conditions",
+      "electromagnetic boundary condition",
+      "thermal boundary condition"
+    ],
+    "definition": "Definition: A boundary condition specifies what happens at the edge or interface of a model, such as fixed temperature, pressure, field, or displacement. It is part of the problem definition rather than a material property.",
+    "context": "Key point: Optical, acoustic, and thermal responses depend on their boundaries; the expansion scenes do not solve those boundary-value problems."
+  },
+  {
+    "id": "poling",
+    "term": "Piezoelectric poling",
+    "aliases": [
+      "poling direction",
+      "poled ceramic"
+    ],
+    "definition": "Definition: Poling aligns electric dipoles in a piezoelectric ceramic so its mechanical–electrical coupling has a chosen direction. The alignment affects which strain components produce charge.",
+    "context": "Key point: A real PZT shunt design must specify electrodes and poling direction; the visual patch only marks the coupling role."
+  },
+  {
+    "id": "magnetic-domain",
+    "term": "Magnetic domain",
+    "aliases": [
+      "programmed magnetic domain",
+      "magnetic inclusion domain"
+    ],
+    "definition": "Definition: A magnetic domain is a region whose microscopic magnetic moments have a common average orientation. A programmed domain arrangement can give a soft body a designed field response.",
+    "context": "Key point: NdFeB domains are fixed inclusions in the magnetic-programmable model; their magnetization is not an adjustable control."
+  },
+  {
+    "id": "thermal-conduction",
+    "term": "Thermal conduction",
+    "aliases": [
+      "conductive heat transfer",
+      "conduction path"
+    ],
+    "definition": "Definition: Thermal conduction is heat transfer through a material caused by a temperature gradient, without bulk movement of the material. Conductivity describes how readily that transfer occurs.",
+    "context": "Key point: Copper sectors and PDMS sectors provide contrasting illustrative conduction paths in the thermal concentrator."
+  },
+  {
+    "id": "transformation-acoustics",
+    "term": "Transformation acoustics",
+    "aliases": [
+      "acoustic transformation optics",
+      "transformed acoustic medium"
+    ],
+    "definition": "Definition: Transformation acoustics designs material properties and geometry so sound follows paths corresponding to a mathematical change of coordinates. It is the acoustic analogue of transformation optics.",
+    "context": "Key point: The pentamode application names this as a research direction; the lattice does not implement or solve a transformed acoustic medium."
+  },
+  {
+    "id": "electrostatic-gating",
+    "term": "Electrostatic gating",
+    "aliases": [
+      "electrical gating",
+      "gate state",
+      "gated optical device"
+    ],
+    "definition": "Definition: Electrostatic gating uses an applied voltage to change the mobile-carrier population in a material. It can tune the optical or electrical response of a thin layer such as graphene.",
+    "context": "Key point: The graphene model treats gating as a qualitative state change and does not specify voltage, carrier density, or a gate-current path."
+  }
 ]
