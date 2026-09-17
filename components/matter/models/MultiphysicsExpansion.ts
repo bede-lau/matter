@@ -3,6 +3,7 @@ import type { LatticeOptions } from '@/lib/matter/geometry';
 import type { Behavior } from './Behaviors';
 import type { Application } from './Applications';
 import { box, mesh, rod, anchor, type Callout } from './primitives';
+import { addHeatFlowChevron, addHeatFlowRoute, placeHeatFlowChevron } from './HeatFlow';
 
 /** Qualitative teaching models; fields are schematic, never numerical solvers. */
 const ids = ['helmholtz','acoustic-hologram','ventilated-silencer','bubble-metascreen','acoustic-luneburg','thermal-concentrator','thermal-diode','thermal-emitter','magnetic-programmable','piezo-shunt'];
@@ -199,7 +200,7 @@ export function createMultiphysicsBehavior(p:LatticeOptions,lattice:T.Group):Beh
  if(!ids.includes(p.kind))return;
  const group=new T.Group();group.name=`behavior-${p.kind}`;
  const u=unit(p),n=count(p),v=p.variant;
- const packets:{mesh:T.Mesh,curve:T.CurvePath<T.Vector3>,offset:number,speed:number,reverse?:boolean}[]=[];
+ const packets:{mesh:T.Object3D,curve:T.CurvePath<T.Vector3>,offset:number,speed:number,reverse?:boolean}[]=[];
  const dynamic:{mesh:T.Mesh,phase:number}[]=[];
  const add=(pts:number[][],color:string,speed=.25,reverse=false)=>{
   const q=path(group,pts,color);
@@ -208,6 +209,11 @@ export function createMultiphysicsBehavior(p:LatticeOptions,lattice:T.Group):Beh
    packets.push({mesh:packet,curve:q.curve,offset:j/3,speed,reverse});
   }
   return q.line;
+ };
+ const addHeat=(pts:number[][],speed=.18,reverse=false)=>{
+  const curve=addHeatFlowRoute(group,pts,'thermal-route');
+  for(let j=0;j<3;j++)packets.push({mesh:addHeatFlowChevron(group,'thermal-flow-chevron'),curve,offset:j/3,speed,reverse});
+  return curve;
  };
  let status='Illustrative field response';
  if(p.kind==='helmholtz'){
@@ -241,18 +247,21 @@ export function createMultiphysicsBehavior(p:LatticeOptions,lattice:T.Group):Beh
   }status='Graded solid filling guides sound toward a focal region';
  }else if(p.kind==='thermal-concentrator'){
   const core=.25+u*.4;
+  // Flat, warm routes sit just above the sector surface; chevrons show heat direction without implying a wave.
   for(let j=-2;j<=2;j++){
    const z=j*.62;
-   add([[-1.9,.19,z],[-1.2,.19,z*.72],[-core,.19,z*.17],[core,.19,z*.17],[1.2,.19,z*.72],[1.9,.19,z]],'#ffb775',.15);
-  }status='Copper sectors crowd heat flow near the core · hot to cold';
+   addHeat([[-1.9,.205,z],[-1.2,.205,z*.72],[-core,.205,z*.17],[core,.205,z*.17],[1.2,.205,z*.72],[1.9,.205,z]],.15);
+  }status='Heat flows from hot to cold · copper sectors concentrate it near the core';
  }else if(p.kind==='thermal-diode'){
+  const surface=.16+(.1+u*.22)+.045;
   for(let j=0;j<n;j++){
    const z=(j-(n-1)/2)*1.7/Math.max(1,n-1);
-   add([[-1.9,.32+u*.22,z],[0,.32+u*.22,z],[1.9,.32+u*.22,z]],'#ffc075',.14,true);
-  }status='Reverse the hot and cold boundaries · compare heat-flow magnitude';
+   addHeat([[-1.9,surface,z],[0,surface,z],[1.9,surface,z]],.14,true);
+  }status='Heat flows from hot to cold · reversing the boundaries changes the qualitative transfer rate';
  }else if(p.kind==='thermal-emitter'){
-  for(let j=-2;j<=2;j++)add([[j*.48,.26,0],[j*.57,.8,.05],[j*.72,1.55,.15]],'#ffad78',.2+u*.08);
-  status='Patterned metal/dielectric stack · selective thermal emission concept';
+  // Rising markers represent emitted thermal radiation above, not a propagating microwave route.
+  for(let j=-2;j<=2;j++)addHeat([[j*.48,.235,0],[j*.57,.8,.05],[j*.72,1.55,.15]],.2+u*.08);
+  status='Selective infrared emission leaves the patterned metal/dielectric stack';
  }else if(p.kind==='magnetic-programmable'){
   for(let j=-1;j<=1;j++){
    const q=path(group,[[-2.1,.65,j*.65],[-1.2,1.15,j*.65],[1.2,1.15,j*.65],[2.1,.65,j*.65]],'#c797ff','applied-magnetic-field');
@@ -276,7 +285,8 @@ export function createMultiphysicsBehavior(p:LatticeOptions,lattice:T.Group):Beh
    if(p.kind==='helmholtz')progress=.5+.48*Math.sin(time*3.3+q.offset*6.28);
    if(p.kind==='ventilated-silencer'&&q.curve.getLength()<2)progress=.5+.48*Math.sin(time*3+q.offset*6.28);
    if(q.reverse){progress=(time*q.speed*(reverse?.48:1)+q.offset)%1;if(reverse)progress=1-progress;}
-   q.mesh.position.copy(q.curve.getPointAt(progress));q.mesh.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),q.curve.getTangentAt(Math.max(.0001,Math.min(.9999,progress))).normalize());
+   if(q.mesh.name==='thermal-flow-chevron')placeHeatFlowChevron(q.mesh,q.curve,progress,Boolean(q.reverse && reverse));
+   else {q.mesh.position.copy(q.curve.getPointAt(progress));q.mesh.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),q.curve.getTangentAt(Math.max(.0001,Math.min(.9999,progress))).normalize());}
   });
   dynamic.forEach(q=>{
    const pulse=.5+.5*Math.sin(time*3+q.phase);

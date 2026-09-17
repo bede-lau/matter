@@ -3271,13 +3271,21 @@ h1 {
   max-width: min(860px, calc(100vw - 32px));
   max-height: min(720px, calc(100dvh - 32px));
   gap: 16px;
-  overflow: auto;
+  overflow: hidden;
   border-color: #405462;
   border-radius: 16px;
   background: #111b24;
   padding: 23px;
   color: #e7eef2;
   box-shadow: 0 28px 80px #000b;
+}
+.structure-picker-scroll {
+  display: grid;
+  min-height: 0;
+  gap: 16px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 .structure-picker-dialog[data-state="open"] {
   animation-duration: var(--motion-panel);

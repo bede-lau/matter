@@ -473,3 +473,5 @@ assert.ok(
 console.log("PASS: visible secondary-phase allocation survives product shaping");
 
 import "./expansion-models";
+
+import "./field-visuals";

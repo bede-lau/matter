@@ -570,7 +570,7 @@
       "inspection cutaway",
       "section view"
     ],
-    "definition": "Definition: A cutaway view removes or moves an outer layer so hidden internal parts can be inspected.",
+    "definition": "Definition: A cutaway removes, moves, or makes an outer layer transparent in a drawing or model so you can see the parts inside.",
     "context": "Key point: It is a teaching and inspection view; the separated components are not necessarily how the product operates."
   },
   {
@@ -2817,5 +2817,46 @@
     ],
     "definition": "Definition: Electrostatic gating uses an applied voltage to change the mobile-carrier population in a material. It can tune the optical or electrical response of a thin layer such as graphene.",
     "context": "Key point: The graphene model treats gating as a qualitative state change and does not specify voltage, carrier density, or a gate-current path."
+  },
+  {
+    "id": "normal-incidence",
+    "term": "Normal incidence",
+    "aliases": [
+      "normal illumination",
+      "normally incident light",
+      "normally incident wave"
+    ],
+    "definition": "Definition: Normal incidence means a wave arrives straight onto a surface, perpendicular to it rather than at a slant.",
+    "context": "Key point: At normal incidence, a symmetric structure can prevent some modes from coupling to the incoming wave; changing the angle can open different channels."
+  },
+  {
+    "id": "specular-reflection",
+    "term": "Specular reflection",
+    "aliases": [
+      "specular channel",
+      "mirror-like reflection"
+    ],
+    "definition": "Definition: Specular reflection is the mirror-like return of a wave, with the outgoing angle equal to the incoming angle for a flat surface.",
+    "context": "Key point: A periodic surface can send energy into a specular reflection channel and, when allowed by its spacing and frequency, into additional diffraction channels."
+  },
+  {
+    "id": "symmetry-protected-mode",
+    "term": "Symmetry-protected mode",
+    "aliases": [
+      "symmetry-protected state",
+      "symmetry-protected resonance"
+    ],
+    "definition": "Definition: A symmetry-protected mode is a wave pattern whose symmetry prevents coupling to a particular outside radiation channel.",
+    "context": "Key point: Perfect symmetry can prevent this mode from responding to normal illumination. Finite size or deliberate asymmetry can let it radiate; absorption can also dissipate its stored energy."
+  },
+  {
+    "id": "phase-gradient",
+    "term": "Spatial phase gradient",
+    "aliases": [
+      "phase ramp",
+      "phase gradient"
+    ],
+    "definition": "Definition: A spatial phase gradient is a controlled change in wave phase from one location to the next across a surface or array.",
+    "context": "Key point: A phase gradient can steer a reflected or transmitted beam, while a uniform phase shift changes timing or phase without changing its direction."
   }
 ]

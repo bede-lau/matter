@@ -1,0 +1,13 @@
+{
+  "name": "Matter | Metamaterial Studio",
+  "short_name": "Matter",
+  "description": "Explore engineered lattices, natural inspiration, material behavior, and research datasets in interactive 3D.",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ],
+  "background_color": "#111820",
+  "theme_color": "#111820",
+  "display": "standalone"
+}

@@ -1,3 +1,4 @@
+import { addHeatFlowRoute, addHeatFlowChevron, placeHeatFlowChevron } from "./HeatFlow";
 import { createMechanicalBehavior } from "./MechanicalExpansion";
 import { createOpticalBehavior } from "./OpticalExpansion";
 import { createMultiphysicsBehavior } from "./MultiphysicsExpansion";
@@ -114,18 +115,18 @@ const behaviorField = (kind: string, lattice: T.Group, variant: number): Behavio
 
   if (kind === "cloak") {
     const paths: T.CatmullRomCurve3[] = [];
-    for (let i = -3; i <= 3; i++) {
-      const z = i === 0 ? 0.24 : i * 0.23;
+    for (const z of [-0.70, -0.42, -0.14, 0.14, 0.42, 0.70]) {
       const side = z < 0 ? -1 : 1;
+      const bend = side * (0.78 + Math.abs(z) * 0.55);
       const { curve } = fieldTube(
         group,
         cyan,
         [
           new T.Vector3(-2.7, 0.32, z),
           new T.Vector3(-1.25, 0.32, z),
-          new T.Vector3(-0.62, 0.32, side * 0.92),
-          new T.Vector3(0, 0.32, side * 1.06),
-          new T.Vector3(0.62, 0.32, side * 0.92),
+          new T.Vector3(-0.62, 0.32, bend * 0.9),
+          new T.Vector3(0, 0.32, bend),
+          new T.Vector3(0.62, 0.32, bend * 0.9),
           new T.Vector3(1.25, 0.32, z),
           new T.Vector3(2.7, 0.32, z),
         ],
@@ -195,26 +196,17 @@ const behaviorField = (kind: string, lattice: T.Group, variant: number): Behavio
   }
 
   if (kind === "thermal-cloak") {
-    const heat = fieldMaterial("#ffb06d", 0.6);
-    const paths: T.CatmullRomCurve3[] = [];
-    for (const z of [-0.82, -0.42, 0.42, 0.82]) {
-      const { curve } = fieldTube(
-        group,
-        heat,
-        [
-          new T.Vector3(-2.05, 0.25, z),
-          new T.Vector3(-0.8, 0.25, z),
-          new T.Vector3(-0.35, 0.25, z * 1.45),
-          new T.Vector3(0.35, 0.25, z * 1.45),
-          new T.Vector3(0.8, 0.25, z),
-          new T.Vector3(2.05, 0.25, z),
-        ],
-        0.015,
-        "thermal-bypass-path",
-      );
-      paths.push(curve);
-    }
-    const updateDots = curveMarkers(group, paths, heat, 10, 0.12);
+    const paths = [-0.82, -0.42, 0.42, 0.82].map(z =>
+      addHeatFlowRoute(group, [
+        [-2.05, 0.25, z], [-0.8, 0.25, z],
+        [-0.35, 0.25, z * 1.45], [0.35, 0.25, z * 1.45],
+        [0.8, 0.25, z], [2.05, 0.25, z],
+      ], "thermal-bypass-path"));
+    const markers = paths.flatMap(curve => [0, 1, 2].map(i => ({
+      curve, marker: addHeatFlowChevron(group), offset: i / 3,
+    })));
+    const updateDots = (time: number) => markers.forEach(({ marker, curve, offset }) =>
+      placeHeatFlowChevron(marker, curve, (time * 0.12 + offset) % 1));
     const core = lattice.getObjectByName("thermal-protected-core") as T.Mesh | undefined;
     const coreMaterial = core?.material instanceof T.MeshStandardMaterial ? core.material : undefined;
     const cool = new T.Color("#334853"), warm = new T.Color("#d98c68");

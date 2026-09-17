@@ -4,7 +4,12 @@ import type { Behavior } from "./Behaviors";
 import type { Application } from "./Applications";
 import { box, mesh, rod, tube, anchor, type Callout } from "./primitives";
 
-/** Educational geometries; distances are illustrative, not a Maxwell solver. */
+/** Educational geometries; distances are illustrative, not a Maxwell solver.
+ * Scientific basis: Smith et al., PRL 84, 4184 (2000), doi:10.1103/PhysRevLett.84.4184;
+ * Koshelev et al., PRL 121, 193903 (2018), https://arxiv.org/abs/1809.00330;
+ * Silveirinha & Engheta, https://arxiv.org/abs/0705.2612;
+ * Hadad et al., https://arxiv.org/abs/1506.00690.
+ */
 const ids = ["negative-index", "epsilon-near-zero", "photonic-bandgap", "bound-state-continuum", "phase-change", "liquid-crystal", "huygens", "structural-color", "graphene-absorber", "space-time"];
 const norm = (p: LatticeOptions) => Math.max(0, Math.min(1, (p.thickness - .3) / 1.3));
 const rows = (p: LatticeOptions) => Math.max(1, Math.min(5, Math.round(p.count)));
@@ -51,18 +56,21 @@ export function createOpticalGeometry(p: LatticeOptions, software = false): T.Gr
   const mark = (name: string, pos: number[]) => anchor(g, pos, name);
   if (p.kind === "negative-index") {
     substrate(g, "#304553", 4.1, 2.3);
-    const cols = n + 2, step = 3.7 / cols, r = step * .29, w = r * (.10 + .19 * u);
+    const cols = n + 2, step = 3.7 / cols, r = step * .32, w = r * (.15 + .19 * u);
     for (const z of [-.7, .7]) {
-      box(g, secondary, [3.9, 1.4, .055], [0, .7, z], "dielectric-board");
+      // Semi-transparent support is an explicit teaching cutaway: FR-4 is not glass.
+      const support = glass(p.secondaryColor ?? "#6d998b", .32);
+      const board = box(g, support, [3.9, 1.15, .055], [0, .575, z], "dielectric-board");
+      board.userData.cutaway = true;
       for (let i = 0; i < cols; i++) {
         const x = (i - (cols - 1) / 2) * step;
-        flatRing(g, copper, r, w, x, .75, z + .028, v === 2 && i % 2 ? Math.PI : 0, "split-ring");
-        if (v === 1) flatRing(g, copper, r * .65, w * .65, x, .75, z + .028, Math.PI, "inner-ring");
-        box(g, copper, [w, 1.25, .022], [x - step * .41, .71, z + .039], "electric-wire");
+        flatRing(g, copper, r, w, x, .65, z + .028, v === 2 && i % 2 ? Math.PI : 0, "split-ring");
+        if (v === 1) flatRing(g, copper, r * .65, w * .65, x, .65, z + .028, Math.PI, "inner-ring");
+        box(g, copper, [w, 1.05, .022], [x - step * .43, .575, z + .039], "electric-wire");
       }
     }
-    mark("functional-array", [0, .75, .74]); mark("control-feature", [.7, .75, .74]);
-    g.userData.polarization = "Propagation +x; E parallel y wires; H normal to xy ring planes (+z).";
+    mark("functional-array", [0, .65, .75]); mark("control-feature", [.7, .65, .75]);
+    g.userData.polarization = "Energy flow +x; incident E along y wires and H along z, normal to xy rings. In an ideal negative-index band, phase propagation reverses relative to energy.";
   } else if (p.kind === "epsilon-near-zero") {
     // Air occupies the open volume. Fixed broad dimension in z sets TE10 cutoff;
     // changing y height is a squeezing control, not a cutoff-frequency knob.
@@ -88,12 +96,13 @@ export function createOpticalGeometry(p: LatticeOptions, software = false): T.Gr
     }
     mark("functional-array", [0, .4, 0]); mark("control-feature", [1, .5, 1]);
   } else if (p.kind === "bound-state-continuum") {
-    substrate(g); const k = n + 2, step = 3.1 / k, a = .03 + .3 * u;
+    substrate(g); const k = n + 2, step = 3.1 / k, a = .3 * u;
     for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) for (const side of [-1, 1]) {
       const length = step * .68 * (v === 0 && side === 1 ? 1 - a : 1);
       const width = step * .18 * (v === 2 && side === 1 ? 1 - a : 1);
       const o = box(g, primary, [width, .28, length], [(i - (k - 1) / 2) * step + side * step * .18, .14, (j - (k - 1) / 2) * step], "asymmetric-resonator");
       o.rotation.y = v === 1 ? side * a : 0;
+      o.userData.pairSide = side;
     }
     mark("functional-array", [0, .28, 0]); mark("control-feature", [.55, .28, .55]);
   } else if (p.kind === "phase-change") {
@@ -168,7 +177,12 @@ export function createOpticalGeometry(p: LatticeOptions, software = false): T.Gr
       box(g, copper, [.025, .016, .47], [x, .008, -.90], "bias-feed");
       const bias = box(g, field("#ffc87c", .32 + .38 * u), [step * .65, .014, .12 + .23 * u], [x, .047, -1.16], "bias-level-symbol"); bias.userData.phase = i / k;
     }
-    box(g, copper, [3.5, .016, .08], [0, .008, -1.17], "bias-bus");
+    // The patterned sheet is illuminated through its thickness. Each cell
+    // receives its own DC bias; a common RF rail would change this into a
+    // different transmission-line device.
+    // Separate drive pads preserve independent cell phases; a common copper
+    // short across all bias terminals would erase the traveling modulation.
+    for (let i = 0; i < k; i++) box(g, copper, [step * .55, .016, .10], [(i - (k - 1) / 2) * step, .008, -1.16], "individual-bias-pad");
     mark("functional-array", [0, .07, 0]); mark("control-feature", [0, .03, -1.17]);
     g.userData.biasDirection = v === 2 ? -1 : v === 1 ? 1 : 0;
   }
@@ -183,6 +197,8 @@ function addPath(g: T.Group, points: number[][], color = "#69e7ff", opacity = .4
   const m = field(color, opacity), line = mesh(new T.TubeGeometry(curve, 40, .012, 5, false), m, g, "explanatory-wave-path");
   line.castShadow = false;
   const packets = Array.from({ length: 3 }, () => { const o = mesh(new T.BoxGeometry(.13, .034, .034), field(color, .72), g, "wave-packet"); o.castShadow = false; return o; });
+  line.userData.propagatingField = true;
+  packets.forEach(o => { o.userData.propagatingField = true; });
   return { curve, mesh: line, packets, phase, opacity, speed };
 }
 function advance(path: Path, time: number, strength = 1, reverse = false) {
@@ -201,10 +217,12 @@ export function createOpticalBehavior(p: LatticeOptions, lattice: T.Group): Beha
   let label = "", custom = (_time: number) => {};
   const path = (pts: number[][], color?: string, opacity?: number, phase?: number, speed?: number) => { const q = addPath(group, pts, color, opacity, phase, speed); paths.push(q); return q; };
   if (p.kind === "negative-index") {
-    for (let i = -1; i <= 1; i++) path([[-2.65, .6 + i * .23, 0], [-1.7, .75 + i * .23, 0], [1.7, .45 + i * .23, 0], [2.65, .6 + i * .23, 0]]);
-    const phaseFronts = Array.from({ length: 5 }, (_, i) => { const o = box(group, field("#b0f4ff", .32), [.014, .65, .9], [0, .75, 0], "backward-phase-front"); o.userData.index = i; return o; });
+    // Normal incidence on a slab does not bend the energy route. The phase
+    // fronts move oppositely only inside the illustrative negative-index band.
+    for (let i = -1; i <= 1; i++) path([[-2.65, .65 + i * .16, 0], [2.65, .65 + i * .16, 0]]);
+    const phaseFronts = Array.from({ length: 5 }, () => box(group, field("#b0f4ff", .16), [.014, .54, .9], [0, .65, 0], "backward-phase-front"));
     custom = t => phaseFronts.forEach((o, i) => { o.position.x = 1.55 - ((t * .42 + i * .62) % 3.1); });
-    label = "Energy travels forward; phase travels backward in the designed microwave band. E: vertical wires. H: normal to rings.";
+    label = "In a designed negative-index band: energy forward, phase backward. E along wires; H normal to rings. FR-4 shown as a cutaway.";
   } else if (p.kind === "epsilon-near-zero") {
     const len = Number(lattice.userData.channelLength ?? 3), h = Number(lattice.userData.channelHeight ?? .5);
     for (const z of [-.52, 0, .52]) path([[-len / 2 - .5, .48, z], [-len / 2 + .5, .48, z], [-len / 2 + .8, .08 + h * .32, z], [len / 2 - .8, .08 + h * .32, z], [len / 2 - .5, .48, z], [len / 2 + .5, .48, z]]);
@@ -218,15 +236,35 @@ export function createOpticalBehavior(p: LatticeOptions, lattice: T.Group): Beha
       path([[-2.45, .32, 0], [-1.7, .32, 0], [-.7, .32, 0], [0, .32, 0]], "#69e7ff", .18, 0, .11);
       const radius = 3.2 / (2 * n + 3) * .48;
       const pts = Array.from({ length: 17 }, (_, i) => [radius * Math.cos(i * Math.PI / 8), .38, radius * Math.sin(i * Math.PI / 8)]);
-      path(pts, "#a3efff", .75, 0, .34); label = "A missing pillar forms a localized cavity. Weak tunneling excites a narrow defect resonance; it is not a through-channel.";
+      const cavity = path(pts, "#a3efff", .75, 0, .34);
+      cavity.mesh.userData.propagatingField = false;
+      cavity.packets.forEach(o => { o.userData.propagatingField = false; });
+      label = "A missing pillar forms a localized cavity. Weak tunneling excites a narrow defect resonance; it is not a through-channel.";
     }
   } else if (p.kind === "bound-state-continuum") {
-    path([[-1.8, 2.3, 0], [-.5, .6, 0], [0, .3, 0]], undefined, .35);
-    const gap = .1 + u * .32;
-    for (const x of [-.32, .32]) path([[x, .35, -.24], [x + .13, .5, 0], [x, .35, .24], [x - .13, .22, 0], [x, .35, -.24]], "#aaf5ff", .65, x, .5);
-    const leak = path([[0, .38, 0], [.6, 1.2, 0], [1.6, 2.3, 0]], undefined, gap, 0, .12 + .16 * u);
-    custom = t => advance(leak, t, .25 + .65 * u);
-    label = "Small asymmetry opens a weak radiation channel: a narrow quasi-BIC resonance. More asymmetry increases radiative leakage.";
+    // A uniform sub-diffraction array radiates into specular channels. These
+    // opposite oscillation symbols represent a paired mode, not ray orbits.
+    path([[0, 2.15, 0], [0, .30, 0]], "#69e7ff", .42);
+    path([[0, .30, 0], [0, -.9, 0]], "#69e7ff", .34);
+    const leakage = path([[.10, .30, 0], [.10, 2.15, 0]], "#b4f4ff", .55, 0, .22);
+    const resonators: T.Mesh[] = [];
+    lattice.traverse(o => { if (o instanceof T.Mesh && o.name === "asymmetric-resonator") resonators.push(o); });
+    const center = (n + 1) / 2;
+    const pairStart = (Math.round(center) * (n + 2) + Math.round(center)) * 2;
+    const symbols = resonators.slice(pairStart, pairStart + 2).map(o => {
+      const symbol = box(group, field("#c4f8ff", .7), [.018, .02, .18], [o.position.x, .31, o.position.z], "paired-mode-symbol");
+      symbol.rotation.y = o.rotation.y;
+      return { symbol, z: o.position.z, sign: Number(o.userData.pairSide) };
+    });
+    custom = t => {
+      advance(leakage, t, u * u);
+      symbols.forEach(({ symbol, z, sign }) => {
+        symbol.position.z = z + sign * .055 * Math.sin(t * 4);
+        (symbol.material as T.MeshBasicMaterial).opacity = u === 0 ? 0 : .35 + .4 * Math.abs(Math.sin(t * 4));
+      });
+    };
+    label = u === 0 ? "Equal pairs: symmetry keeps the ideal mode from coupling to light arriving straight onto the surface. Finite size and loss still matter."
+      : "Light arriving straight onto the surface excites a quasi-BIC. Opposite oscillations largely cancel; asymmetry opens weak radiative leakage.";
   } else if (p.kind === "phase-change") {
     const outputs: Path[] = [];
     for (let i = -2; i <= 2; i++) {
@@ -245,7 +283,8 @@ export function createOpticalBehavior(p: LatticeOptions, lattice: T.Group): Beha
     for (let i = -3; i <= 3; i++) {
       const x = i * .38;
       const out = v === 2 ? 0 : x + (v === 1 ? .85 * (.5 + u) : 0);
-      path([[x, 2.25, 0], [x, .58, 0], [out, -1.45, 0]], undefined, .4, v ? Math.abs(i) * .06 : 0);
+      path([[x, 2.25, 0], [x, .58, 0]], undefined, .4);
+      path([[x, .58, 0], [out, -1.45, 0]], undefined, .4, v ? Math.abs(i) * .06 : 0);
     }
     label = v === 0 ? "Balanced electric and magnetic scattering can suppress reflection near a designed frequency." : v === 1 ? "A post-size gradient imposes a phase ramp; transmitted wave packets steer together." : "A radial post-size profile supplies different phase delays that bring light to a common focus.";
   } else if (p.kind === "structural-color") {
@@ -266,11 +305,11 @@ export function createOpticalBehavior(p: LatticeOptions, lattice: T.Group): Beha
     custom = t => { (heat.material as T.MeshBasicMaterial).opacity = .06 + .24 * (.5 + .5 * Math.sin(t * 2)); };
     label = "At a matched infrared resonance, graphene confines and dissipates light; the gold mirror prevents transmission. Gating shifts the resonance.";
   } else if (p.kind === "space-time") {
-    path([[-2.5, .6, 0], [-1.4, .25, 0], [1.3, .25, 0], [2.5, .65, v === 0 ? 0 : .5]], undefined, .55, 0, .22);
-    const reverse = path([[2.5, .65, v === 0 ? 0 : .5], [1.3, .25, 0], [-1.3, .25, v === 0 ? 0 : v === 2 ? .55 : -.55], [-2.5, .65, v === 0 ? 0 : v === 2 ? .8 : -.8]], "#b7f6ff", .35, .5, .22);
+    const forward = path([[0, 2.15, 0], [0, .12, 0], [0, -.9, 0]], undefined, .55, 0, .22);
+    const reverse = path([[.12, -.9, 0], [.12, .12, 0], [.12, 2.15, 0]], "#b7f6ff", .35, .5, .22);
     const indicators: T.Mesh[] = []; lattice.traverse(o => { if (o instanceof T.Mesh && o.name === "bias-level-symbol") indicators.push(o); });
-    custom = t => { indicators.forEach((o, i) => { (o.material as T.MeshBasicMaterial).opacity = v === 0 ? .3 + .35 * u : .12 + (.25 + .4 * u) * (.5 + .5 * Math.sin(t * 3 - (v === 2 ? -1 : 1) * i * Math.PI / 2)); }); advance(reverse, t, 1); };
-    label = v === 0 ? "Static bias: the reciprocal reference. Swap source and receiver to recover the same channel." : "A traveling electrical bias changes RF scattering in space and time, so reversed paths can differ. This implementation needs modulation power.";
+    custom = t => { indicators.forEach((o, i) => { (o.material as T.MeshBasicMaterial).opacity = v === 0 ? .45 : .45 + .4 * u * Math.sin(t * 3 - (v === 2 ? -1 : 1) * i * Math.PI / 2); }); advance(forward, t, v === 2 ? 1 - u * (.55 - .3 * Math.sin(t * 2) ** 2) : 1); advance(reverse, t, v === 1 ? 1 - u * (.55 - .3 * Math.sin(t * 2) ** 2) : 1); };
+    label = v === 0 ? "Static bias: the reciprocal reference. Swap source and receiver to recover the same channel." : "A traveling electrical bias can give different forward and reverse RF responses. Brightness is schematic; modulation uses external power.";
   }
   return { group, camera: [10, 7, 11], target: [0, .35, 0], update(time) { paths.forEach(q => advance(q, time)); custom(time); return label; } };
 }
@@ -283,51 +322,105 @@ export function createOpticalApplication(p: LatticeOptions, lattice: T.Group): A
   const dark = solid("#223440"), metal = solid("#91a3ae"), ivory = solid("#d3e0e2");
   box(group, dark, [6.8, .18, 3.8], [0, -1.06, 0], "optical-table");
   for (const x of [-2.8, 2.8]) for (const z of [-1.35, 1.35]) cylinder(group, metal, .09, .5, x, -1.4, z, "table-leg");
-  const sample = new T.Group(); group.add(sample); sample.scale.setScalar(.52); sample.position.set(0, -.16, 0); sample.add(lattice);
-  // Substrate bottom -.16 * .52 + -.16 = -.2432, exactly on holder top.
-  box(group, ivory, [2.3, .10, 1.85], [0, -.2932, 0], "sample-holder");
-  cylinder(group, metal, .14, .6268, 0, -.6566, 0, "sample-post");
-  box(group, metal, [.85, .08, .75], [0, -.93, 0], "sample-foot");
   const microwave = ["negative-index", "epsilon-near-zero", "space-time"].includes(p.kind);
-  const inplane = microwave || p.kind === "photonic-bandgap";
-  const reflective = ["phase-change", "structural-color", "graphene-absorber"].includes(p.kind);
-  const beamY = p.kind === "negative-index" ? .23 : p.kind === "epsilon-near-zero" ? .0896 : p.kind === "photonic-bandgap" ? .0064 : -.03;
-  const sourcePos = inplane ? [-2.5, beamY, 0] : [-1.6, 1.1, 0];
-  const detectorPos = inplane ? [2.5, beamY, 0] : reflective ? [1.6, 1.1, 0] : [1.6, -.42, 0];
+  const upright = ["bound-state-continuum", "huygens", "liquid-crystal", "space-time"].includes(p.kind);
+  const inplane = ["negative-index", "epsilon-near-zero", "photonic-bandgap"].includes(p.kind);
+  const sample = new T.Group(); group.add(sample); sample.scale.setScalar(.52); sample.position.set(0, upright ? .25 : -.16, 0); sample.add(lattice);
+  if (upright) sample.rotation.z = Math.PI / 2;
+  // Vertical transmission specimens leave the optical axis above the holder.
+  // Other samples retain a horizontal support in direct contact with the base.
+  const holderTop = upright ? .25 - (p.kind === "space-time" ? 1.9 : 1.8) * .52 : -.2432;
+  box(group, ivory, [upright ? .44 : 2.3, .10, 1.85], [upright ? .04 : 0, holderTop - .05, 0], "sample-holder");
+  const postTop = holderTop - .10;
+  cylinder(group, metal, .14, postTop + .89, upright ? .04 : 0, (postTop - .89) / 2, 0, "sample-post");
+  box(group, metal, [.85, .08, .75], [0, -.93, 0], "sample-foot");
+  const enzHeight = Number(lattice.userData.channelHeight ?? .5);
+  const beamY = upright ? .25 : p.kind === "negative-index" ? -.16 + .65 * .52
+    : p.kind === "epsilon-near-zero" ? -.16 + (.08 + enzHeight * .32) * .52
+    : p.kind === "photonic-bandgap" ? .0064 : -.03;
+  const surfaceY = -.16 + (p.kind === "structural-color" ? .43 : p.kind === "graphene-absorber" ? .23 : .14) * .52;
+  const sourcePos = inplane || upright ? [-2.5, beamY, 0] : [-1.6, 1.1, 0];
+  const steering = p.kind === "huygens" && variant(p) === 1 ? .44 * (.5 + norm(p)) : 0;
+  const detectorPos = inplane || upright ? [2.5, beamY + steering, 0] : [1.6 + (p.kind === "phase-change" && variant(p) === 2 ? .8 * norm(p) : 0), 1.1, 0];
+  const aim = new T.Vector3(0, inplane || upright ? beamY : surfaceY, 0);
   function instrument(pos: number[], name: string, isSource: boolean) {
     const unit = new T.Group(); unit.position.set(...pos as [number, number, number]); group.add(unit); unit.name = name;
-    box(unit, isSource ? dark : ivory, [.64, .40, .60], [0, 0, 0], `${name}-body`);
-    const axis = new T.Vector3(-pos[0], (inplane ? beamY : 0) - pos[1], -pos[2]).normalize();
-    const lens = cylinder(unit, microwave ? metal : glass("#75d7f0", .55), .18, .12, 0, 0, 0, `${name}-aperture`);
-    lens.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), axis); lens.position.copy(axis.multiplyScalar(.36));
-    const bottom = pos[1] - .2;
+    const halfHeight = upright ? .44 : .2;
+    box(unit, isSource ? dark : ivory, [.64, halfHeight * 2, upright ? .9 : .60], [0, 0, 0], `${name}-body`);
+    const axis = (upright && !isSource ? new T.Vector3(.10, beamY, 0) : aim.clone()).sub(unit.position).normalize();
+    const lens = cylinder(unit, microwave ? metal : glass("#75d7f0", .55), upright ? .38 : .18, .12, 0, 0, 0, `${name}-aperture`);
+    lens.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), axis); lens.position.copy(axis.clone().multiplyScalar(.36));
+    const port = anchor(unit, axis.clone().multiplyScalar(.42).toArray(), `${name}-beam-port`);
+    unit.userData.beamPort = port;
+    unit.userData.beamAxis = axis;
+    const bottom = pos[1] - halfHeight;
     cylinder(group, metal, .075, bottom + .89, pos[0], (bottom - .89) / 2, pos[2], `${name}-post`);
     box(group, metal, [.75, .08, .65], [pos[0], -.93, pos[2]], `${name}-foot`);
     return unit;
   }
   const source = instrument(sourcePos, microwave ? "rf-source" : "light-source", true);
   const detector = instrument(detectorPos, microwave ? "rf-receiver" : "optical-detector", false);
-  // The lower detector uses an open sample-holder slot; its beam is oblique.
-  if (!inplane && !reflective) {
-    group.remove(group.getObjectByName("sample-holder")!);
-    for (const z of [-.78, .78]) box(group, ivory, [2.3, .10, .3], [0, -.2932, z], "sample-holder-rail");
-    for (const x of [-1.07, 1.07]) box(group, ivory, [.16, .10, 1.56], [x, -.2932, 0], "sample-holder-end");
-  }
   const controller = box(group, dark, [1.2, .30, .60], [0, -.82, -1.44], "readout-controller");
   box(group, field("#80e5ed", .8), [.8, .06, .025], [0, -.76, -1.128], "readout-screen");
   tube(group, metal, [[sourcePos[0], sourcePos[1] - .18, -.25], [sourcePos[0], -.88, -.5], [-2.65, -.88, -1.45], [-.6, -.88, -1.45]], .024, false, "source-cable");
   tube(group, metal, [[detectorPos[0], detectorPos[1] - .18, -.25], [detectorPos[0], -.88, -.5], [2.65, -.88, -1.45], [.6, -.88, -1.45]], .024, false, "receiver-cable");
-  const beam = new T.Group(); group.add(beam);
-  const halfSample = p.kind === "epsilon-near-zero" ? Number(lattice.userData.channelLength) * .26 : 1.0;
-  const hit = inplane ? [-halfSample, beamY, 0] : [0, .04, 0];
-  const exit = inplane ? [halfSample, beamY, 0] : hit;
-  const incoming = addPath(beam, [sourcePos, hit], "#69e7ff", .4, 0, .28);
-  const outgoing = addPath(beam, [exit, detectorPos], "#69e7ff", p.kind === "graphene-absorber" ? .10 : .4, .4, .28);
-  // In-plane specimen phenomena remain visible at their own physical scale.
+  const beam = new T.Group(); beam.name = "connected-instrument-fields"; group.add(beam);
+  group.updateMatrixWorld(true);
+  const portPosition = (unit: T.Group, offset = 0) => {
+    const port = (unit.userData.beamPort as T.Object3D).getWorldPosition(new T.Vector3());
+    const axis = unit.userData.beamAxis as T.Vector3;
+    return port.add(new T.Vector3(-axis.y, axis.x, 0).multiplyScalar(offset)).toArray();
+  };
+  const routes: Path[] = [];
+  let reflectedBic: Path | undefined, reverseRf: Path | undefined, phaseOutput: Path | undefined;
+  const halfSample = p.kind === "epsilon-near-zero" ? Number(lattice.userData.channelLength) * .26 : 1.04;
+  if (inplane) {
+    if (p.kind === "photonic-bandgap" && variant(p) !== 1) {
+      const edge = [-.86, beamY, 0];
+      routes.push(addPath(beam, [portPosition(source), edge], "#69e7ff", .5));
+      const reflected = portPosition(source); reflected[2] = .07;
+      routes.push(addPath(beam, [edge, reflected], "#b4f4ff", .4, .3));
+      if (variant(p) === 2) routes.push(addPath(beam, [edge, [0, beamY, 0]], "#69e7ff", .10, 0, .11));
+    } else {
+      // Only the missing-row crystal has a through channel. RF routes join
+      // the aperture faces and remain inside the ENZ air throat at all heights.
+      routes.push(addPath(beam, [portPosition(source), [-halfSample, beamY, 0], [halfSample, beamY, 0], portPosition(detector)], "#69e7ff", .55, 0, .22));
+    }
+  } else if (upright) {
+    const lanes = p.kind === "huygens" ? [-.28, -.14, 0, .14, .28] : [0];
+    lanes.forEach(offset => {
+      // x=-.30 is just in front of the tallest sample layer; x=.10 is
+      // behind the silica substrate. Separate segments retain a sharp interface.
+      const entry = [-.30, beamY + offset, 0], exit = [.10, beamY + offset, 0];
+      routes.push(addPath(beam, [portPosition(source, offset), entry], "#69e7ff", .43));
+      routes.push(addPath(beam, [entry, exit], "#69e7ff", .28));
+      const outOffset = p.kind === "huygens" && variant(p) === 2 ? 0 : -offset * Math.abs((detector.userData.beamAxis as T.Vector3).x);
+      routes.push(addPath(beam, [exit, portPosition(detector, outOffset)], "#69e7ff", .43, .3));
+    });
+    if (p.kind === "bound-state-continuum") {
+      const returnPort = portPosition(source); returnPort[2] = .065;
+      reflectedBic = addPath(beam, [[-.30, beamY, .065], returnPort], "#b4f4ff", .5, .4, .22);
+    }
+    if (p.kind === "space-time") {
+      const start = portPosition(detector), end = portPosition(source);
+      start[2] = end[2] = .075;
+      reverseRf = addPath(beam, [start, end], "#b7f6ff", .3, .5, .22);
+    }
+  } else {
+    const hit = [0, surfaceY, 0];
+    routes.push(addPath(beam, [portPosition(source), hit], "#69e7ff", .43));
+    const color = p.kind === "structural-color" ? `#${new T.Color().setHSL(.62 - .5 * norm(p), .85, .63).getHexString()}` : "#69e7ff";
+    const output = addPath(beam, [hit, portPosition(detector)], color, p.kind === "graphene-absorber" ? .09 + .11 * (1 - norm(p)) : .43, .3);
+    if (p.kind === "phase-change") phaseOutput = output;
+    else routes.push(output);
+  }
+  // Reuse local phase fronts and resonator/bias symbols, but remove the
+  // standalone excitation paths: application routes are anchored to hardware.
   const behavior = createOpticalBehavior(p, lattice)!;
+  behavior.group.traverse(o => { if (o.userData.propagatingField) o.visible = false; });
   sample.add(behavior.group);
   const labels: Record<string, [string, string, string, string]> = {
-    "negative-index": ["Microwave source", "Copper rings + wires", "Phase receiver", "Dielectric support"],
+    "negative-index": ["Microwave source", "Copper rings + wires", "Microwave receiver", "FR-4 support (cutaway)"],
     "epsilon-near-zero": ["Microwave feed", "Air-filled throat", "Output receiver", "Copper guide wall"],
     "photonic-bandgap": ["Edge light input", "Silicon pillar crystal", "Output detector", "Silica support"],
     "bound-state-continuum": ["Tunable light source", "Asymmetric pairs", "Resonance detector", "Silica support"],
@@ -352,10 +445,13 @@ export function createOpticalApplication(p: LatticeOptions, lattice: T.Group): A
     { label: names[0], anchor: anchor(source, [0, .2, 0], "source-callout"), side: "left", slot: 0 },
     { label: names[1], anchor: lattice.getObjectByName("functional-array")!, side: "left", slot: 1 },
     { label: names[2], anchor: anchor(detector, [0, .2, 0], "detector-callout"), side: "right", slot: 0 },
-    { label: names[3], anchor: ["phase-change", "liquid-crystal", "graphene-absorber", "space-time"].includes(p.kind) ? anchor(controller, [0, .15, 0], "controller-callout") : lattice.getObjectByName("substrate")!, side: "right", slot: 1 },
+    { label: names[3], anchor: ["phase-change", "liquid-crystal", "graphene-absorber", "space-time"].includes(p.kind) ? anchor(controller, [0, .15, 0], "controller-callout") : lattice.getObjectByName(p.kind === "negative-index" ? "dielectric-board" : p.kind === "epsilon-near-zero" ? "guide-side-wall" : "substrate")!, side: "right", slot: 1 },
   ];
   return { group, callouts, camera: [10, 7, 11], target: [0, .1, 0], update(t, _e) {
-    advance(incoming, t); advance(outgoing, t, p.kind === "graphene-absorber" ? .3 : p.kind === "photonic-bandgap" && variant(p) !== 1 ? .08 : p.kind === "phase-change" ? .35 + .6 * (1 - norm(p)) : 1);
+    routes.forEach(q => advance(q, t, p.kind === "space-time" && variant(p) === 2 ? 1 - norm(p) * (.55 - .3 * Math.sin(t * 2) ** 2) : 1));
+    if (phaseOutput) advance(phaseOutput, t, .35 + .6 * (1 - norm(p)));
+    if (reflectedBic) advance(reflectedBic, t, norm(p) ** 2);
+    if (reverseRf) advance(reverseRf, t, variant(p) === 1 ? 1 - norm(p) * (.55 - .3 * Math.sin(t * 2) ** 2) : 1);
     return behavior.update(t);
   } };
 }

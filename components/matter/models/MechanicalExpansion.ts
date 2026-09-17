@@ -27,7 +27,19 @@ function ribbon(g:T.Object3D,m:T.Material,n:number,name:string) {
   return {obj,write:(fn:(s:number,side:number,face:number)=>V)=>{const p=geo.attributes.position as T.BufferAttribute;for(let i=0;i<=n;i++)for(let k=0;k<4;k++)p.setXYZ(i*4+k,...fn(i/n,k%2?1:-1,k<2?1:-1));p.needsUpdate=true;geo.computeVertexNormals();geo.computeBoundingSphere();}};
 }
 function plate(g:T.Object3D,m:T.Material,name:string){return ribbon(g,m,1,name);}
-function fieldArrow(g:T.Object3D,origin:V,direction:V,color:string,length=.58){ const arrow=new T.ArrowHelper(vec(direction).normalize(),vec(origin),length,color,.14,.07);arrow.name='explanatory-load-arrow';g.add(arrow);return arrow; }
+function fieldArrow(g:T.Object3D,origin:V,direction:V,color:string,length=.58){ const arrow=new T.ArrowHelper(vec(direction).normalize(),vec(origin),length,color,.14,.07);arrow.name='explanatory-load-arrow';arrow.userData.length=length;arrow.line.visible=false;const shaft=new T.Mesh(new T.CylinderGeometry(.008,.008,Math.max(.01,length-.12),6),new T.MeshBasicMaterial({color}));shaft.name='load-arrow-shaft';shaft.position.y=(length-.12)/2;arrow.add(shaft);g.add(arrow);return arrow; }
+function setWorldPosition(o:T.Object3D,world:T.Vector3){
+ const parent=o.parent;if(!parent){o.position.copy(world);return;}
+ parent.updateWorldMatrix(true,false);o.position.copy(parent.worldToLocal(world.clone()));
+}
+/** Keep an arrow's tip directly over the marked load point, even when its parent is transformed. */
+function pointArrowTipAtWorld(arrow:T.ArrowHelper,worldPoint:T.Vector3,direction:V,gap=.055){
+ const parent=arrow.parent;const worldDirection=vec(direction).normalize();
+ const tip=worldPoint.clone().add(new T.Vector3(0,gap,0));
+ const tail=tip.clone().addScaledVector(worldDirection,-(arrow.userData.length as number));
+ if(parent){parent.updateWorldMatrix(true,false);const localTail=parent.worldToLocal(tail.clone());const localNext=parent.worldToLocal(tail.clone().add(worldDirection));arrow.position.copy(localTail);arrow.setDirection(localNext.sub(localTail).normalize());}
+ else {arrow.position.copy(tail);arrow.setDirection(worldDirection);}
+}
 
 export const mechanicalControls: Record<string,{thickness:string;count:string;thicknessValue:(v:number)=>string;countValue:(v:number)=>string}> = {
  'pentamode':{thickness:'Neck radius',count:'Cells across',thicknessValue:v=>`${(2+normalized(v)*5).toFixed(1)}% of cell`,countValue:v=>`${count(v)+1} cells`},
@@ -163,9 +175,14 @@ export function createMechanicalBehavior(p:LatticeOptions,lattice:T.Group):Behav
  if(!ids.includes(p.kind))return undefined;
  const rig=lattice.userData.mechanicalRig as Rig|undefined;if(!rig)return undefined;
  const group=new T.Group();group.name=`behavior-${p.kind}`;
- const arrow=fieldArrow(group,[2.5,.8,0],p.kind==='thermal-expansion'?[-1,0,0]:[0,-1,0],p.kind==='thermal-expansion'?'#ffb36d':'#85ddf7',.48);
- const halo=new T.Mesh(new T.TorusGeometry(.14,.009,5,28),new T.MeshBasicMaterial({color:p.kind==='thermal-expansion'?'#ffb36d':'#85ddf7',transparent:true,opacity:.65}));halo.name='explanatory-observation-marker';group.add(halo);
- return {group,camera:[9,6,10],target:[0,.25,0],update:t=>{const status=rig.update(t);const a=rig.landmarks[p.kind==='thermal-expansion'?2:1];a.updateWorldMatrix(true,false);halo.position.copy(a.getWorldPosition(new T.Vector3()));halo.position.y+=.18;halo.rotation.x=Math.PI/2;arrow.position.copy(halo.position).add(new T.Vector3(.12,.7,0));return status;}};
+ const isThermal=p.kind==='thermal-expansion';
+ const arrow=fieldArrow(group,[2.5,.8,0],isThermal?[-1,0,0]:[0,-1,0],isThermal?'#ff6538':'#85ddf7',isThermal?.48:.64);
+ const halo=new T.Mesh(new T.TorusGeometry(.14,.009,5,28),new T.MeshBasicMaterial({color:isThermal?'#ff6538':'#85ddf7',transparent:true,opacity:.72}));halo.name='explanatory-observation-marker';group.add(halo);
+ return {group,camera:[9,6,10],target:[0,.25,0],update:t=>{const status=rig.update(t);const a=rig.landmarks[isThermal?2:1];a.updateWorldMatrix(true,false);const haloWorld=a.getWorldPosition(new T.Vector3()).add(new T.Vector3(0,.18,0));setWorldPosition(halo,haloWorld);halo.rotation.x=Math.PI/2;
+  // The cyan load arrow has no lateral offset: its tip stays centered just above the cyan halo.
+  if(!isThermal)pointArrowTipAtWorld(arrow,haloWorld,[0,-1,0],.045);
+  else pointArrowTipAtWorld(arrow,haloWorld,[-1,0,0],.045);
+  return status;}};
 }
 
 export function createMechanicalApplication(p:LatticeOptions,lattice:T.Group):Application|undefined {
@@ -209,7 +226,17 @@ export function createMechanicalApplication(p:LatticeOptions,lattice:T.Group):Ap
   if(rig.fixture==='shear'&&moving)moving.position.x=.075*Math.sin(t*.75)*(max.y-min.y);
   if(rig.fixture==='snap'&&moving){const a=rig.landmarks[2];const top=1.03,bottom=a.position.y+.075;moving.position.y=(top+bottom)/2;moving.scale.y=(top-bottom)/.7;}
   for(const pin of hardware){const idx=pin.userData.anchorIndex;if(typeof idx==='number'){const a=rig.landmarks[idx].position;(pin.userData.carriage as T.Mesh).position.x=a.x;segment(pin,[a.x,-.26,a.z],[a.x,a.y,a.z],.035);}}
-  if(p.kind==='thermal-expansion'){load.position.set(0,.30,1.0);load.setDirection(new T.Vector3(0,1,0));}else if(p.kind==='pentamode')load.position.set(moving?.position.x??0,max.y+.28,0);else if(p.kind==='bistable-beam')load.position.set(.38,rig.landmarks[2].position.y+.53,0);else load.position.set(rig.landmarks[2].position.x,rig.landmarks[2].position.y+.58,rig.landmarks[2].position.z);
+  if(p.kind==='thermal-expansion'){
+   // This warm marker identifies the heater-to-strip direction; it is deliberately distinct from cyan mechanical loads.
+   pointArrowTipAtWorld(load,new T.Vector3(0,.22,1.0),[0,1,0],.04);
+  }else if(p.kind==='pentamode'){
+   const target=moving?.getWorldPosition(new T.Vector3())??rig.landmarks[2].getWorldPosition(new T.Vector3());
+   pointArrowTipAtWorld(load,target,[1,0,0],.05);
+  }else if(p.kind==='bistable-beam'){
+   pointArrowTipAtWorld(load,rig.landmarks[2].getWorldPosition(new T.Vector3()),[0,-1,0],.055);
+  }else {
+   pointArrowTipAtWorld(load,rig.landmarks[2].getWorldPosition(new T.Vector3()),[0,-1,0],.055);
+  }
   return status;};update(0,0);void base;void rubber;
  return {group,callouts,camera:[10,7,11],target:[0,.4,0],update};
 }

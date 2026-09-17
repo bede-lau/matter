@@ -1,3 +1,4 @@
+import { addHeatFlowRoute, addHeatFlowChevron, placeHeatFlowChevron } from "./HeatFlow";
 import { createMechanicalApplication } from "./MechanicalExpansion";
 import { createOpticalApplication } from "./OpticalExpansion";
 import { createMultiphysicsApplication } from "./MultiphysicsExpansion";
@@ -330,35 +331,28 @@ export function createApplication(
     const floor = box(group, p.dark, [6.1, 0.13, 3.85], [0, -0.31, 0], "cloak-test-surface");
     const waves = fieldMaterial("#68d7ff", 0.68);
     const rays: T.Mesh[] = [];
-    for (let i = -3; i <= 3; i++) {
-      const z = i * 0.28;
-      const bypass = Math.max(0.16, 0.62 - Math.abs(z) * 0.35);
+    // The cylindrical cloak redirects energy in the annular plane, not over
+    // the top of the object. Six separated tracks avoid a duplicated centre ray.
+    for (const z of [-0.70, -0.42, -0.14, 0.14, 0.42, 0.70]) {
+      const side = Math.sign(z);
+      const bend = side * (0.78 + Math.abs(z) * 0.55);
       rays.push(
-        fieldTube(
-          group,
-          waves,
-          [
-            [-3.05, 0.34, z],
-            [-1.48, 0.34, z],
-            [-0.72, 0.34 + bypass, z],
-            [0, 0.34 + bypass * 1.18, z],
-            [0.72, 0.34 + bypass, z],
-            [1.48, 0.34, z],
-            [3.05, 0.34, z],
-          ],
-          0.016,
-          "microwave-field-line",
-        ),
+        fieldTube(group, waves, [
+          [-3.05, 0.34, z], [-2.0, 0.34, z], [-1.48, 0.34, z],
+          [-0.78, 0.34, bend * 0.9], [0, 0.34, bend],
+          [0.78, 0.34, bend * 0.9], [1.48, 0.34, z],
+          [2.0, 0.34, z], [3.05, 0.34, z],
+        ], 0.016, "microwave-field-line"),
       );
     }
     label("Segmented shell: redirects the microwave path", shell, [0.86, 0.04, 0.62], "left", 0);
     label("Incoming field: straight before the shell", rays[0], [-1.7, 0, 0], "left", 1);
     label("Hidden object: scattering is reduced at one frequency", hidden, [0, 0.2, 0], "right", 0);
-    label("Outgoing field: nearly parallel again", rays[6], [1.7, 0, 0], "right", 1);
+    label("Outgoing field: nearly parallel again", rays[rays.length - 1], [1.7, 0, 0], "right", 1);
     camera = [7.5, 4.5, 9.8];
     target = [0, -0.1, 0];
     update = (t, e) => {
-      rays.forEach((ray, i) => (ray.position.z = Math.sin(t * 2.2 + i) * 0.012));
+      rays.forEach((ray, i) => ((ray.material as T.MeshBasicMaterial).opacity = 0.55 + 0.12 * Math.sin(t * 2.2 - i * 0.35)));
       return e > 0.15 ? "Shell opened · microwave route" : "Cloak present · rays rejoin after the object";
     };
   } else if (kind === "membrane-absorber") {
@@ -405,28 +399,15 @@ export function createApplication(
     const coolSink = box(group, p.metal, [0.28, 0.23, 1.42], [2.28, -0.54, 0], "cool-boundary");
     const core = mesh(new T.CylinderGeometry(0.27, 0.27, 0.1, 28), p.ivory, group, "protected-core");
     core.position.set(0, -0.35, 0);
-    const heat = fieldMaterial("#ffb266", 0.6);
-    const heatDots: { dot: T.Mesh; base: T.Vector3 }[] = [];
-    for (let z of [-0.82, -0.42, 0.42, 0.82])
-      fieldTube(
-        group,
-        heat,
-        [
-          [-2.05, -0.30, z],
-          [-0.95, -0.30, z],
-          [-0.42, -0.30, z * 1.12],
-          [0.42, -0.30, z * 1.12],
-          [0.95, -0.30, z],
-          [2.05, -0.30, z],
-        ],
-        0.014,
-        "thermal-flow-path",
-      );
-    for (let i = 0; i < 9; i++) {
-      const dot = ellipsoid(group, heat, [-1.7 + i * 0.4, -0.30, 0.72 * Math.sin(i * 1.4)], [0.045, 0.045, 0.045], "heat-flow-dot");
-      dot.castShadow = false;
-      heatDots.push({ dot, base: dot.scale.clone() });
-    }
+    const heatPaths = [-0.82, -0.42, 0.42, 0.82].map(z =>
+      addHeatFlowRoute(group, [
+        [-2.05, -0.27, z], [-0.95, -0.27, z],
+        [-0.42, -0.27, z * 1.4], [0.42, -0.27, z * 1.4],
+        [0.95, -0.27, z], [2.05, -0.27, z],
+      ], "thermal-flow-path"));
+    const heatMarkers = heatPaths.flatMap(curve => [0, 1, 2].map(i => ({
+      curve, marker: addHeatFlowChevron(group), offset: i / 3,
+    })));
     label("Conductivity rings: guide heat around the core", shield, [0, 0, 0], "left", 0);
     label("Hot boundary: sends a short thermal pulse", heatSource, [0, 0, 0], "left", 1);
     label("Protected core: warms later", core, [0, 0, 0], "right", 0);
@@ -434,14 +415,8 @@ export function createApplication(
     camera = [7.5, 4.6, 9.2];
     target = [0, -0.4, 0];
     update = (t, e) => {
-      const travel = (t * 0.46) % 1;
-      heatDots.forEach(({ dot, base }, i) => {
-        const phase = (travel + i / heatDots.length) % 1;
-        dot.position.x = -1.8 + phase * 3.6;
-        dot.position.y = -0.30;
-        dot.position.z = 0.78 * Math.sin(phase * Math.PI * 2);
-        dot.scale.copy(base).multiplyScalar(0.7 + 0.35 * Math.sin(phase * Math.PI));
-      });
+      heatMarkers.forEach(({ marker, curve, offset }) =>
+        placeHeatFlowChevron(marker, curve, (t * 0.18 + offset) % 1));
       return e > 0.15 ? "Layered plate · transient heat path" : "Heat diverted · core warms over time";
     };
   } else if (kind === "topological") {

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Layers3,
@@ -30,7 +30,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Choice, ExportMenu, ModeTabs } from "./ReuiControls";
-import MiniLattice from "./MiniLattice";
 import { GlossaryProvider, GlossaryText } from "./Glossary";
 import { families, bases } from "@/lib/matter/catalog";
 import { structureCards } from "@/lib/matter/learning";
@@ -148,6 +147,9 @@ export default function Studio() {
   });
   const file = useRef<HTMLInputElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
+  const structurePickerTrigger = useRef<HTMLButtonElement>(null);
+  const structurePickerContent = useRef<HTMLDivElement>(null);
+  const structurePickerScrollTop = useRef(0);
   const f = families[family];
   const specialisedParameters = specialisedParameterLabels[f.id];
   const allowedBase = f.allowedBase ?? bases.map((_, index) => index);
@@ -201,8 +203,34 @@ export default function Studio() {
     setSecond(nextSecond);
     setBlend(nextBlend);
     setSceneParameters((current) => ({ ...current, blend: nextBlend }));
+    closeStructurePicker();
+  };
+  const rememberStructurePickerScroll = () => {
+    const content = structurePickerContent.current;
+    if (content) structurePickerScrollTop.current = content.scrollTop;
+  };
+  const closeStructurePicker = () => {
+    rememberStructurePickerScroll();
     setStructurePickerOpen(false);
   };
+  const handleStructurePickerOpenChange = (open: boolean) => {
+    if (!open) rememberStructurePickerScroll();
+    setStructurePickerOpen(open);
+  };
+  useLayoutEffect(() => {
+    if (!structurePickerOpen) return;
+    const restoreScroll = () => {
+      const content = structurePickerContent.current;
+      if (!content) return;
+      content.scrollTop = structurePickerScrollTop.current;
+      // Keep the value the browser can actually represent if filtering made the
+      // previous offset larger than the current result set.
+      structurePickerScrollTop.current = content.scrollTop;
+    };
+    restoreScroll();
+    const animationFrame = requestAnimationFrame(restoreScroll);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [structurePickerOpen]);
   const startAnimation = () => {
     setPlay(true);
     // A new run recreates application motion, including the Kelvin impact path.
@@ -353,7 +381,7 @@ export default function Studio() {
         <header className="topbar">
           <a className="brand" href="/" aria-label="Matter home">
             <span className="brand-symbol">
-              <MiniLattice kind="octet" color="#c2ef72" logo />
+              <img src="/favicon.svg" width="40" height="40" alt="" />
             </span>
             matter<span className="brand-period">.</span>
           </a>
@@ -457,10 +485,10 @@ export default function Studio() {
             <div className="studio-toolbar">
               <Dialog
                 open={structurePickerOpen}
-                onOpenChange={setStructurePickerOpen}
+                onOpenChange={handleStructurePickerOpenChange}
               >
                 <DialogTrigger asChild>
-                  <button className="structure-picker-trigger">
+                  <button ref={structurePickerTrigger} className="structure-picker-trigger">
                     <span className="structure-picker-trigger__image" aria-hidden="true">
                       {activeReference && (
                         <img
@@ -479,7 +507,21 @@ export default function Studio() {
                     <ChevronDown size={17} aria-hidden="true" />
                   </button>
                 </DialogTrigger>
-                <DialogContent className="structure-picker-dialog">
+                <DialogContent
+                  className="structure-picker-dialog"
+                  onCloseAutoFocus={(event) => {
+                    // Radix's default focus restoration can scroll the page to
+                    // the trigger. Focus it directly while preserving the page
+                    // position instead.
+                    event.preventDefault();
+                    structurePickerTrigger.current?.focus({ preventScroll: true });
+                  }}
+                >
+                  <div
+                    ref={structurePickerContent}
+                    className="structure-picker-scroll"
+                    onScroll={rememberStructurePickerScroll}
+                  >
                   <DialogHeader>
                     <span className="eyebrow">STRUCTURE LIBRARY</span>
                     <DialogTitle>Choose a repeating structure</DialogTitle>
@@ -551,12 +593,13 @@ export default function Studio() {
                     </span>
                     <button
                       onClick={() => {
-                        setStructurePickerOpen(false);
+                        closeStructurePicker();
                         setTab("learn");
                       }}
                     >
                       Open Field Guide <ArrowUpRight size={15} />
                     </button>
+                  </div>
                   </div>
                 </DialogContent>
               </Dialog>
