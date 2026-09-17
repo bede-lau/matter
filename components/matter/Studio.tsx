@@ -612,10 +612,10 @@ export default function Studio() {
                 <div className="viewport-meta">
                   <div className="viewport-tag">
                     {mode === "application"
-                      ? f.application + " · product anatomy"
+                      ? f.application + (f.controlNote ? " · teaching demonstrator" : " · product anatomy")
                       : mode === "deform"
                         ? "Illustrative behavior"
-                        : "Periodic unit-cell architecture"}
+                        : f.controlNote ? "Architecture and components" : "Periodic unit-cell architecture"}
                   </div>
                   <div className="material-phase-key" aria-live="polite">
                     <span className="phase-key-item">

@@ -190,7 +190,7 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
             </header>
 
             <div className="field-guide-v2__lesson-visuals">
-              <figure className="field-guide-v2__reference-figure">
+              <figure className="field-guide-v2__reference-figure" data-published={Boolean(reference?.credit)}>
                 {reference && <img src={reference.image} alt={reference.alt} decoding="async" />}
                 <figcaption>
                   <span>START HERE</span>

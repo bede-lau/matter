@@ -138,6 +138,12 @@ export default function Scene(p: SceneProps) {
           controls.target.set(...(behavior.target as [number, number, number]));
       }
     }
+    root.traverse(object => {
+      if (object instanceof T.Mesh) {
+        for (const material of Array.isArray(object.material) ? object.material : [object.material])
+          if (material instanceof T.MeshStandardMaterial) material.wireframe = p.wire;
+      }
+    });
     // Project product annotations from component anchors; they follow orbit and exploded motion.
     const overlay = document.createElement("div");
     overlay.className = "scene-annotations";

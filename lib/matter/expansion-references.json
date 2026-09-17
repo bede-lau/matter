@@ -4,12 +4,13 @@
     "title": "Pentamode",
     "eyebrow": "PUBLISHED RESEARCH",
     "image": "/images/expansion/pentamode.jpg",
-    "alt": "Two-dimensional pentamode lattice unit cell with thin struts and rectangular masses.",
-    "sourceLabel": "Chen, Liu & Hu, Scientific Reports (2015), Fig. 1",
-    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4621533/",
-    "note": "Published microstructure design; this figure is not a photographed specimen.",
-    "credit": "Chen, Liu & Hu, Scientific Reports (2015), Fig. 1 · CC BY 4.0",
-    "imageKind": "published lattice-design figure"
+    "alt": "Three white 3D-printed hybrid pentamode lattice specimens on a dark background.",
+    "sourceLabel": "Mohammadi et al., Additively manufactured hybrid anisotropic pentamode metamaterials (2020), Fig. 2",
+    "sourceUrl": "https://arxiv.org/abs/2005.08360",
+    "note": "Photographed, additively manufactured hybrid pentamode specimens. Their fabricated geometry differs from the simplified studio cell.",
+    "credit": "Mohammadi et al., Additively manufactured hybrid anisotropic pentamode metamaterials (2020), Fig. 2",
+    "imageKind": "photograph of additively manufactured specimens",
+    "license": "arXiv.org perpetual non-exclusive license; check author/publisher reuse terms"
   },
   {
     "id": "rotating-squares",
@@ -21,19 +22,21 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10856801/",
     "note": "The source uses rectangular rotating units; it is a close analogue of rotating squares.",
     "credit": "Złotkiewicz et al., Materials (2024), Fig. 15 · CC BY 4.0",
-    "imageKind": "prototype photograph and analysis figure"
+    "imageKind": "prototype photograph and analysis figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "chiral-honeycomb",
     "title": "Chiral Honeycomb",
     "eyebrow": "PUBLISHED RESEARCH",
     "image": "/images/expansion/chiral-honeycomb.jpg",
-    "alt": "Antichiral thermomechanical lattice specimen photographed at four temperatures.",
-    "sourceLabel": "Jänicke et al., Materials (2020), Fig. 12",
-    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7254316/",
-    "note": "Antichiral thermomechanical lattice, rather than a conventional chiral honeycomb tensile specimen.",
-    "credit": "Jänicke et al., Materials (2020), Fig. 12 · CC BY 4.0",
-    "imageKind": "experimental prototype photograph"
+    "alt": "Three 3D-printed hybrid chiral and re-entrant mechanical metamaterial specimens.",
+    "sourceLabel": "Jiang & Li, Scientific Reports (2018), Fig. 1",
+    "sourceUrl": "https://www.nature.com/articles/s41598-018-20795-2",
+    "note": "Photographed 3D-printed chiral prototype, showing a physical ring-and-ligament architecture.",
+    "credit": "Jiang & Li, Scientific Reports (2018), Fig. 1 · CC BY 4.0",
+    "imageKind": "3D-printed chiral metamaterial prototype photograph",
+    "license": "CC BY 4.0"
   },
   {
     "id": "miura-origami",
@@ -45,19 +48,21 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13467906/",
     "note": "Shows the physical test setup.",
     "credit": "Experimental Study on Miura-Ori Metamaterials, Polymers (2026), Fig. 4 · CC BY 4.0",
-    "imageKind": "experimental test-rig photograph"
+    "imageKind": "experimental test-rig photograph",
+    "license": "CC BY 4.0"
   },
   {
     "id": "kirigami",
     "title": "Kirigami",
     "eyebrow": "PUBLISHED RESEARCH",
-    "image": "/images/expansion/kirigami.jpg",
-    "alt": "Biaxial compression fixture for a folded-sheet mechanical metamaterial.",
-    "sourceLabel": "Experimental Study on Miura-Ori Metamaterials, Polymers (2026), Fig. 4",
-    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13467906/",
-    "note": "Context substitute: origami test fixture, not a slit kirigami specimen.",
-    "credit": "Experimental Study on Miura-Ori Metamaterials, Polymers (2026), Fig. 4 · CC BY 4.0",
-    "imageKind": "experimental folded-sheet test-rig photograph"
+    "image": "/images/expansion/kirigami.png",
+    "alt": "Cut-sheet kirigami samples buckled into several three-dimensional lattice configurations.",
+    "sourceLabel": "Yang, Dias & Holmes, Multistable Kirigami for Tunable Architected Materials (2018), Fig. 1",
+    "sourceUrl": "https://arxiv.org/abs/1807.06498",
+    "note": "Physical PET cut-sheet specimens and their buckled configurations. The studio illustrates a simpler attached-ribbon mechanism.",
+    "credit": "Yang, Dias & Holmes, Multistable Kirigami for Tunable Architected Materials (2018), Fig. 1",
+    "imageKind": "experimental kirigami specimen photographs",
+    "license": "arXiv.org perpetual non-exclusive license; check author/publisher reuse terms"
   },
   {
     "id": "bistable-beam",
@@ -69,7 +74,8 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9176747/",
     "note": "Published experimental figure.",
     "credit": "Science Advances (2022), Fig. 2 · CC BY-NC 4.0",
-    "imageKind": "experimental mechanism figure"
+    "imageKind": "experimental mechanism figure",
+    "license": "CC BY-NC 4.0"
   },
   {
     "id": "tensegrity",
@@ -81,31 +87,34 @@
     "sourceUrl": "https://www.nature.com/articles/s41598-017-03412-6",
     "note": "Published figure.",
     "credit": "Scientific Reports (2017), Fig. 1 · CC BY 4.0",
-    "imageKind": "prototype photograph and schematic"
+    "imageKind": "prototype photograph and schematic",
+    "license": "CC BY 4.0"
   },
   {
     "id": "spinodal-shell",
     "title": "Spinodal Shell",
     "eyebrow": "PUBLISHED RESEARCH",
-    "image": "/images/expansion/spinodal-shell.jpg",
-    "alt": "Conformal interlocked metamaterial absorber architecture and application concept.",
-    "sourceLabel": "Chainmail-inspired conformable absorber, Nature Communications (2026), Fig. 1",
-    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12923583/",
-    "note": "Context substitute: interlocked conformal architecture, not a spinodal shell.",
-    "credit": "Chainmail-inspired conformable absorber, Nature Communications (2026), Fig. 1 · CC BY 4.0",
-    "imageKind": "fabricated interlocked-metamaterial figure"
+    "image": "/images/expansion/spinodal-shell.png",
+    "alt": "Scanning electron micrographs of low-density shell-based spinodal metamaterial samples fabricated in IP-Dip by direct laser writing.",
+    "sourceLabel": "Hsieh, Endo, Zhang, Bauer & Valdevit, The mechanical response of cellular materials with spinodal topologies (2019), Supplementary Fig. S1 d–f",
+    "sourceUrl": "https://arxiv.org/abs/1904.06733",
+    "note": "Panels d–f show fabricated spinodal shells at 10%, 7% and 5% relative density; panels a–c show related solid-network structures.",
+    "credit": "Hsieh, Endo, Zhang, Bauer & Valdevit, The mechanical response of cellular materials with spinodal topologies (2019), Supplementary Fig. S1 d–f",
+    "imageKind": "SEM of two-photon-polymerized spinodal-shell samples",
+    "license": "arXiv record does not state a CC reuse license; author-copyrighted preprint—permission required for republication"
   },
   {
     "id": "chainmail",
     "title": "Chainmail",
     "eyebrow": "PUBLISHED RESEARCH",
-    "image": "/images/expansion/chainmail.jpg",
-    "alt": "Chainmail-inspired conformable microwave metamaterial absorber units.",
-    "sourceLabel": "Chainmail-inspired conformable absorber, Nature Communications (2026), Fig. 1",
-    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12923583/",
-    "note": "Electromagnetic absorber rather than mechanical chainmail.",
-    "credit": "Chainmail-inspired conformable absorber, Nature Communications (2026), Fig. 1 · CC BY 4.0",
-    "imageKind": "fabricated metamaterial figure"
+    "image": "/images/expansion/chainmail.png",
+    "alt": "Structured chain-mail fabric draped over a hand and shown in a mechanically jammed state.",
+    "sourceLabel": "Wang et al., Structured fabrics with tunable mechanical properties, Nature 596, 238–243 (2021), Fig. 1; prototype photos S. Fan",
+    "sourceUrl": "https://www.nature.com/articles/s41586-021-03698-7",
+    "note": "The source includes photographs of printed aluminium structured fabric draped over a hand and stiffened by confinement. The studio shows unconstrained link drape only.",
+    "credit": "Wang et al., Structured fabrics with tunable mechanical properties, Nature 596, 238–243 (2021), Fig. 1; prototype photos S. Fan",
+    "imageKind": "photograph of 3D-printed aluminum chain-mail fabric",
+    "license": "© Springer Nature Limited; permissions required for reuse"
   },
   {
     "id": "thermal-expansion",
@@ -117,7 +126,8 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7254316/",
     "note": "Direct experimental negative-thermal-expansion evidence.",
     "credit": "Jänicke et al., Materials (2020), Fig. 12 · CC BY 4.0",
-    "imageKind": "experimental prototype photograph"
+    "imageKind": "experimental prototype photograph",
+    "license": "CC BY 4.0"
   },
   {
     "id": "negative-index",
@@ -127,9 +137,10 @@
     "alt": "Copper-patterned microwave metamaterial boards used for effective-medium measurements.",
     "sourceLabel": "Scientific Reports (2017), Fig. 1",
     "sourceUrl": "https://www.nature.com/articles/s41598-017-04680-y",
-    "note": "Microwave demonstration.",
+    "note": "A fabricated microwave effective-medium board provides hardware context. This shared ENZ reference is not a negative-index measurement.",
     "credit": "Scientific Reports (2017), Fig. 1 · CC BY 4.0",
-    "imageKind": "microwave metamaterial board photograph"
+    "imageKind": "microwave metamaterial board photograph",
+    "license": "CC BY 4.0"
   },
   {
     "id": "epsilon-near-zero",
@@ -139,9 +150,10 @@
     "alt": "Copper-patterned microwave metamaterial sample for effective-parameter experiments.",
     "sourceLabel": "Scientific Reports (2017), Fig. 1",
     "sourceUrl": "https://www.nature.com/articles/s41598-017-04680-y",
-    "note": "Context is microwave effective-medium hardware.",
+    "note": "A fabricated microwave effective-medium board provides experimental hardware context.",
     "credit": "Scientific Reports (2017), Fig. 1 · CC BY 4.0",
-    "imageKind": "microwave metamaterial board photograph"
+    "imageKind": "microwave metamaterial board photograph",
+    "license": "CC BY 4.0"
   },
   {
     "id": "photonic-bandgap",
@@ -153,7 +165,8 @@
     "sourceUrl": "https://www.nature.com/articles/s41467-024-54284-0",
     "note": "Shows fabricated silicon structures; not a direct bandgap measurement.",
     "credit": "Nature Communications (2024), Fig. 2 · CC BY 4.0",
-    "imageKind": "SEM and nanophotonic-device figure"
+    "imageKind": "SEM and nanophotonic-device figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "bound-state-continuum",
@@ -165,7 +178,8 @@
     "sourceUrl": "https://www.nature.com/articles/s41467-024-54284-0",
     "note": "Direct quasi-BIC fabrication context.",
     "credit": "Nature Communications (2024), Fig. 2 · CC BY 4.0",
-    "imageKind": "SEM and nanophotonic-device figure"
+    "imageKind": "SEM and nanophotonic-device figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "phase-change",
@@ -177,7 +191,8 @@
     "sourceUrl": "https://doi.org/10.37188/lam.2021.019",
     "note": "Published figure.",
     "credit": "Light: Advanced Manufacturing (2021), Fig. 1 · CC BY 4.0",
-    "imageKind": "phase-change photonics figure"
+    "imageKind": "phase-change photonics figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "liquid-crystal",
@@ -189,7 +204,8 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4490413/",
     "note": "Plasmonic liquid-crystal context.",
     "credit": "Nature Communications (2015), Fig. 1 · CC BY 4.0",
-    "imageKind": "plasmonic-liquid-crystal experiment figure"
+    "imageKind": "plasmonic-liquid-crystal experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "huygens",
@@ -199,9 +215,10 @@
     "alt": "Scanning electron micrographs of Huygens metasurface elements.",
     "sourceLabel": "arXiv:2012.12173, Fig. 1",
     "sourceUrl": "https://arxiv.org/abs/2012.12173",
-    "note": "Open preprint figure.",
+    "note": "The source combines a fabricated silicon metasurface micrograph with measurements and simulations. Its higher-order scattering design is related to, but differs from, the simplified studio lesson.",
     "credit": "arXiv:2012.12173, Fig. 1 · CC BY 4.0",
-    "imageKind": "SEM nanophotonic figure"
+    "imageKind": "SEM nanophotonic figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "structural-color",
@@ -213,7 +230,8 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4490413/",
     "note": "Plasmonic color platform, not silicon-pillar structural color.",
     "credit": "Nature Communications (2015), Fig. 1 · CC BY 4.0",
-    "imageKind": "plasmonic color experiment figure"
+    "imageKind": "plasmonic color experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "graphene-absorber",
@@ -225,7 +243,8 @@
     "sourceUrl": "https://www.nature.com/articles/s43246-022-00279-7",
     "note": "Published device figure.",
     "credit": "Communications Materials (2022), Fig. 1 · CC BY 4.0",
-    "imageKind": "graphene absorber device figure"
+    "imageKind": "graphene absorber device figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "space-time",
@@ -237,7 +256,8 @@
     "sourceUrl": "https://www.nature.com/articles/s41467-020-15273-1",
     "note": "Published experiment context.",
     "credit": "Nature Communications (2020), Fig. 1 · CC BY 4.0",
-    "imageKind": "time-modulated metamaterial experiment figure"
+    "imageKind": "time-modulated metamaterial experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "helmholtz",
@@ -249,7 +269,8 @@
     "sourceUrl": "https://www.frontiersin.org/journals/mechanical-engineering/articles/10.3389/fmech.2020.586249/full",
     "note": "Direct acoustic test setup.",
     "credit": "Frontiers in Mechanical Engineering (2020), Fig. 1 · CC BY 4.0",
-    "imageKind": "impedance-tube experiment photograph"
+    "imageKind": "impedance-tube experiment photograph",
+    "license": "CC BY 4.0"
   },
   {
     "id": "acoustic-hologram",
@@ -261,7 +282,8 @@
     "sourceUrl": "https://www.nature.com/articles/srep35437",
     "note": "Published experimental figure.",
     "credit": "Scientific Reports (2016), Fig. 2 · CC BY 4.0",
-    "imageKind": "acoustic hologram experiment figure"
+    "imageKind": "acoustic hologram experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "ventilated-silencer",
@@ -273,7 +295,8 @@
     "sourceUrl": "https://www.frontiersin.org/journals/physics/articles/10.3389/fphy.2025.1586858/full",
     "note": "Published experimental figure.",
     "credit": "Frontiers in Physics (2025), Fig. 5 · CC BY 4.0",
-    "imageKind": "experimental acoustic figure"
+    "imageKind": "experimental acoustic figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "bubble-metascreen",
@@ -285,7 +308,8 @@
     "sourceUrl": "https://www.nature.com/articles/s42005-021-00795-x",
     "note": "Published experimental platform.",
     "credit": "Communications Physics (2021), Fig. 1 · CC BY 4.0",
-    "imageKind": "bubble-metascreen experiment figure"
+    "imageKind": "bubble-metascreen experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "acoustic-luneburg",
@@ -297,7 +321,8 @@
     "sourceUrl": "https://www.nature.com/articles/s41598-018-34581-7",
     "note": "Published experimental figure.",
     "credit": "Scientific Reports (2018), Fig. 2 · CC BY 4.0",
-    "imageKind": "acoustic Luneburg-lens experiment figure"
+    "imageKind": "acoustic Luneburg-lens experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "thermal-concentrator",
@@ -309,7 +334,8 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4479797/",
     "note": "Published thermal-flow experiment.",
     "credit": "Scientific Reports (2015), Fig. 1 · CC BY 4.0",
-    "imageKind": "thermal metamaterial experiment figure"
+    "imageKind": "thermal metamaterial experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "thermal-diode",
@@ -321,19 +347,21 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4352864/",
     "note": "Binary phase-change system, not a TPU thermal diode.",
     "credit": "Scientific Reports (2015), Fig. 1 · CC BY 4.0",
-    "imageKind": "thermal-rectification experiment figure"
+    "imageKind": "thermal-rectification experiment figure",
+    "license": "CC BY 4.0"
   },
   {
     "id": "thermal-emitter",
     "title": "Thermal Emitter",
     "eyebrow": "PUBLISHED RESEARCH",
     "image": "/images/expansion/thermal-emitter.jpg",
-    "alt": "Phase-change nanophotonic device concepts.",
-    "sourceLabel": "Light: Advanced Manufacturing (2021), Fig. 1; contextual substitute for Nanophotonics thermal-emitter article",
-    "sourceUrl": "https://doi.org/10.1515/nanoph-2022-0020",
-    "note": "Context substitute: phase-change optical device, not the cited thermal-emitter Fig. 5.",
-    "credit": "Light: Advanced Manufacturing (2021), Fig. 1; contextual substitute for Nanophotonics thermal-emitter article · CC BY 4.0",
-    "imageKind": "phase-change nanophotonics figure"
+    "alt": "VO2 microdisk thermal-emitter fabrication, SEM views, and photographs of patterned samples.",
+    "sourceLabel": "Long, Taylor & Wang, Enhanced Infrared Emission by Thermally Switching the Excitation of Magnetic Polariton with Scalable Microstructured VO2 Metasurfaces (2020), Fig. 1",
+    "sourceUrl": "https://arxiv.org/abs/2005.08913",
+    "note": "Microscopy and sample photographs of a fabricated VO₂ thermal emitter. This is a different material platform from the gold/alumina studio example.",
+    "credit": "Long, Taylor & Wang, Enhanced Infrared Emission by Thermally Switching the Excitation of Magnetic Polariton with Scalable Microstructured VO2 Metasurfaces (2020), Fig. 1",
+    "imageKind": "SEM and fabricated thermal-emitter photographs",
+    "license": "arXiv.org perpetual non-exclusive license; check author/publisher reuse terms"
   },
   {
     "id": "magnetic-programmable",
@@ -345,7 +373,8 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7500935/",
     "note": "Published figure.",
     "credit": "ACS Applied Bio Materials (2020), Fig. 3 · CC BY-NC 4.0",
-    "imageKind": "magnetically programmed metamaterial figure"
+    "imageKind": "magnetically programmed metamaterial figure",
+    "license": "CC BY-NC 4.0"
   },
   {
     "id": "piezo-shunt",
@@ -357,6 +386,7 @@
     "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12072944/",
     "note": "Published experimental figure.",
     "credit": "Materials (2025), Fig. 4 · CC BY 4.0",
-    "imageKind": "piezoelectric shunt experiment figure"
+    "imageKind": "piezoelectric shunt experiment figure",
+    "license": "CC BY 4.0"
   }
 ]
