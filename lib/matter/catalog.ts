@@ -1,3 +1,4 @@
+import { additionalBases, expandedFamilies } from "./expansion";
 export type Family = {
   id: string;
   name: string;
@@ -586,6 +587,7 @@ export const families: Family[] = [
     allowedSecondary: [],
     materialNote: "Rigid acrylic plates sit in a fixed water tank. Water is the wave medium, not a secondary solid phase.",
   },
+  ...expandedFamilies,
 ];
 export const bases = [
   {
@@ -714,4 +716,5 @@ export const bases = [
     color: "#83c6e8",
     intro: "A clear rigid plastic often used for laboratory tank walls, channels, and model plates.",
   },
+  ...additionalBases,
 ];

@@ -34,6 +34,9 @@ import MiniLattice from "./MiniLattice";
 import { GlossaryProvider, GlossaryText } from "./Glossary";
 import { families, bases } from "@/lib/matter/catalog";
 import { structureCards } from "@/lib/matter/learning";
+import { mechanicalControls } from "./models/MechanicalExpansion";
+import { opticalControls } from "./models/OpticalExpansion";
+import { multiphysicsControls } from "./models/MultiphysicsExpansion";
 import Scene from "./Scene";
 import ResearchExplorer from "./ResearchExplorer";
 import FieldGuide from "./FieldGuide";
@@ -63,6 +66,9 @@ const specialisedParameterLabels: Record<
     countValue?: (value: number) => string;
   }
 > = {
+  ...mechanicalControls,
+  ...opticalControls,
+  ...multiphysicsControls,
   metalens: { thickness: "Post height", count: "Post density" },
   cloak: { thickness: "Trace width", count: "Ring count" },
   "membrane-absorber": {

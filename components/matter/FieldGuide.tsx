@@ -9,6 +9,7 @@ import {
   CirclePlay,
   Layers3,
 } from "lucide-react";
+import researchDatasets from "@/lib/matter/frontier-datasets.json";
 import { families } from "@/lib/matter/catalog";
 import { materialCards, structureCards } from "@/lib/matter/learning";
 import { GlossaryText } from "./Glossary";
@@ -279,6 +280,17 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
               </button>
             </div>
           </article>
+        </div>
+      </section>
+      <section className="frontier-datasets" aria-labelledby="dataset-heading">
+        <div><span className="eyebrow">OPEN RESEARCH</span><h2 id="dataset-heading">Explore the data behind new ideas</h2>
+          <p>Public research resources from 2021–2025. Simulation records and experimental measurements answer different questions.</p></div>
+        <div className="frontier-datasets__grid">
+          {researchDatasets.datasets.map(dataset => <article key={dataset.id}>
+            <span className="eyebrow">{dataset.year} · {dataset.modality}</span>
+            <h3>{dataset.title}</h3><p>{dataset.evidence}</p><p>{dataset.use}</p>
+            <SourceLink href={dataset.url} label={`Open ${dataset.title}`}>Explore this dataset</SourceLink>
+          </article>)}
         </div>
       </section>
     </section>

@@ -1,3 +1,6 @@
+import { createMechanicalGeometry } from "@/components/matter/models/MechanicalExpansion";
+import { createOpticalGeometry } from "@/components/matter/models/OpticalExpansion";
+import { createMultiphysicsGeometry } from "@/components/matter/models/MultiphysicsExpansion";
 import * as T from "three";
 import { MarchingCubes } from "three/examples/jsm/objects/MarchingCubes.js";
 export type LatticeOptions = {
@@ -14,6 +17,8 @@ export type LatticeOptions = {
 };
 /** Shared geometry for the studio and interactive field guide. */
 export function createLattice(p: LatticeOptions, software = false) {
+  const expanded = createMechanicalGeometry(p, software) ?? createOpticalGeometry(p, software) ?? createMultiphysicsGeometry(p, software);
+  if (expanded) return expanded;
   const root = new T.Group();
   const blend = Math.max(0, Math.min(1, p.blend ?? 0));
   const showSecondPhase = Boolean(p.secondaryColor && blend > 0);

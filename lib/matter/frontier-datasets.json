@@ -1,0 +1,46 @@
+{
+  "verifiedOn": "2026-09-17",
+  "scope": "Four public metamaterials resources checked for identity, access URL, provenance, and data modality. ‘Simulation’ means the released records are computationally generated; it does not claim experimental validation.",
+  "datasets": [
+    {
+      "id": "sutd-prcm",
+      "title": "SUTD Polarized Reflection of Complex Metasurfaces (SUTD-PRCM)",
+      "year": 2022,
+      "modality": "simulation",
+      "url": "https://arxiv.org/abs/2203.00002",
+      "evidence": "The paper describes approximately 260,000 complex metasurface samples created from electromagnetic simulation.",
+      "use": "Benchmarking forward or inverse-learning workflows; not experimental spectra."
+    },
+    {
+      "id": "photonic-structure-database",
+      "title": "The Diversity of Three-Dimensional Photonic Crystals database",
+      "year": 2021,
+      "modality": "simulation",
+      "url": "https://glotzerlab.github.io/photonics/",
+      "citation": "https://doi.org/10.1038/s41467-021-22809-6",
+      "evidence": "The database indexes structures, photonic band gaps, and band structures versus filling fraction and dielectric contrast.",
+      "use": "Explore calculated crystal geometries and photonic-bandgap maps."
+    },
+    {
+      "id": "programmable-acoustic-multitouch",
+      "title": "Dynamic Shaping of Multi-Touch Stimuli by Programmable Acoustic Metamaterial",
+      "year": 2025,
+      "modality": "experimental",
+      "url": "https://zenodo.org/records/16342129",
+      "doi": "https://doi.org/10.5281/zenodo.16342129",
+      "evidence": "Zenodo labels this a July 2025 dataset containing raw experimental physical and perceptual evaluations.",
+      "use": "Inspect raw experimental data for a programmable low-frequency vibrotactile acoustic metamaterial."
+    },
+    {
+      "id": "diffmeta-mim",
+      "title": "DiffMeta MIM metamaterial inverse-design dataset",
+      "year": 2024,
+      "modality": "simulation",
+      "url": "https://zenodo.org/records/12797962",
+      "code": "https://github.com/tsudalab/DiffMeta",
+      "doi": "https://doi.org/10.5281/zenodo.12797962",
+      "evidence": "The July 2024 Zenodo release supplies 60,000 MIM structure records with emissivity, reflectivity, and transmittance spectra; the linked repository identifies it as generated/training data.",
+      "use": "Reproduce or benchmark manufacturing-aware inverse design of MIM optical metamaterials."
+    }
+  ]
+}

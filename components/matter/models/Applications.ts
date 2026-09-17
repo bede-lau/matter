@@ -1,3 +1,6 @@
+import { createMechanicalApplication } from "./MechanicalExpansion";
+import { createOpticalApplication } from "./OpticalExpansion";
+import { createMultiphysicsApplication } from "./MultiphysicsExpansion";
 import * as T from "three";
 import {
   materials,
@@ -32,6 +35,9 @@ export function createApplication(
   count = 3,
   thickness = 0.8,
 ): Application {
+  const options = { kind, variant, count, thickness, color };
+  const expanded = createMechanicalApplication(options, lattice) ?? createOpticalApplication(options, lattice) ?? createMultiphysicsApplication(options, lattice);
+  if (expanded) return expanded;
   const group = new T.Group();
   group.name = `application-${kind}`;
   const p = materials();

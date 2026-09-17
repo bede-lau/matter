@@ -4804,3 +4804,16 @@ h1 {
 .field-guide-v2__reference-credit { padding: 14px 0; color: #aebfca; font-size: 13px; line-height: 1.6; }
 .field-guide-v2__reference-credit a { display: inline-flex; gap: 6px; align-items: center; color: #c2ef72; text-decoration: underline; text-underline-offset: 3px; }
 .model-reading-note { margin-top: 18px; padding-top: 16px; border-top: 1px solid #334650; color: #b6c7d1; font-size: 13px; line-height: 1.6; }
+
+/* Narrow screens place annotation cards below the 3D object. */
+.viewport:has(.scene-annotations[data-compact="true"]) { min-height: 720px; }
+.scene-annotations[data-compact="true"] .scene-callout { font-size: 12px; line-height: 1.45; padding: 10px; min-height: 64px; }
+
+.frontier-datasets { padding: 48px 0; border-top: 1px solid var(--border); }
+.frontier-datasets h2 { margin: 12px 0; font-size: clamp(24px, 3vw, 36px); }
+.frontier-datasets p { color: var(--muted-foreground); line-height: 1.65; }
+.frontier-datasets__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 24px; }
+.frontier-datasets article { border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+.frontier-datasets h3 { font-size: 20px; margin: 12px 0; }
+.frontier-datasets a { display: inline-flex; gap: 8px; align-items: center; color: #c2ef72; margin-top: 12px; }
+@media (max-width: 700px) { .frontier-datasets__grid { grid-template-columns: 1fr; } }

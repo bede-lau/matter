@@ -197,15 +197,13 @@ export default function Scene(p: SceneProps) {
       svg.setAttribute("width", String(w));
       svg.setAttribute("height", String(h));
       const compact = w < 760;
-      const leftInset = compact ? 8 : 24;
+      overlay.dataset.compact = String(compact);
+      const leftInset = compact ? 16 : 24;
       // This is an actual protected lane, not just a visual offset. It keeps
       // prose clear of the orbit/reset/full-screen tool strip at every size.
-      const rightInset = compact ? 76 : 152;
+      const rightInset = compact ? 16 : 152;
       const labelWidth = compact
-        ? Math.min(
-            116,
-            Math.max(78, Math.floor((w - leftInset - rightInset - 12) / 2)),
-          )
+        ? Math.floor((w - 44) / 2)
         : Math.min(218, Math.max(172, Math.floor(w * 0.16)));
       const projected = calloutNodes.map((entry) => {
         const { c, label } = entry;
@@ -225,14 +223,14 @@ export default function Scene(p: SceneProps) {
       // Header material chips and the motion badge occupy their own protected
       // bands. Sort anchors within each side lane and give labels measured
       // vertical spacing so they never collide with each other or the footer.
-      const safeTop = compact ? Math.max(150, h * 0.27) : Math.max(165, h * 0.27);
-      const safeBottom = h - (compact ? 142 : 156);
+      const safeTop = compact ? h - 310 : Math.max(165, h * 0.27);
+      const safeBottom = h - (compact ? 125 : 156);
       for (const side of ["left", "right"] as const) {
         const entries = projected
           .filter((entry) => entry.visible && entry.c.side === side)
           .sort((a, b) => a.py - b.py || a.c.slot - b.c.slot);
         const gap = compact ? 9 : 16;
-        const heights = entries.map((entry) => Math.max(44, entry.label.offsetHeight));
+        const heights = entries.map((entry) => Math.max(compact ? 64 : 44, entry.label.offsetHeight));
         const total = heights.reduce((sum, height) => sum + height, 0) + Math.max(0, entries.length - 1) * gap;
         const anchorCenter = entries.length
           ? entries.reduce((sum, entry) => sum + entry.py, 0) / entries.length
@@ -249,8 +247,8 @@ export default function Scene(p: SceneProps) {
           dot.style.display = "none";
           continue;
         }
-        line.style.display = "block";
-        dot.style.display = "block";
+        line.style.display = compact ? "none" : "block";
+        dot.style.display = compact ? "none" : "block";
         label.style.top = labelY + "px";
         const edge = c.side === "left" ? labelX + labelWidth : labelX;
         line.setAttribute(
@@ -272,13 +270,51 @@ export default function Scene(p: SceneProps) {
       });
     let firstRender = true,
       lastDraw = 0;
+    // Reserve separate space for the model, callouts, heading and controls.
+    // Fit the initial assembly rather than guessing a global camera distance.
+    const fitApplication = (w: number, h: number) => {
+      if (!application || !latest.current.labels || w < 1 || h < 1) return;
+      application.update(0, latest.current.explode / 100);
+      scene.updateMatrixWorld(true);
+      const box = new T.Box3().setFromObject(application.group);
+      const center = box.getCenter(new T.Vector3());
+      const direction = camera.position.clone().sub(controls.target).normalize();
+      const compact = w < 760;
+      const labelWidth = Math.min(218, Math.max(172, Math.floor(w * .16)));
+      const left = compact ? 18 : 24 + labelWidth + 18;
+      const right = compact ? w - 76 : w - 152 - labelWidth - 18;
+      const top = compact ? 180 : 168;
+      const bottom = compact ? h - 325 : h - 124;
+      camera.setViewOffset(w, h, w / 2 - (left + right) / 2, h / 2 - (top + bottom) / 2, w, h);
+      controls.target.copy(center);
+      const corners: T.Vector3[] = [];
+      for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z])
+        corners.push(new T.Vector3(x, y, z));
+      for (let distance = 5; distance < 50; distance *= 1.07) {
+        camera.position.copy(center).addScaledVector(direction, distance);
+        camera.lookAt(center);
+        camera.updateMatrixWorld();
+        const fits = corners.every(point => {
+          const v = point.clone().project(camera);
+          const x = (v.x + 1) * w / 2, y = (1 - v.y) * h / 2;
+          return x >= left && x <= right && y >= top && y <= bottom;
+        });
+        if (fits) break;
+      }
+      controls.maxDistance = Math.max(22, camera.position.distanceTo(center) * 1.5);
+      controls.update();
+    };
     const resize = () => {
       firstRender = true;
       const w = container.clientWidth,
         h = container.clientHeight;
       renderer.setSize(w, h);
       camera.aspect = w / h;
+      camera.clearViewOffset();
       camera.updateProjectionMatrix();
+      fitApplication(w, h);
+      renderer.render(scene, camera);
+      if (application) updateCallouts();
     };
     const ro = new ResizeObserver(resize);
     ro.observe(container);

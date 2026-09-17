@@ -56,6 +56,9 @@ export class SoftwareRenderer {
       pts: number[];
       z: number;
       color: string;
+      rgb: number[];
+      depths: number[];
+      opacity: number;
       wire: boolean;
     }[] = [];
     const va = new T.Vector3(),
@@ -89,6 +92,7 @@ export class SoftwareRenderer {
       const mat = (
         Array.isArray(obj.material) ? obj.material[0] : obj.material
       ) as T.MeshStandardMaterial;
+      if (mat.opacity === 0) return;
       const idx = geo.index;
       const vertexColors = geo.attributes.color;
       const len = Math.min(geo.drawRange.count, idx ? idx.count : pos.count);
@@ -151,7 +155,7 @@ export class SoftwareRenderer {
               .applyMatrix3(normalMatrix)
               .normalize();
           }
-          const intensity = 0.27 + 0.62 * Math.abs(normal.dot(light));
+          const intensity = mat instanceof T.MeshBasicMaterial ? 1 : 0.27 + 0.62 * Math.abs(normal.dot(light));
           const color = vertexColors
             ? phaseColor
                 .copy(colorA).fromBufferAttribute(vertexColors, idx ? idx.getX(i) : i)
@@ -171,9 +175,11 @@ export class SoftwareRenderer {
             : obj instanceof T.InstancedMesh && obj.instanceColor
               ? instanceColor
               : mat.color ?? new T.Color("#c2ef72");
+          const litColor = color.clone();
+          if (mat.emissive) litColor.add(mat.emissive.clone().multiplyScalar(mat.emissiveIntensity ?? 1));
           const shade = (c: number) =>
             Math.min(255, Math.round(Math.pow(c, 1 / 2.2) * 255 * intensity));
-          const rgb = `rgb(${shade(color.r)},${shade(color.g)},${shade(color.b)})`;
+          const rgb = `rgb(${shade(litColor.r)},${shade(litColor.g)},${shade(litColor.b)})`;
           va.project(camera);
           vb.project(camera);
           vc.project(camera);
@@ -189,26 +195,55 @@ export class SoftwareRenderer {
             ],
             z: (va.z + vb.z + vc.z) / 3,
             color: rgb,
+            rgb: [shade(litColor.r), shade(litColor.g), shade(litColor.b)],
+            depths: [va.z, vb.z, vc.z],
+            opacity: mat.transparent ? mat.opacity : 1,
             wire: !!mat.wireframe,
           });
         }
       }
     });
-    triangles.sort((a, b) => b.z - a.z);
-    for (const t of triangles) {
+    // Per-pixel depth prevents large faces from cutting holes through closer
+    // geometry. Translucent teaching fields blend against the opaque scene.
+    const pixels = ctx.getImageData(0, 0, w, h);
+    const depth = new Float32Array(w * h).fill(Infinity);
+    const raster = (t: (typeof triangles)[number], writeDepth: boolean) => {
+      const [ax, ay, bx, by, cx, cy] = t.pts;
+      const denom = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
+      if (Math.abs(denom) < 1e-8) return;
+      const minX = Math.max(0, Math.floor(Math.min(ax, bx, cx)));
+      const maxX = Math.min(w - 1, Math.ceil(Math.max(ax, bx, cx)));
+      const minY = Math.max(0, Math.floor(Math.min(ay, by, cy)));
+      const maxY = Math.min(h - 1, Math.ceil(Math.max(ay, by, cy)));
+      for (let y = minY; y <= maxY; y++) for (let x = minX; x <= maxX; x++) {
+        const u = ((by - cy) * (x + .5 - cx) + (cx - bx) * (y + .5 - cy)) / denom;
+        const v = ((cy - ay) * (x + .5 - cx) + (ax - cx) * (y + .5 - cy)) / denom;
+        const q = 1 - u - v;
+        if (u < -1e-7 || v < -1e-7 || q < -1e-7) continue;
+        const z = u * t.depths[0] + v * t.depths[1] + q * t.depths[2];
+        const index = y * w + x;
+        if (z < -1 || z > 1 || z > depth[index] + 1e-7) continue;
+        const alpha = t.opacity;
+        for (let c = 0; c < 3; c++)
+          pixels.data[index * 4 + c] = t.rgb[c] * alpha + pixels.data[index * 4 + c] * (1 - alpha);
+        if (writeDepth) depth[index] = z;
+      }
+    };
+    triangles.filter(t => !t.wire && t.opacity >= .999).forEach(t => raster(t, true));
+    triangles.filter(t => !t.wire && t.opacity < .999)
+      .sort((a, b) => b.z - a.z).forEach(t => raster(t, false));
+    ctx.putImageData(pixels, 0, 0);
+    for (const t of triangles.filter(t => t.wire)) {
       ctx.beginPath();
       ctx.moveTo(t.pts[0], t.pts[1]);
       ctx.lineTo(t.pts[2], t.pts[3]);
       ctx.lineTo(t.pts[4], t.pts[5]);
       ctx.closePath();
-      ctx.fillStyle = t.color;
-      if (t.wire) {
-        ctx.strokeStyle = t.color;
-        ctx.lineWidth = 0.45;
-        ctx.stroke();
-      } else {
-        ctx.fill();
-      }
+      ctx.strokeStyle = t.color;
+      ctx.globalAlpha = t.opacity;
+      ctx.lineWidth = .45;
+      ctx.stroke();
     }
+    ctx.globalAlpha = 1;
   }
 }

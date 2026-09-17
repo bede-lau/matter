@@ -1,3 +1,6 @@
+import { createMechanicalBehavior } from "./MechanicalExpansion";
+import { createOpticalBehavior } from "./OpticalExpansion";
+import { createMultiphysicsBehavior } from "./MultiphysicsExpansion";
 import * as T from "three";
 import type { LatticeOptions } from "@/lib/matter/geometry";
 
@@ -477,5 +480,5 @@ const behaviorField = (kind: string, lattice: T.Group, variant: number): Behavio
 };
 
 export function createBehavior(p: LatticeOptions, lattice: T.Group) {
-  return behaviorField(p.kind, lattice, p.variant);
+  return createMechanicalBehavior(p, lattice) ?? createOpticalBehavior(p, lattice) ?? createMultiphysicsBehavior(p, lattice) ?? behaviorField(p.kind, lattice, p.variant);
 }
