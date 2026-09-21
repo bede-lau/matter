@@ -27,6 +27,8 @@ export type Application = {
   camera: number[];
   target: number[];
   update: (t: number, e: number) => string;
+  /** Refresh per-run state without rebuilding the renderer or product scene. */
+  restart?: () => void;
 };
 export function createApplication(
   kind: string,

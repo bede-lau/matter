@@ -420,7 +420,7 @@ export function buildHelmet(lattice: T.Group, color: string): Application {
     contactY = 1.08 + ballRadius;
   // This seed is fixed for one run and refreshed whenever the learner starts
   // a new animation. Each automatic replay also takes a different direction.
-  const dropSeed = Math.random();
+  let dropSeed = Math.random();
   const ball = ellipsoid(
     group,
     p.metal,
@@ -445,6 +445,9 @@ export function buildHelmet(lattice: T.Group, color: string): Application {
     callouts,
     camera: [6.2, 3.1, 8.1],
     target: [0, 0.1, 0],
+    restart: () => {
+      dropSeed = Math.random();
+    },
     update: (t, e) => {
       shell.position.y = e * 0.85;
       core.position.y = e * 0.37;

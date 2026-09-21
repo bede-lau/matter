@@ -1,5 +1,12 @@
 "use client";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Box,
   Layers3,
@@ -33,12 +40,16 @@ import { Choice, ExportMenu, ModeTabs } from "./ReuiControls";
 import { GlossaryProvider, GlossaryText } from "./Glossary";
 import { families, bases } from "@/lib/matter/catalog";
 import { structureCards } from "@/lib/matter/learning";
-import { mechanicalControls } from "./models/MechanicalExpansion";
-import { opticalControls } from "./models/OpticalExpansion";
-import { multiphysicsControls } from "./models/MultiphysicsExpansion";
-import Scene from "./Scene";
-import ResearchExplorer from "./ResearchExplorer";
-import FieldGuide from "./FieldGuide";
+import {
+  mechanicalControls,
+  opticalControls,
+  multiphysicsControls,
+} from "@/lib/matter/control-labels";
+import ReferenceImage from "./ReferenceImage";
+
+const Scene = lazy(() => import("./Scene"));
+const ResearchExplorer = lazy(() => import("./ResearchExplorer"));
+const FieldGuide = lazy(() => import("./FieldGuide"));
 type RecordRow = {
   family: string;
   variant: string;
@@ -491,12 +502,12 @@ export default function Studio() {
                   <button ref={structurePickerTrigger} className="structure-picker-trigger">
                     <span className="structure-picker-trigger__image" aria-hidden="true">
                       {activeReference && (
-                        <img
+                        <ReferenceImage
                           src={activeReference.image}
                           alt=""
                           width={40}
                           height={40}
-                          decoding="async"
+                          eager
                         />
                       )}
                     </span>
@@ -563,13 +574,13 @@ export default function Studio() {
                         >
                           <span className="structure-picker-card__image" aria-hidden="true">
                             {reference && (
-                              <img
+                              <ReferenceImage
                                 src={reference.image}
                                 alt=""
                                 width={104}
                                 height={78}
-                                loading={selected ? "eager" : "lazy"}
-                                decoding="async"
+                                eager={selected}
+                                rootSelector=".structure-picker-scroll"
                               />
                             )}
                           </span>
@@ -630,28 +641,30 @@ export default function Studio() {
                     <span /> LIVE 3D
                   </span>
                 </div>
-                <Scene
-                  kind={f.id}
-                  variant={variant}
-                  count={sceneParameters.count}
-                  thickness={
-                    specialisedParameters
-                      ? sceneParameters.thick
-                      : (sceneParameters.thick * 10) / sceneParameters.size
-                  }
-                  color={baseMaterial.color}
-                  secondaryColor={secondaryMaterial.color}
-                  blend={sceneParameters.blend / 100}
-                  playing={play}
-                  mode={mode}
-                  wire={wire}
-                  section={section}
-                  reset={reset}
-                  explode={explode}
-                  labels={showLabels}
-                  speed={speed}
-                  playNonce={playNonce}
-                />
+                <Suspense fallback={null}>
+                  <Scene
+                    kind={f.id}
+                    variant={variant}
+                    count={sceneParameters.count}
+                    thickness={
+                      specialisedParameters
+                        ? sceneParameters.thick
+                        : (sceneParameters.thick * 10) / sceneParameters.size
+                    }
+                    color={baseMaterial.color}
+                    secondaryColor={secondaryMaterial.color}
+                    blend={sceneParameters.blend / 100}
+                    playing={play}
+                    mode={mode}
+                    wire={wire}
+                    section={section}
+                    reset={reset}
+                    explode={explode}
+                    labels={showLabels}
+                    speed={speed}
+                    playNonce={playNonce}
+                  />
+                </Suspense>
                 <div className="viewport-meta">
                   <div className="viewport-tag">
                     {mode === "application"
@@ -1127,20 +1140,24 @@ export default function Studio() {
           </section>
         )}
         {tab === "learn" && (
-          <FieldGuide
-            onOpenStudio={(familyIndex, variantIndex, nextMode) => {
-              choose(familyIndex);
-              setVariant(variantIndex);
-              setMode(nextMode);
-              if (nextMode === "application") startAnimation();
-              else setPlay(false);
-              setTab("studio");
-            }}
-          />
+          <Suspense fallback={null}>
+            <FieldGuide
+              onOpenStudio={(familyIndex, variantIndex, nextMode) => {
+                choose(familyIndex);
+                setVariant(variantIndex);
+                setMode(nextMode);
+                if (nextMode === "application") startAnimation();
+                else setPlay(false);
+                setTab("studio");
+              }}
+            />
+          </Suspense>
         )}
         {tab === "data" && (
           <section className="dataset-section">
-            <ResearchExplorer />
+            <Suspense fallback={null}>
+              <ResearchExplorer />
+            </Suspense>
             <div className="dataset-intro">
               <div>
                 <Upload size={30} />

@@ -12,6 +12,7 @@ import {
 import researchDatasets from "@/lib/matter/frontier-datasets.json";
 import { families } from "@/lib/matter/catalog";
 import { materialCards, structureCards } from "@/lib/matter/learning";
+import ReferenceImage from "./ReferenceImage";
 import { GlossaryText } from "./Glossary";
 import MiniLattice from "./MiniLattice";
 
@@ -167,7 +168,12 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
                   onClick={() => setActiveIndex(index)}
                 >
                   {itemReference && (
-                    <img src={itemReference.image} alt="" loading="lazy" decoding="async" />
+                    <ReferenceImage
+                      src={itemReference.image}
+                      alt=""
+                      eager={index === activeIndex}
+                      rootSelector=".field-guide-v2__cell-chooser"
+                    />
                   )}
                   <span>
                     <strong>{item.name}</strong>
@@ -191,7 +197,15 @@ export default function FieldGuide({ onOpenStudio }: FieldGuideProps) {
 
             <div className="field-guide-v2__lesson-visuals">
               <figure className="field-guide-v2__reference-figure" data-published={Boolean(reference?.credit)}>
-                {reference && <img src={reference.image} alt={reference.alt} decoding="async" />}
+                {reference && (
+                  <ReferenceImage
+                    key={reference.id}
+                    src={reference.image}
+                    alt={reference.alt}
+                    variant="display"
+                    eager
+                  />
+                )}
                 <figcaption>
                   <span>START HERE</span>
                   <strong>{reference?.imageKind ?? reference?.eyebrow.split(" · ")[0] ?? "REAL REFERENCE"}</strong>

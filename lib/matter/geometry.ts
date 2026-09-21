@@ -140,7 +140,7 @@ export function createLattice(p: LatticeOptions, software = false) {
     // The canvas fallback favors a bounded, recognizable silhouette over a
     // slow high-poly tessellation. WebGL keeps the denser interactive mesh.
     const res = software
-      ? Math.min(24, 14 + n * 3)
+      ? Math.min(17, 10 + n * 2)
       : n <= 3
         ? 64
         : n === 4
@@ -151,7 +151,7 @@ export function createLattice(p: LatticeOptions, software = false) {
       material,
       false,
       false,
-      software ? 16000 : 220000,
+      software ? 4500 : 220000,
     );
     mc.isolation = 0;
     mc.scale.setScalar(1.9);

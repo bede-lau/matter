@@ -11,10 +11,15 @@ export class SoftwareRenderer {
   last = 0;
   setPixelRatio(_n: number) {}
   setSize(w: number, h: number) {
-    this.width = w;
-    this.height = h;
-    this.domElement.width = w;
-    this.domElement.height = h;
+    // CPU rasterization cost grows with every output pixel. Keep the fallback
+    // responsive by rendering to a bounded internal buffer and letting the
+    // browser scale it to the unchanged preview dimensions. WebGL rendering is
+    // unaffected and retains the full device-pixel budget.
+    const scale = Math.min(1, Math.sqrt(140_000 / Math.max(1, w * h)));
+    this.width = Math.max(1, Math.round(w * scale));
+    this.height = Math.max(1, Math.round(h * scale));
+    this.domElement.width = this.width;
+    this.domElement.height = this.height;
     this.domElement.style.width = w + "px";
     this.domElement.style.height = h + "px";
   }
@@ -203,11 +208,30 @@ export class SoftwareRenderer {
         }
       }
     });
-    // Per-pixel depth prevents large faces from cutting holes through closer
-    // geometry. Translucent teaching fields blend against the opaque scene.
-    const pixels = ctx.getImageData(0, 0, w, h);
-    const depth = new Float32Array(w * h).fill(Infinity);
-    const raster = (t: (typeof triangles)[number], writeDepth: boolean) => {
+    const solidTriangles = triangles.filter((triangle) => !triangle.wire);
+    // Dense procedural surfaces are much faster through the browser's native
+    // Canvas rasterizer. Smaller product scenes retain the more accurate
+    // per-pixel depth path that prevents large overlapping faces from cutting
+    // holes through one another.
+    if (solidTriangles.length > 2_200) {
+      solidTriangles
+        .sort((a, b) => b.z - a.z)
+        .forEach((triangle) => {
+          ctx.beginPath();
+          ctx.moveTo(triangle.pts[0], triangle.pts[1]);
+          ctx.lineTo(triangle.pts[2], triangle.pts[3]);
+          ctx.lineTo(triangle.pts[4], triangle.pts[5]);
+          ctx.closePath();
+          ctx.fillStyle = triangle.color;
+          ctx.globalAlpha = triangle.opacity;
+          ctx.fill();
+        });
+      ctx.globalAlpha = 1;
+    } else {
+      // Per-pixel depth keeps sparse scenes visually stable around large faces.
+      const pixels = ctx.getImageData(0, 0, w, h);
+      const depth = new Float32Array(w * h).fill(Infinity);
+      const raster = (t: (typeof triangles)[number], writeDepth: boolean) => {
       const [ax, ay, bx, by, cx, cy] = t.pts;
       const denom = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
       if (Math.abs(denom) < 1e-8) return;
@@ -228,11 +252,16 @@ export class SoftwareRenderer {
           pixels.data[index * 4 + c] = t.rgb[c] * alpha + pixels.data[index * 4 + c] * (1 - alpha);
         if (writeDepth) depth[index] = z;
       }
-    };
-    triangles.filter(t => !t.wire && t.opacity >= .999).forEach(t => raster(t, true));
-    triangles.filter(t => !t.wire && t.opacity < .999)
-      .sort((a, b) => b.z - a.z).forEach(t => raster(t, false));
-    ctx.putImageData(pixels, 0, 0);
+      };
+      solidTriangles
+        .filter((triangle) => triangle.opacity >= 0.999)
+        .forEach((triangle) => raster(triangle, true));
+      solidTriangles
+        .filter((triangle) => triangle.opacity < 0.999)
+        .sort((a, b) => b.z - a.z)
+        .forEach((triangle) => raster(triangle, false));
+      ctx.putImageData(pixels, 0, 0);
+    }
     for (const t of triangles.filter(t => t.wire)) {
       ctx.beginPath();
       ctx.moveTo(t.pts[0], t.pts[1]);
@@ -245,5 +274,8 @@ export class SoftwareRenderer {
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
+    this.domElement.dataset.softwareRenderMs = (
+      performance.now() - now
+    ).toFixed(1);
   }
 }
