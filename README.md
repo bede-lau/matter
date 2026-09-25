@@ -1,63 +1,126 @@
-# Matter | Metamaterial Studio
+# Matter Lab
 
-An interactive, source-grounded learning prototype. React 19, TypeScript, Vinext, Three.js, and accessible Radix controls. No paid API or API key is required.
+**Repository description:** Interactive 3D learning studio for exploring 36 metamaterial families, their structures, material choices, behavior, applications, and research sources.
 
-## Run the exported code
+Matter Lab is a browser-based learning studio for seeing how carefully designed structures can change the way materials respond to forces, light, sound, heat, and electromagnetic fields. Browse source-linked examples, inspect procedural 3D models, adjust supported design controls, and explore an experimental materials dataset.
 
-Install Node.js 22.13 or newer. In this folder run:
+It is an educational prototype. Its models and animations explain ideas; they do not replace measurements, simulation, engineering review, or manufacturing tests.
+
+## What’s inside
+
+- **36 metamaterial families:** six core lattice families and 30 additional, research-linked families spanning mechanical, electromagnetic, optical, acoustic, thermal, magnetic, and electromechanical topics.
+- **108 catalog variants:** three named geometry or configuration variants for each family.
+- **Interactive 3D views:** procedural geometry, orbit and zoom, cutaways, component labels, supported design controls, and illustrative behavior scenes.
+- **Material-aware selections:** material choices are limited to those defined for each teaching model. Where a model uses separate functional layers, hinges, inclusions, or supports, they are shown as distinct parts rather than as an arbitrary blended material.
+- **A visual Field Guide:** plain-language explanations, source links, family variants, and reference images. Small lattice previews are rendered on demand.
+- **A contextual glossary:** 282 short definitions, with keyboard-accessible term and component-label interactions.
+- **Research data exploration:** filtering and plotting for 20,520 records from an elastodynamic metamaterials dataset, with source attribution and export.
+- **Data import and export:** import CSV or JSON records, check their format and units, inspect supported-family mappings, and export the current session’s data.
+- **Accessible controls and rendering fallback:** keyboard-operable interactions and a geometry-based software renderer for browsers where WebGL is unavailable.
+
+### Core lattice families
+
+| Family | Example of the structural idea |
+| --- | --- |
+| Gyroid | A connected, curved surface with open passages |
+| Octet truss | A three-dimensional network of triangular load paths |
+| Re-entrant lattice | Inward-angled ribs that can widen when pulled |
+| Kelvin cell | A repeating, space-filling cell used to study crushing |
+| Honeycomb | Thin-walled cells supporting a lightweight panel |
+| Local resonator | A host structure coupled to moving internal masses |
+
+Each core family has three geometry variants and a product-application teaching scene.
+
+### Research-linked families
+
+The 30 additional families have their own structure, behavior, application, material notes, variants, source records, and qualitative procedural model.
+
+| Area | Families |
+| --- | --- |
+| Mechanical | Pentamode lattice; rotating squares; chiral honeycomb; Miura origami; kirigami ribbon sheet; bistable beam; tensegrity cell; spinodal shell; chainmail sheet; bimetal thermal-expansion strip |
+| Electromagnetic | Negative-index split-ring array; epsilon-near-zero channel; space-time modulated metasurface |
+| Optical | Photonic-bandgap crystal; quasi-BIC metasurface; phase-change metasurface; liquid-crystal metasurface; Huygens metasurface; structural-colour pillar array; graphene absorber |
+| Acoustic | Helmholtz resonator array; acoustic hologram; ventilated metamaterial silencer; bubble metascreen; acoustic Luneburg lens |
+| Thermal | Thermal concentrator; thermal diode; selective thermal emitter |
+| Magnetic | Magnetically programmable elastomer |
+| Electromechanical | Piezo-shunted beam |
+
+These examples are a curated learning catalog, not a complete or ranked survey of metamaterials research. A linked paper or image provides context; it does not mean the procedural model reproduces the paper’s specimen or measured results.
+
+## Run locally
+
+### Requirements
+
+- Node.js 22.13 or newer
+- npm
+- A modern browser; WebGL2 is recommended for the full 3D lighting
+
+### Install and start
 
 ```bash
 npm ci
-npx vite --host 0.0.0.0
+npm run dev
 ```
 
-Open the URL printed by Vite. WebGL2 hardware acceleration gives the best lighting and performance. A software canvas renderer is included for environments where WebGL is disabled. It uses the same actual geometry, at reduced surface resolution and without physically based lighting.
+Open the local address printed by Vite. The app does not require an API key or a paid service. If WebGL is unavailable, a lower-detail software-rendered view is used where supported.
 
-For a production Cloudflare Workers build, run `npm run build` from macOS/Linux, WSL, or Git Bash (the build scripts use Bash). Deployment configuration is in `.openai/hosting.json`. The included project ID belongs to this generated Site: do not deploy an unrelated copy to that ID. To make an independent hosted project, register it through your own deployment workflow.
+### Build and checks
 
-## Included
+```bash
+npm run build
+npm test
+npm run test:models
+npm run lint
+```
 
-- Six 3D families with 18 geometry variants: gyroid, FCC octet truss, re-entrant lattice, Kelvin cell, honeycomb, local resonator.
-- Repetition, thickness and cell-size controls; orbit/zoom; wireframe; cutaway; pause/resume; reset; full screen.
-- Structure, illustrative behavior, and six distinct product applications: detailed running shoe and athlete, aircraft wing, fitted knee protection, cycling helmet, honeycomb skateboard, and motor isolation mount.
-- Shoe anatomy includes mesh vamp, tongue, laces, eyelets, padded collar, heel counter, sockliner, strobel board, cellular midsole and traction outsole.
-- Exploded product assemblies, projected component labels, motion speed and 18 variant-specific learning notes. The running animation uses two-link leg IK, opposing arms, stance and airborne intervals.
-- Two-phase material composition exploration with ideal Voigt/Reuss solid-modulus bounds and an illustrative lattice scaling law.
-- ReUI dropdown action menu and full-width icon tabs, matching accessible material selectors, self-hosted Inter typography and a 3D lattice logo.
-- Visual field guide with demand-rendered, rotatable lattices, concise explanations, expandable origins and direct variant links.
-- 77 contextual definitions: click dotted terms, highlight known jargon, or activate a 3D component label. Keyboard activation and Escape dismissal are supported.
-- Detailed fitted knee brace with tension dial and patella ring, ankle/collar alignment, vented helmet with a gravity-based slow-motion drop, and aft-swept aircraft tail surfaces.
-- 20,520 real UCI elastodynamic dataset rows, center/width filtering, exact stable top-five matches, a batched canvas plot, source attribution and export.
-- CSV/JSON import, positive-unit validation, evidence labels, source URLs, supported-family 3D mapping and JSON export. Imported data is kept only for the current tab session; export to retain it.
-- A source research catalog of nine families and three open datasets.
+`npm test` runs the production build and the Node test suite. `npm run test:models` checks procedural model geometry and application assemblies. `npm run lint` runs ESLint. The Cloudflare/Vinext build scripts use Bash; Windows users should run them through WSL or Git Bash.
 
-## Scientific limits
+## Data and references
 
-This is a concept-learning prototype, not a materials discovery engine, FEA solver, or manufacturing certification tool. Density is an illustrative family-specific model, not integrated mesh volume. Modulus estimates do not constitute measured predictions. Composition bounds assume ideal linear elastic phases; bonding, processing, anisotropy and print defects are not solved. The gyroid field is a trigonometric approximation rather than an exact minimal surface. The standalone honeycomb view is an edge-frame schematic; the skateboard application uses vertical hexagonal shell walls. Finite arrays show boundaries. Cutaway does not generate capped cross-sections. Most deformation uses illustrative affine compression rather than local finite-element physics. Resonator masses have relative animated displacement, but no dynamic solution is computed. Application scenes use detailed procedural illustrations, not photoreal scanned people or validated use-case assets. The product envelopes normalize geometry for teaching: they are not dimensionally calibrated CAD. The three variants in each family share its product context while changing the internal lattice and teaching note.
+- `public/data/elastodynamic.json` contains 20,520 data rows and its attribution, source URLs, license, hashes, and normalization notes. The data is from the [UCI 2D Elastodynamic Metamaterials dataset](https://archive.ics.uci.edu/dataset/692/2d%2Belastodynamic%2Bmetamaterials) and is identified in the dataset as CC BY 4.0.
+- `public/data/research.json` contains additional research-source records used by the app.
+- `lib/matter/expansion.ts` defines the 30 additional families, their teaching copy, compatible materials, variants, and source links.
+- `lib/matter/expansion-references.json` records the reference-image descriptions, credits, source links, and reuse notes. Image rights vary by item; check its license field before reusing an image.
+- Imported records are checked for supported format and values, not independently verified for scientific accuracy. They remain in the current tab session unless exported.
 
-The catalog is curated, not exhaustive. Optical, thermal and electromagnetic families are research references only, not interactive 3D modes. The UCI encoded 15-bit design is displayed as a code, not falsely reconstructed as its 10x10 geometry.
+## Scientific scope and limits
 
-## Data provenance
+The studio builds many structures procedurally with Three.js. These models are simplified visual explanations, not scans or dimensionally complete CAD. Geometry, materials, and behavior are selected to make a mechanism legible. A material selection or animation does not imply a measured property.
 
-`public/data/elastodynamic.json` contains original attribution, CC BY 4.0 license, original URLs, archive/CSV SHA-256 hashes, declared units, normalization notes and the repository row-count discrepancy. The repository lists 20,521; the downloaded CSV contains 20,520 data rows plus one header.
+In particular:
 
-`public/data/research.json` contains additional primary research sources. Imported user records retain their evidence label; the app validates their format, not their truth.
+- The new research-linked families are qualitative teaching models. Their reference papers and images are not proof that the rendered geometry is experimentally validated.
+- Material-property values and composition estimates are illustrative where shown. They are not design allowables or predictions for a manufactured part.
+- No finite-element, electromagnetic, optical, acoustic, thermal, or multiphysics solver is included. The scenes do not calculate the full physics of those systems.
+- Density, stiffness, and deformation depend on geometry, scale, material grade, process, boundary conditions, and defects. The app does not model all of these factors.
+- Product scenes are procedural demonstrations, not certified product designs or clinical, safety, or performance advice.
+- Dataset matches and plots help explore the included data; they do not establish that a candidate design will work.
 
-## Main files
+Use the cited sources for scientific context and consult domain experts and validated tools for engineering decisions.
 
-- `components/matter/Studio.tsx`: workspace, controls and import/export.
-- `components/matter/Scene.tsx`: WebGL rendering and projected annotations.
-- `lib/matter/geometry.ts`: shared procedural lattice topology for the studio and card previews.
-- `components/matter/Glossary.tsx` and `lib/matter/glossary.json`: contextual definitions.
-- `components/matter/ReuiControls.tsx`: adapted ReUI c-dropdown-menu-1 and c-tabs-6 patterns.
-- `lib/matter/research.ts` and `components/matter/ResearchPlot.tsx`: exact nearest-match query and canvas rendering.
-- `components/matter/models/`: separate product assemblies, shoe anatomy, kinematic athlete and shared mesh primitives.
-- `components/matter/SoftwareRenderer.ts`: software geometry projection fallback.
-- `components/matter/ResearchExplorer.tsx`: actual UCI dataset exploration.
-- `lib/matter/catalog.ts`: curated educational content and illustrative base values.
-- `docs/ARCHITECTURE.md`: PRD/ARD and proposed scale-up architecture. Its future architecture must not be confused with features implemented here.
-- `docs/IMPLEMENTATION.md`: tested scope, limitations and next integration steps.
+## Project map
 
-## Blender and Unity
+| Path | Purpose |
+| --- | --- |
+| `app/` | App entry point, document metadata, and global styles |
+| `components/matter/Studio.tsx` | Main studio layout, controls, and import/export flow |
+| `components/matter/Scene.tsx` | Three.js scene, rendering lifecycle, and annotations |
+| `lib/matter/geometry.ts` and `components/matter/models/*Expansion.ts` | Procedural geometry for the core and additional families |
+| `components/matter/models/` | Product scenes, family-specific behavior, and reusable model parts |
+| `components/matter/FieldGuide.tsx` and `MiniLattice.tsx` | Source-linked Field Guide and on-demand previews |
+| `components/matter/ResearchExplorer.tsx` | Dataset search, filtering, and plot integration |
+| `components/matter/ResearchPlot.tsx` | Batched canvas plotting |
+| `components/matter/Glossary.tsx` and `lib/matter/glossary.json` | Contextual glossary and definitions |
+| `lib/matter/catalog.ts` | Family catalog, variants, and teaching content |
+| `lib/matter/expansion.ts` | Additional families and their material constraints |
+| `lib/matter/expansion-references.json` | Reference-image credits and reuse information |
+| `docs/ARCHITECTURE.md` | Architecture notes and future scale-up ideas |
+| `docs/IMPLEMENTATION.md` | Implemented scope, verification notes, and limitations |
 
-No Blender or Unity MCP endpoint was available or connected during this build. The website does not require either to run. Manual setup paths and primary repository references are in `docs/ARCHITECTURE.md`. Import reviewed glTF/GLB assets through Three.js for higher fidelity characters and authored animation; exported assets should be versioned rather than requiring live MCP in production.
+## Technology
+
+React 19, TypeScript, Vinext/Vite, Three.js, Radix UI, and Tailwind CSS. Research data and reference assets are stored locally in the repository; no generative AI service is needed to run the app.
+
+## License and asset use
+
+Check the repository’s license files and the per-item source and license notes before redistributing code, data, or images. The research images do not all share the same reuse terms. Preserve attribution and comply with each source’s stated license or permission requirements.

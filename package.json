@@ -1,5 +1,6 @@
 {
   "name": "site-creator-vinext-starter",
+  "description": "Interactive 3D learning studio for exploring 36 metamaterial families, their structures, materials, behavior, applications, and research sources.",
   "version": "0.1.0",
   "private": true,
   "engines": {
