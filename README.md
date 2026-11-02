@@ -1,4 +1,10 @@
-# Matter Lab
+<h1 align="center">Matter Lab</h1>
+<p align="center"><b>🏆 Best Astra Build · Astra Commons KL</b></p>
+<p align="center"><b>Explore the geometry, behavior, and applications of engineered metamaterials.</b></p>
+
+Explore the catalog, 3D studio, research links, and implementation details below.
+
+---
 
 <p align="center">
   <img src="public/icon-512.png" alt="Matter Lab Logo" width="128" height="128" />
