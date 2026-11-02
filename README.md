@@ -2,6 +2,8 @@
   <img src="public/icon-512.png" alt="Matter Lab mark" width="160" />
 </p>
 
+<p align="center"><strong>🏆 Best Astra Build · Astra Commons KL</strong></p>
+
 <p align="center">
   <strong>See the cell, the tiled field, and a use, with the paper still attached.</strong>
 </p>
