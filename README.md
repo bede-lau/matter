@@ -11,7 +11,7 @@ Explore the catalog, 3D studio, research links, and implementation details below
 </p>
 
 <p align="center">
-  <strong>Interactive 3D learning studio for exploring 36 metamaterial families, engineered lattice geometries, physical behaviors, real-world product assemblies, and research datasets.</strong>
+  <strong>Interactive 3D learning studio for exploring 48 metamaterial families, engineered lattice geometries, physical behaviors, real-world product assemblies, and research datasets.</strong>
 </p>
 
 <p align="center">
@@ -19,8 +19,8 @@ Explore the catalog, 3D studio, research links, and implementation details below
   <img src="https://img.shields.io/badge/TypeScript-5.9-blue.svg" alt="TypeScript 5.9" />
   <img src="https://img.shields.io/badge/Three.js-0.185-black.svg" alt="Three.js" />
   <img src="https://img.shields.io/badge/Dataset-20%2C520%20records-emerald.svg" alt="UCI Dataset" />
-  <img src="https://img.shields.io/badge/Metamaterials-36%20families-indigo.svg" alt="36 Families" />
-  <img src="https://img.shields.io/badge/Variants-108%20configurations-purple.svg" alt="108 Variants" />
+  <img src="https://img.shields.io/badge/Metamaterials-48%20families-indigo.svg" alt="48 Families" />
+  <img src="https://img.shields.io/badge/Variants-144%20configurations-purple.svg" alt="144 Variants" />
   <img src="https://img.shields.io/badge/License-CC%20BY%204.0%20%2F%20Custom-orange.svg" alt="License" />
 </p>
 
@@ -42,8 +42,8 @@ Explore the catalog, 3D studio, research links, and implementation details below
 
 ## Key Highlights
 
-- **36 Curated Metamaterial Families:** Spanning 7 physics domains (Mechanical, Electromagnetic, Optical, Acoustic, Thermal, Magnetic, and Electromechanical).
-- **108 Catalog Variants:** 3 distinct topological or geometric configurations for every family (e.g., sheet, skeletal, graded gyroids; re-entrant variations; chiral patterns).
+- **48 Curated Metamaterial Families:** Spanning 7 physics domains (Mechanical, Electromagnetic, Optical, Acoustic, Thermal, Magnetic, and Electromechanical).
+- **144 Catalog Variants:** 3 distinct topological or geometric configurations for every family (e.g., sheet, skeletal, graded gyroids; re-entrant variations; chiral patterns).
 - **Interactive Procedural 3D Engine:** Powered by Three.js with real-time orbit, zoom, pan, cross-sectional cutaways, projected 3D component callouts, and animated kinematics.
 - **CPU Software Renderer Fallback:** Built-in geometric rasterizer ensuring full interactive accessibility in environments or browsers where WebGL/GPU acceleration is unavailable.
 - **6 Dedicated Product Application Assemblies:** Explore how cellular cores function inside full-scale products:
@@ -73,7 +73,7 @@ Explore the catalog, 3D studio, research links, and implementation details below
 | **Honeycomb** | Hexagonal prismatic cellular array maximizing out-of-plane shear and bending resistance | **Skateboard Deck:** Lightweight structural sandwich panel with composite skins |
 | **Local Resonator** | Elastic matrix embedding heavy resonant internal cores for acoustic and vibrational band gaps | **Industrial Drive Mount:** Dynamic vibration attenuation and motor isolation |
 
-### 2. Research-Linked Extended Catalog (30 Families)
+### 2. Research-Linked Extended Catalog (selected families)
 
 | Domain | Metamaterial Families | Primary Physical Phenomena |
 | :--- | :--- | :--- |
@@ -145,7 +145,7 @@ matter/
 │   │   │   ├── HelmetAssembly.ts     # Kelvin cell impact helmet & ball drop
 │   │   │   ├── SkateboardAssembly.ts # Honeycomb composite board assembly
 │   │   │   ├── MotorAssembly.ts      # Vibration-isolated rotating motor
-│   │   │   └── *Expansion.ts         # 30 procedural models for research families
+│   │   │   └── *Expansion.ts         # Procedural models for research families
 │   │   ├── Studio.tsx                # Primary studio view, toolbars & layout state
 │   │   ├── Scene.tsx                 # Three.js lifecycle, camera, lights & cutaways
 │   │   ├── SoftwareRenderer.ts       # CPU-based polygon rasterizer fallback
@@ -158,7 +158,7 @@ matter/
 │   └── ui/                           # Base UI component primitives
 ├── lib/
 │   └── matter/
-│       ├── catalog.ts                # Master catalog definitions (36 families, 108 variants)
+│       ├── catalog.ts                # Master catalog definitions (48 families, 144 variants)
 │       ├── expansion.ts              # Extended research catalog specifications
 │       ├── geometry.ts               # Parametric unit cell & lattice math
 │       ├── glossary.json             # Glossary dictionary & descriptions
